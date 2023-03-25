@@ -1,0 +1,59 @@
+<template>
+  <div class="huadiao-build-note">
+    <huadiao-header :user="user" :isLogin="isLogin"/>
+    <left-slider-board/>
+    <note-list-board/>
+    <sun-light-theme/>
+    <huadiao-middle-tip/>
+    <huadiao-warning-top-container/>
+    <huadiao-popup-window/>
+  </div>
+</template>
+
+<script>
+import {mapState} from "vuex";
+import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
+import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
+import SunLightTheme from "@/pages/notes/components/SunLightTheme";
+import LeftSliderBoard from "@/pages/notes/components/LeftSliderBoard";
+import NoteListBoard from "@/pages/notes/components/NoteListBoard";
+
+export default {
+  name: "HuadiaoNotes",
+  data() {
+    return {}
+  },
+  computed: {
+    ...mapState(["isLogin", "user"]),
+  },
+  beforeMount() {
+  },
+  methods: {},
+  beforeDestroy() {
+  },
+  components: {
+    NoteListBoard,
+    LeftSliderBoard,
+    SunLightTheme,
+    HuadiaoWarningTopContainer,
+    HuadiaoPopupWindow,
+    HuadiaoMiddleTip,
+    HuadiaoHeader
+  },
+}
+</script>
+
+<style>
+body {
+  background-color: #ececec;
+}
+</style>
+
+<style scoped>
+.huadiao-build-note {
+  min-width: 1000px;
+  overflow-x: hidden;
+}
+</style>

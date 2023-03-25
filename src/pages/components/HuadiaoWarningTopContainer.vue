@@ -1,0 +1,109 @@
+<template>
+  <div class="huadiao-warning-tip-container">
+    <transition-group name="top-slide" tag="div">
+      <div class="huadiao-warning-tip"
+           v-for="(warningTip) in warningTip"
+           :key="warningTip.warningIndex"
+           :style="'color: ' + defaultTipStyle.color + ';background-color:' + defaultTipStyle.backgroundColor + ';'"
+           ref="huadiaoWarningTip">
+        <div class="warning-title">
+          <img :src="defaultTipStyle.svg" alt>
+          <span>{{defaultTipStyle.title}}</span>
+        </div>
+        <div class="warning-tip-content">{{warningTip.warningTip}}</div>
+      </div>
+    </transition-group>
+  </div>
+</template>
+
+<script>
+import {Timer} from "@/assets/js/utilsClass";
+
+export default {
+  name: "HuadiaoWarningTopContainer",
+  props: ["tipStyle"],
+  data() {
+    return {
+      // 唯一标识
+      warningIndex: 0,
+      // 提示信息容器
+      warningTip: [],
+      // 默认的样式
+      defaultTipStyle: {
+        color: "#fff",
+        backgroundColor: "#7A2727A6",
+        svg: "/svg/warning.svg",
+        title: "警告",
+      }
+    }
+  },
+  beforeMount() {
+    // 添加警告提示, 右下角展示
+    this.$bus.$on("huadiaoWarningTip", this.addHuadiaoWarningTip);
+    this.modifyDefaultStyle();
+  },
+  methods: {
+    // 修改默认样式
+    modifyDefaultStyle() {
+      for(let key in this.tipStyle) {
+        // 如果默认样式对象具有该属性
+        if(Object.hasOwnProperty.call(this.defaultTipStyle, key)) {
+          this.defaultTipStyle[key] = this.tipStyle[key];
+        }
+      }
+    },
+    // 花凋警告提示
+    addHuadiaoWarningTip(warningTip) {
+      let time = 3500;
+      this.warningTip.push({
+        warningTip,
+        warningIndex: this.warningIndex++
+      });
+      new Timer().timeout(() => {
+        this.warningTip.shift();
+      }, time);
+    },
+  },
+  beforeDestroy() {
+  },
+}
+</script>
+
+<style scoped>
+/* 提示组件容器 */
+.huadiao-warning-tip-container {
+  position: fixed;
+  z-index: 999;
+  bottom: 0px;
+  right: 0px;
+}
+
+.huadiao-warning-tip {
+  width: 200px;
+  margin: 0 20px 20px 0;
+  padding: 10px 20px;
+  font-size: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.20);
+  transition: var(--transition-500ms);
+}
+
+.warning-title img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.warning-title span {
+  font-weight: 700;
+}
+
+.warning-tip-content {
+  width: 100%;
+  word-wrap: break-word;
+  margin-top: 6px;
+  text-indent: 1em;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+</style>

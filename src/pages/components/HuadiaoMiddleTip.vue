@@ -1,0 +1,81 @@
+<template>
+  <transition name="fade">
+    <div class="huadiao-mark-tip-container"
+         ref="huadiaoMarkTipContainer"
+         v-show="show"
+    >
+      <span>{{ tip }}</span>
+    </div>
+  </transition>
+</template>
+
+<script>
+import {Timer} from "@/assets/js/utilsClass";
+
+export default {
+  name: "HuadiaoMiddleTip",
+  props: ["tipStyle"],
+  data() {
+    return {
+      tip: "屏中提示组件",
+      // 展示
+      show: false,
+      timer: new Timer(),
+      // 默认样式
+      defaultTipStyle: {
+        color: "#fff",
+        backgroundColor: "#C73636AA",
+      }
+    }
+  },
+  beforeMount() {
+    // 添加操作提示, 屏中展示
+    this.$bus.$on("huadiaoMiddleTip", this.addHuadiaoMiddleTip);
+    this.modifyDefaultStyle();
+  },
+  mounted() {
+    this.$refs.huadiaoMarkTipContainer.style.color = this.defaultTipStyle.color;
+    this.$refs.huadiaoMarkTipContainer.style.backgroundColor = this.defaultTipStyle.backgroundColor;
+  },
+  methods: {
+    // 修改默认样式
+    modifyDefaultStyle() {
+      for(let key in this.tipStyle) {
+        // 如果默认样式对象具有该属性
+        if(Object.hasOwnProperty.call(this.defaultTipStyle, key)) {
+          this.defaultTipStyle[key] = this.tipStyle[key];
+        }
+      }
+    },
+    // 花凋中间弹窗提示
+    addHuadiaoMiddleTip(middleTip) {
+      // 6 个字读 1 秒
+      let time = middleTip.length / 12 * 1000;
+      time = time > 2000 ? time : 2000;
+      this.tip = middleTip;
+      this.show = true;
+      this.timer.timeout(() => {
+        this.show = false;
+      }, time);
+    },
+  },
+  beforeDestroy() {
+  }
+}
+</script>
+
+<style scoped>
+.huadiao-mark-tip-container {
+  position: fixed;
+  z-index: 999;
+  top: 50vh;
+  left: 50%;
+  padding: 10px 30px;
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 7px;
+  box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.10);
+  transform: translate(-50%, -50%);
+  transition: var(--transition-1000ms);
+}
+</style>

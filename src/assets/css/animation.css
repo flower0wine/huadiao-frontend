@@ -1,0 +1,105 @@
+/*
+* 功能描述：动画
+* 创建日期：2023 年 02 月 
+*/
+
+/*渐隐及渐现*/
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave {
+    opacity: 1;
+}
+
+/* 交替渐现渐隐 */
+.replace-fade-enter {
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+.replace-fade-enter {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.replace-fade-leave-active {
+    display: none;
+}
+
+/* 右滑及左滑 */
+.left-slide-enter,
+.left-slide-leave-to {
+    transform: translateX(-100%);
+}
+
+.left-slide-enter-to,
+.left-slide-leave {
+    transform: translateX(0);
+}
+
+/* 上移渐现渐隐 */
+.top-slide-enter {
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+.top-slide-enter-to,
+.top-slide-leave {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.top-slide-leave-to {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+/* 下滑渐隐渐现 */
+.bottom-slide-enter,
+.bottom-slide-leave-to {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.bottom-slide-enter-to,
+.bottom-slide-leave {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* 色相反转 */
+@keyframes background {
+    0% {
+        -webkit-filter: hue-rotate(0deg);
+    }
+    100% {
+        -webkit-filter: hue-rotate(-360deg);
+    }
+}
+
+/* 无限顺时针旋转 */
+@keyframes circleRotate {
+    0% {
+        transform: rotateZ(0deg);
+    }
+    100% {
+        transform: rotateZ(360deg);
+    }
+}
+
+/* 上下跳动一次 */
+@keyframes upAndDown {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
