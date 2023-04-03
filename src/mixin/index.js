@@ -31,14 +31,19 @@ export const mixin = {
             this.$bus.$emit("huadiaoPopupWindow", iconType, operationType, tip, confirmFn, cancelFn);
         },
         // 发送请求
-        sendRequest(params, data = {}, headers = {}, fn, errorFn) {
-            axios({
-                url: constants.url + "dispatcherServlet",
-                method: "post",
-                headers,
-                params,
-                data,
-            }).then(fn).catch(errorFn ? errorFn : (error) => {
+        sendRequest({path, params, data, headers, fn, errorFn}) {
+            let srcObj = {
+                url: constants.url + path,
+                params: {},
+                data: {},
+                headers: {},
+            };
+            // 修改对象属性
+            this.modifySrcObject(srcObj, {params, data, headers});
+            // 发送请求
+            axios(srcObj)
+                .then(fn)
+                .catch(errorFn ? errorFn : (error) => {
                 if (error.request) {
                     // 联网但没有连上服务器
                     if (!this.isConnectServer) {
@@ -61,8 +66,9 @@ export const mixin = {
                 // 如果是 VueComponent 实例对象
                 if (el instanceof this.__proto__.constructor) {
                     this.$(el).off();
-                    // 如果是 Element 实例对象
-                } else if (el instanceof Element) {
+                }
+                // 如果是 Element 实例对象
+                else if (el instanceof Element) {
                     this.$(el[0]).off();
                 }
             }
@@ -120,7 +126,7 @@ export const mixin = {
                     let search = this.binarySearchPosition(array, number);
                     for (let index = array.length; index > search; index--) {
                         array[index] = array[index - 1];
-                        array.splice(index, 1, array[index- 1]);
+                        array.splice(index, 1, array[index - 1]);
                     }
                     array.splice(search, 1, number);
                 }
@@ -161,6 +167,40 @@ export const mixin = {
             } else {
                 return mid + 1;
             }
+        },
+        // 修改源对象指定属性为提供的对象的属性
+        modifySrcObject(srcConfig, config) {
+            for (let c in config) {
+                if (typeof srcConfig[c] === "object") {
+                    this.modifySrcObject(srcConfig[c], config[c]);
+                } else {
+                    srcConfig[c] = config[c];
+                }
+            }
+        },
+        // 判断我和他人的关系
+        judgeMeAndOtherRelation(followed, following) {
+            return following ? followed ? "已互粉" : "已关注" : "关注";
+        },
+        // 获取指定长度的随机字符串, 可能包含字母, 数字, !, _, :, =
+        getUniqueString(length) {
+            let len = length ? length : 10;
+            let chars = [
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+            ];
+            let charsIndex;
+            let res = "";
+            for (let index = 0; index <= len; index++) {
+                charsIndex = (Math.random() * chars.length).toFixed(0);
+                res += chars[charsIndex];
+            }
+            return res;
+        },
+        // 添加背景
+        addBackground(url) {
+            return "url('" + url + "')";
         },
     },
 }

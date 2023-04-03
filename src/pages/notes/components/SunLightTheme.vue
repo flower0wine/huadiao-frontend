@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import {Timer} from "@/assets/js/utilsClass";
+import {Timer} from "@/assets/js/utils";
 
 export default {
   name: "SunLightTheme",
@@ -104,6 +104,7 @@ export default {
   width: 40px;
   height: 22px;
   border-radius: 11px;
+  cursor: pointer;
 }
 
 /* 滑块 */

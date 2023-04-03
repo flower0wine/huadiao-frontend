@@ -67,7 +67,7 @@ export default {
 .huadiao-star {
   position: relative;
   min-height: 100vh;
-  background: url("~@/../public/img/star/starBackground.png") no-repeat center center fixed;
+  background: url("~/public/img/star/starBackground.png") no-repeat center center fixed;
   background-size: cover;
   overflow: hidden;
   /* 华文楷体 */

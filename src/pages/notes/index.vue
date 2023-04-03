@@ -1,5 +1,5 @@
 <template>
-  <div class="huadiao-build-note">
+  <div class="huadiao-note-container">
     <huadiao-header :user="user" :isLogin="isLogin"/>
     <left-slider-board/>
     <note-list-board/>
@@ -17,7 +17,7 @@ import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import SunLightTheme from "@/pages/notes/components/SunLightTheme";
-import LeftSliderBoard from "@/pages/notes/components/LeftSliderBoard";
+import LeftSliderBoard from "@/pages/components/NoteLeftSliderBoard";
 import NoteListBoard from "@/pages/notes/components/NoteListBoard";
 
 export default {
@@ -52,7 +52,7 @@ body {
 </style>
 
 <style scoped>
-.huadiao-build-note {
+.huadiao-note-container {
   min-width: 1000px;
   overflow-x: hidden;
 }

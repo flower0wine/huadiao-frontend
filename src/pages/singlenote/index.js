@@ -11,7 +11,8 @@ import index from "@/pages/singlenote/index.vue";
 import "@/assets/css/common.css";
 import "@/assets/css/animation.css";
 import {mixin} from "@/mixin";
-import $ from "jquery";
+import {mixin as currentMixin} from "@/pages/singlenote/mixin";
+import domParser from "@/assets/js/plugins/huadiao-domparser";
 import router from "@/pages/singlenote/router";
 import store from "@/pages/singlenote/store";
 
@@ -23,13 +24,14 @@ Vue.use(VueRouter);
 // 使用 VUE 混入
 // 引入所有页面公共 mixin
 Vue.mixin(mixin);
+Vue.mixin(currentMixin);
 
 new Vue({
     beforeCreate() {
         // 全局事件总线, 声明 vm 为中间变量
         Vue.prototype.$bus = this;
         // 全局 jquery
-        Vue.prototype.$ = $;
+        Vue.prototype.$ = domParser;
     },
     // 渲染
     render: h => h(index),

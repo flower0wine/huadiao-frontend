@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import {Timer} from "@/assets/js/utilsClass";
+import {Timer} from "@/assets/js/utils";
 
 export default {
   name: "StarImgAnimation",

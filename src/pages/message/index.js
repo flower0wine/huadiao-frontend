@@ -11,7 +11,7 @@ import index from "@/pages/message/index.vue";
 import "@/assets/css/common.css";
 import "@/assets/css/animation.css";
 import {mixin} from "@/mixin";
-import $ from "jquery";
+import domParser from "@/assets/js/plugins/huadiao-domparser";
 import router from "@/pages/message/router";
 import store from "@/pages/message/store";
 
@@ -29,7 +29,7 @@ new Vue({
         // 全局事件总线, 声明 vm 为中间变量
         Vue.prototype.$bus = this;
         // 全局 jquery
-        Vue.prototype.$ = $;
+        Vue.prototype.$ = domParser;
     },
     // 渲染
     render: h => h(index),

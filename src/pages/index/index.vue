@@ -97,9 +97,19 @@ export default {
     scrollToChangeInputColor() {
       window.addEventListener("scroll", () => {
         if(window.scrollY < this.$refs.indexPage.clientHeight) {
-          this.$bus.$emit("userIndexPageColor");
+          this.$bus.$emit("modifyHuadiaoConfig", {
+            inputTheme: {
+              inputBackgroundColor: "#E06969A2",
+              searchBackgroundColor: "#E314148A",
+            },
+          });
         } else {
-          this.$bus.$emit("userForumPageColor");
+          this.$bus.$emit("modifyHuadiaoConfig", {
+            inputTheme: {
+              inputBackgroundColor: "#a2a9b7a2",
+              searchBackgroundColor: "#17a6988a",
+            },
+          });
         }
       })
     },

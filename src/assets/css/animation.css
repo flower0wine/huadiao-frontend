@@ -57,6 +57,26 @@
     opacity: 0;
 }
 
+/* 上滑展示 */
+.top-show-enter {
+    transform: translateY(100px);
+    opacity: 0;
+}
+
+.top-show-enter-to {
+    transform: translateY(0px);
+    opacity: 1;
+}
+
+.top-show-enter-active {
+    transition: var(--transition-500ms);
+}
+
+.top-show-leave-active {
+    display: none;
+    transition: all 0s;
+}
+
 /* 下滑渐隐渐现 */
 .bottom-slide-enter,
 .bottom-slide-leave-to {

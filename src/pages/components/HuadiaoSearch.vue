@@ -3,6 +3,7 @@
     <transition name="width-change">
       <input type="search"
              :class="isShow.searchInput ? classList.longInputClass : classList.shortInputClass"
+             :style="'background-color: ' + inputTheme.inputBackgroundColor + '; color: ' + inputTheme.textColor"
              autocomplete="off"
              maxlength="50"
              ref="searchInput"
@@ -11,11 +12,10 @@
     </transition>
     <span :class="isShow.searchInput ? classList.smallSearchClass : classList.bigSearchClass"
           @click="clickToSearch"
+          :style="'background-color: ' + inputTheme.searchBackgroundColor"
           ref="searchContainer"
     >
-      <img src="/svg/search.svg"
-           class="search-icon"
-           alt>
+      <span v-html="svg.searchIcon" class="search-icon" :style="'fill: ' + inputTheme.searchIconColor"></span>
     </span>
   </div>
 </template>
@@ -23,11 +23,15 @@
 <script>
 export default {
   name: "HuadiaoSearch",
+  props: ["inputTheme"],
   data() {
     return {
       isShow: {
         // 输入框
         searchInput: false,
+      },
+      svg: {
+        searchIcon: `<svg t="1678007890020" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4976" width="200" height="200"><path d="M465.454545 868.848485C226.521212 868.848485 31.030303 673.357576 31.030303 434.424242S226.521212 0 465.454545 0s434.424242 195.490909 434.424243 434.424242-195.490909 434.424242-434.424243 434.424243z m0-806.787879C260.654545 62.060606 93.090909 229.624242 93.090909 434.424242s167.563636 372.363636 372.363636 372.363637 372.363636-167.563636 372.363637-372.363637S670.254545 62.060606 465.454545 62.060606z" p-id="4977"></path><path d="M766.448485 806.787879c6.206061-6.206061 15.515152-6.206061 21.721212 0l183.078788 167.563636c6.206061 6.206061 6.206061 15.515152 0 21.721212-6.206061 6.206061-15.515152 6.206061-21.721212 0l-183.078788-167.563636c-6.206061-6.206061-6.206061-15.515152 0-21.721212z" p-id="4978"></path><path d="M961.939394 1014.690909c-6.206061 0-15.515152-3.10303-21.721212-9.309091L757.139394 837.818182c-6.206061-6.206061-9.309091-12.412121-9.309091-21.721212 0-9.309091 3.10303-15.515152 9.309091-21.721212 6.206061-6.206061 12.412121-9.309091 21.721212-9.309091 9.309091 0 15.515152 3.10303 21.721212 9.309091l183.078788 167.563636c6.206061 6.206061 9.309091 12.412121 9.309091 21.721212 0 9.309091-3.10303 15.515152-9.309091 21.721212-6.206061 3.10303-12.412121 9.309091-21.721212 9.309091z m-186.181818-198.593939l183.078788 167.563636-192.387879-176.872727 9.309091 9.309091z" p-id="4979"></path></svg>`,
       },
       classList: {
         smallSearchClass: ["search-icon-box", "search-icon-scale-small"],
@@ -35,22 +39,9 @@ export default {
         longInputClass: ["search", "long-input"],
         shortInputClass: ["search"]
       },
-      inputTheme: {
-        index: {
-          inputBackgroundColor: "#E06969A2",
-          searchBackgroundColor: "#E314148A",
-        },
-        forum: {
-          inputBackgroundColor: "#a2a9b7a2",
-          searchBackgroundColor: "#17a6988a",
-        }
-      }
     }
   },
   mounted() {
-    // 更改输入框颜色
-    this.$bus.$on("userIndexPageColor", this.userIndexPageColor);
-    this.$bus.$on("userForumPageColor", this.userForumPageColor);
   },
   methods: {
     // 点击搜索
@@ -63,16 +54,6 @@ export default {
         });
       }
     },
-    // 输入框使用主题颜色, 当滚动到第一屏时
-    userIndexPageColor() {
-      this.$refs.searchInput.style.backgroundColor = this.inputTheme.index.inputBackgroundColor;
-      this.$refs.searchContainer.style.backgroundColor = this.inputTheme.index.searchBackgroundColor;
-    },
-    // 输入框使用论坛颜色, 当滚动到第二屏时
-    userForumPageColor() {
-      this.$refs.searchInput.style.backgroundColor = this.inputTheme.forum.inputBackgroundColor;
-      this.$refs.searchContainer.style.backgroundColor = this.inputTheme.forum.searchBackgroundColor;
-    }
   },
   beforeDestroy() {
     this.clearAllRefsEvents();
@@ -84,6 +65,8 @@ export default {
 .huadiao-search-container {
   position: relative;
   width: 400px;
+  height: 36px;
+  margin-left: auto;
 }
 
 /* 搜索框 */
@@ -91,10 +74,8 @@ export default {
   float: right;
   height: 36px;
   padding-left: 15px;
-  font-size: 16px;
+  font-size: 14px;
   border-radius: 15px;
-  color: #fff;
-  background-color: #E89090A2;
   box-shadow: var(--box-shadow-min);
   transition: var(--transition-500ms);
 }
@@ -107,7 +88,6 @@ export default {
   height: 36px;
   display: inline-block;
   border-radius: 50%;
-  background-color: #E314148A;
   box-shadow: var(--box-shadow-min);
   transition: var(--transition-500ms);
 }
@@ -144,7 +124,7 @@ export default {
   }
 }
 
-.search-icon {
+.search-icon /deep/ svg {
   width: 20px;
   height: 20px;
   margin: 7px;

@@ -1,10 +1,13 @@
 <template>
   <transition name="upright-slide">
-    <div class="huadiao-popup-window-container" v-if="isShow">
-      <div class="huadiao-popup-window">
+    <div class="huadiao-popup-window-container"
+         v-if="isShow"
+         :style="'--cancel-background-hover: ' + defaultTipStyle.cancelBackgroundHover + '; --confirm-background-hover: ' + defaultTipStyle.confirmBackgroundHover"
+    >
+      <div class="huadiao-popup-window" :style="`color: ${defaultTipStyle.color}; background-color: ${defaultTipStyle.backgroundColor}`">
         <div class="popup-window-header">
           <div class="tip-type">
-            <img :src="'/svg/' + config.icon[iconType] + '.svg'" alt="">
+            <img :src="`/svg/${config.icon[iconType]}.svg`" alt="">
           </div>
           <div class="tip-title">{{config.tipTitle[iconType]}}</div>
         </div>
@@ -13,14 +16,20 @@
           <div class="confirm-or-cancel" v-if="config.operation.confirmOrCancel">
             <div class="confirm"
                  @click="clickConfirm"
+                 :style="'background-color: ' + defaultTipStyle.confirmBtnBackgroundColor"
                  ref="confirm"
             >确认</div>
             <div class="cancel"
                  @click="clickCancel"
+                 :style="`background-color: ${defaultTipStyle.cancelBtnBackgroundColor}`"
                  ref="cancel"
             >取消</div>
           </div>
-          <div class="has-read" v-else-if="config.operation.hasRead" @click="isShow = false">已阅</div>
+          <div class="has-read"
+               v-else-if="config.operation.hasRead"
+               :style="'background-color: ' + defaultTipStyle.hasRedaBtnBackgroundColor"
+               @click="isShow = false"
+          >已阅</div>
         </div>
       </div>
     </div>
@@ -28,7 +37,7 @@
 </template>
 
 <script>
-import {Timer} from "@/assets/js/utilsClass";
+import {Timer} from "@/assets/js/utils";
 
 export default {
   name: "HuadiaoPopupWindow",
@@ -71,6 +80,15 @@ export default {
       callback: {
         confirmCallback: null,
         cancelCallback: null,
+      },
+      defaultTipStyle: {
+        color: "#fff",
+        backgroundColor: "rgba(215, 78, 78, 0.28)",
+        hasRedaBtnBackgroundColor: "#a170de",
+        confirmBtnBackgroundColor: "#a170de",
+        confirmBackgroundHover: "#8f63c7",
+        cancelBtnBackgroundColor: "#afaeae",
+        cancelBackgroundHover: "#a19f9f",
       },
       timer: new Timer(),
     }
@@ -149,6 +167,8 @@ export default {
   height: 100vh;
   background-color: transparent;
   transition: var(--transition-500ms);
+  --cancel-background-hover: "";
+  --confirm-background-hover: "";
 }
 
 .huadiao-popup-window {
@@ -158,8 +178,6 @@ export default {
   width: 400px;
   transform: translate(-50%, 0);
   border-radius: 8px;
-  color: #fff;
-  background-color: rgba(215, 78, 78, 0.28);
   backdrop-filter: blur(2px);
   box-shadow: var(--box-shadow-min);
   transition: var(--transition-500ms);
@@ -214,16 +232,11 @@ export default {
 
 .has-read {
   margin: 20px auto;
-  background-color: #a170de;
-}
-
-.confirm {
-  background-color: #a170de;
 }
 
 .has-read:hover,
 .confirm:hover {
-  background-color: #8f63c7;
+  background-color: var(--confirm-background-hover);
   transform: translateY(-3px);
   box-shadow: var(--box-shadow-min);
 }
@@ -234,12 +247,8 @@ export default {
   padding: 20px 100px;
 }
 
-.cancel {
-  background-color: #afaeae;
-}
-
 .cancel:hover {
-  background-color: #a19f9f;
+  background-color: var(--cancel-background-hover);
   transform: translateY(-3px);
   box-shadow: var(--box-shadow-min);
 }

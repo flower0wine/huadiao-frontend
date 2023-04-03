@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import {Timer} from "@/assets/js/utilsClass";
+import {Timer} from "@/assets/js/utils";
 
 export default {
   name: "HuadiaoMiddleTip",
@@ -40,12 +40,7 @@ export default {
   methods: {
     // 修改默认样式
     modifyDefaultStyle() {
-      for(let key in this.tipStyle) {
-        // 如果默认样式对象具有该属性
-        if(Object.hasOwnProperty.call(this.defaultTipStyle, key)) {
-          this.defaultTipStyle[key] = this.tipStyle[key];
-        }
-      }
+      this.modifySrcObject(this.defaultTipStyle, this.tipStyle);
     },
     // 花凋中间弹窗提示
     addHuadiaoMiddleTip(middleTip) {

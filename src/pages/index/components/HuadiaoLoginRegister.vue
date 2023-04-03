@@ -146,7 +146,7 @@
 </template>
 
 <script>
-import {Timer} from "@/assets/js/utilsClass";
+import {Timer} from "@/assets/js/utils";
 import {mapState} from "vuex";
 
 export default {
