@@ -13,7 +13,7 @@
       <template v-slot:relation="props">
         <div :class="props.className"
              @click="props.changeFollowStatus"
-        >{{props.follow ? (item.isFriend ? "已互粉" : "已关注") : "关注"}}</div>
+        >{{props.follow ? (item.friend ? "已互粉" : "已关注") : "关注"}}</div>
       </template>
       <template v-slot:toolMenu>
         <div @click="deleteFan(index)">移除粉丝</div>

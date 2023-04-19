@@ -1,12 +1,10 @@
 <template>
-  <div class="private-message-board">
-    私信
-  </div>
+
 </template>
 
 <script>
 export default {
-  name: "PrivateMessageBoard",
+  name: "OtherMessage",
   data() {
     return {}
   },
@@ -17,4 +15,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>

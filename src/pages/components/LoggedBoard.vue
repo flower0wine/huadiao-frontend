@@ -3,14 +3,14 @@
        ref="loggedBarContainer"
        :style="LoggedBoardAttachStyle"
   >
-    <h1 class="logged-bar-nickname">{{user.nickname}}</h1>
+    <div class="logged-bar-nickname">{{ user.nickname }}</div>
     <div class="logged-bar">
       <a :href="'/' + user.uid + '/follow/follows'" class="logged-bar-follows">
-        <em>{{user.follows}}</em>
+        <em>{{ user.follow }}</em>
         <span>关注</span>
       </a>
       <a :href="'/' + user.uid + '/follow/fans'" class="logged-bar-fans">
-        <em>{{user.fans}}</em>
+        <em>{{ user.fan }}</em>
         <span>粉丝</span>
       </a>
     </div>
@@ -19,11 +19,11 @@
          v-for="(item, index) in loggedBoardConfig"
          :key="index"
       >
-        <span>{{item.content}}</span>
+        <span>{{ item.content }}</span>
         <span class="entry-icon" v-html="svg.access" :style="'fill: ' + boardStyle.accessColor"></span>
       </a>
     </div>
-    <div class="logged-bar-logout">
+    <div class="logged-bar-logout" @click="clickToLogoutHuadiao">
       <div>退出登录</div>
     </div>
   </div>
@@ -58,13 +58,23 @@ export default {
       return color + backgroundImage + shadow;
     }
   },
-  mounted() {
-    this.initial();
-  },
   methods: {
-    // 初始化
-    initial() {
-    },
+    // 退出登录
+    clickToLogoutHuadiao() {
+      this.sendRequest({
+        path: "logoutHuadiao",
+        thenCallback: () => {
+          window.location.reload();
+        },
+        errorCallback: (error) => {
+          if (error.response.status === 500) {
+            this.huadiaoMiddleTip("可能由于服务器的原因导致退出登录失败!");
+          } else {
+            this.huadiaoMiddleTip("退出登录失败");
+          }
+        }
+      })
+    }
   },
   beforeDestroy() {
   }
@@ -88,11 +98,13 @@ export default {
 
 /* 用户昵称 */
 .logged-bar-nickname {
-  font-size: 20px;
+  font-size: 18px;
   color: var(--textColor);
   font-weight: 700;
   text-align: center;
   margin-top: 37px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 用户关注及粉丝 */
@@ -127,7 +139,8 @@ export default {
 /* 数量 */
 .logged-bar-follows em,
 .logged-bar-fans em {
-  font-size: 21px;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 /* 共同样式 */
@@ -153,7 +166,7 @@ export default {
 }
 
 .logged-bar-links a span {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .logged-bar-links .entry-icon {

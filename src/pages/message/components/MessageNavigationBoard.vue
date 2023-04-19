@@ -19,7 +19,7 @@
     </div>
     <router-link class="message-settings"
                  tag="div"
-                 to="/message/settings"
+                 to="/settings"
                  active-class="message-navigation-active"
     >
       <div v-html="svg.setting"></div>
@@ -29,6 +29,7 @@
 </template>
 
 <script>
+
 export default {
   name: "MessageNavigationBoard",
   data() {
@@ -41,20 +42,60 @@ export default {
         navigation: [{
           content: "回复我的",
           number: 0,
-          to: "/message/reply",
+          to: "/reply",
         }, {
-          content: "私信",
+          content: "我的消息",
           number: 0,
-          to: "/message/private"
+          to: "/whisper"
         }, {
           content: "收到的赞",
           number: 0,
-          to: "/message/like"
+          to: "/like"
         }, {
           content: "系统消息",
-          number: 99,
-          to: "/message/system",
+          number: 0,
+          to: "/system",
         }],
+      },
+    };
+  },
+  watch: {
+    "$store.state.message.replyMeMessage": {
+      deep: true,
+      immediate: true,
+      handler(newValue) {
+        this.config.navigation[0].number = newValue.length;
+      }
+    },
+    "$store.state.message.whisper": {
+      deep: true,
+      immediate: true,
+      handler(newValue) {
+        let length = 0;
+        for(let whisper of newValue) {
+          let temp = 0;
+          for(let message of whisper.messageList) {
+            if(!message.me) {
+              temp++;
+            }
+          }
+          length += temp;
+        }
+        this.config.navigation[1].number = length;
+      }
+    },
+    "$store.state.message.likeMeMessage": {
+      deep: true,
+      immediate: true,
+      handler(newValue) {
+        this.config.navigation[2].number = newValue.length;
+      }
+    },
+    "$store.state.message.systemMessage": {
+      deep: true,
+      immediate: true,
+      handler(newValue) {
+        this.config.navigation[3].number = newValue.length;
       }
     }
   },

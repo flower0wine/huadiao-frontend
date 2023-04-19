@@ -37,30 +37,34 @@
            target="_blank"
            ref="avatarBox"
         >
-          <img src="/svg/noLoginAvatar.svg"
-               class="user-avatar-box"
-               :class="isLogin ? '' : 'no-logged'"
-               alt=""
-          >
-          <div v-if="isLogin && userConfig.hasAvatar"
-               class="user-avatar-box logged-avatar"
-               :style="'border: 2px solid ' + boardConfig.loggedBoardStyle.borderColor"
-               ref="avatar"
-          ></div>
+            <img src="/svg/noLoginAvatar.svg"
+                 class="user-avatar-box"
+                 :style="login ? 'border: 2px solid ' + boardConfig.loggedBoardStyle.borderColor : ''"
+                 :class="login ? '' : 'no-logged'"
+                 alt=""
+            >
+            <div v-if="login && user.userAvatar"
+                 :style="`border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}; background-image: ${user.userAvatar}`"
+                 class="user-avatar-box logged-avatar"
+                 ref="avatar"
+            ></div>
         </a>
         <!--未登录组件-->
-        <template v-if="!isLogin">
+        <template v-if="!login">
           <div class="login-box">登录</div>
           <transition name="fade">
-            <no-login-board v-show="isMouseEnter.enterAvatar"
+            <no-login-board v-show="isShow.noLoggedOrLoggedBoard.show"
+                            v-if="isShow.noLoggedOrLoggedBoard.render"
                             :noLogin="huadiaoIndexHeaderConfig.noLogin"
+                            :boardStyle="boardConfig.noLoggedBoardStyle"
             />
           </transition>
         </template>
         <!--已登录组件-->
-        <template v-if="isLogin">
+        <template v-if="login">
           <transition name="fade">
-            <logged-board v-show="isMouseEnter.enterAvatar"
+            <logged-board v-show="isShow.noLoggedOrLoggedBoard.show"
+                          v-if="isShow.noLoggedOrLoggedBoard.render"
                           :user="user"
                           :boardStyle="boardConfig.loggedBoardStyle"
             />
@@ -80,49 +84,18 @@ import constants from "@/assets/js/constants";
 
 export default {
   name: "HuadiaoHeader",
-  props: ["isLogin", "user", "huadiaoHeaderStyle"],
+  props: ["huadiaoHeaderStyle"],
   data() {
     return {
-      // 鼠标是否进入
-      isMouseEnter: {
-        // 进入头像框
-        enterAvatar: false
+      svg: {
+        avatar: `<svg t="1657536982283" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3627" width="200" height="200"><path d="M510.77050482 2.21923328c281.4240859 0 509.56537287 228.14128697 509.56537173 509.56653682 0 281.42757888-228.14128697 509.56653682-509.56537173 509.56653681-281.42757888 0-509.56886585-228.14012302-509.56886585-509.56653681 0-281.4240859 228.14128697-509.56653682 509.56886585-509.56653682z" fill="#EEEEEE" p-id="3628"></path><path d="M510.77050482 516.51164387c90.0558939 0 163.05952199-73.30168832 163.05952199-163.72549973 0-90.42264633-73.00362809-163.72433465-163.05952199-163.72433465-90.05705785 0-163.06301497 73.30168832-163.06301497 163.72433465-0.00116395 90.42497536 73.00479317 163.72549859 163.06301497 163.72549973z m251.51800206 200.09807531l1.21552441-0.45756757c-39.85964146-100.90130205-137.98992099-172.25861689-252.73352647-172.25861689-113.31967317 0-210.42537358 69.60155875-251.2141221 168.51890176l0.56235463 0.22820181a39.9609344 39.9609344 0 0 0-2.9188881 15.01940622c0 22.15886393 17.97555086 40.12510094 40.15420757 40.12509981 16.79146325 0 31.16701469-10.30401138 37.16196921-24.92522837l0.65433486 0.26545948c28.69987328-68.84360192 96.50958109-117.22355485 175.60014393-117.22355484 79.76934741 0 148.05874461 49.21940878 176.32433493 119.00725475l0.2875813-0.10828003c6.4338944 13.58499499 20.27037696 22.98434901 36.30970538 22.98434901 22.17516373 0 40.15187968-17.96507307 40.15187968-40.12509981a40.14256469 40.14256469 0 0 0-1.55549923-11.05032533z" fill="#CCCCCC" p-id="3629"></path></svg>`,
       },
-      // 用户配置
-      userConfig: {
-        // 是否上传了头像
-        hasAvatar: false,
-      },
-      // 首页头部配置
-      huadiaoIndexHeaderConfig: {
-        // logo 路径
-        logoPath: "/img/authority.png",
-        // 头像配置
-        avatar: {
-          title: this.isLogin ? INDEX_TIPS.LOGGED : INDEX_TIPS.NOT_LOGGED,
-          src: this.isLogin ? '/homepage/' + this.user.uid : constants.wrongLink,
+      isShow: {
+        // 登录或未登录面板
+        noLoggedOrLoggedBoard: {
+          render: false,
+          show: false,
         },
-        // 头部右侧配置
-        rightEntry: [{
-          description: "历史",
-          svg: `<svg t="1677554746272" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4761" width="200" height="200"><path d="M511.99772445 2.27555555C230.48419555 2.27555555 2.27555555 230.48419555 2.27555555 511.99772445S230.48419555 1021.72444445 511.99772445 1021.72444445 1021.72444445 793.51125333 1021.72444445 511.99772445 793.51125333 2.27555555 511.99772445 2.27555555z m402.60380444 679.75168c-93.5424 221.46616889-348.90752 325.17006222-570.37482667 231.62766223S19.05664 564.74737778 112.59904 343.28007111 461.50656 18.11000889 682.97386667 111.65240889c191.15690667 80.74012445 298.74631111 285.18627555 257.05358222 488.46279111a436.90097778 436.90097778 0 0 1-25.42592 81.91203555z" p-id="4762"></path><path d="M547.62496 496.79815111V220.86656c0-20.08974222-16.28615111-36.37475555-36.37475555-36.37475555s-36.37475555 16.28615111-36.37475556 36.37475555v306.06791111l229.24060444 229.24060444c14.20515555 14.20515555 37.23719111 14.20515555 51.44234667 0s14.20515555-37.23719111 0-51.44234666L547.62496 496.79815111z" p-id="4763"></path></svg>`,
-          url: this.isLogin ? "/history" : constants.wrongLink,
-        }, {
-          description: "消息",
-          svg: `<svg t="1677554846449" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4906" width="200" height="200"><path d="M948.90666667 75.09333333H75.09333333a72.81777778 72.81777778 0 0 0-72.81777778 72.81777778v764.58666667a72.81777778 72.81777778 0 0 0 72.81777778 72.81777777h873.81333334a72.81777778 72.81777778 0 0 0 72.81777778-72.81777777V147.91111111a72.81777778 72.81777778 0 0 0-72.81777778-72.81777778z m0 72.81777778v133.87548444l-429.44284445 290.47011556L75.09333333 271.66492445V147.91111111h873.81333334zM75.09333333 912.49777778V359.59239111l423.98151112 286.75640889a36.37248 36.37248 0 0 0 40.77795555 0L948.90666667 369.67765333V912.49777778H75.09333333z" p-id="4907"></path></svg>`,
-          url: this.isLogin ? "/message" : constants.wrongLink,
-        }],
-        // 未登录面板配置
-        noLogin: [{
-          description: "发布博客",
-          svg: "/svg/blog.svg"
-        }, {
-          description: "发布视频",
-          svg: "/svg/fanju.svg"
-        }, {
-          description: "标记喜欢的番剧",
-          svg: "/svg/fanju.svg"
-        }],
       },
       boardConfig: {
         blur: false,
@@ -144,11 +117,62 @@ export default {
           textColor: "#dad5d5",
           accessColor: "#fff",
           background: "-webkit-linear-gradient(left bottom, #454440b9, #84041bb6)",
-        }
-      }
-    }
+        },
+        // 未登录面板
+        noLoggedBoardStyle: {
+          boardTextColor: "#cecaca",
+          background: "-webkit-linear-gradient(left bottom, #454440b4, #84041bb9)",
+          ImmediatelyBtnBackgroundColor: "#4c829e",
+          registerTextColor: "#4c829e",
+        },
+      },
+    };
   },
   computed: {
+    login: {
+      get() {
+        return this.$store.state.user?.login || false;
+      },
+      set() {
+      }
+    },
+    user() {
+      return this.$store.state.user;
+    },
+    // 首页头部配置
+    huadiaoIndexHeaderConfig() {
+      return {
+        // logo 路径
+        logoPath: "/img/authority.png",
+        // 头像配置
+        avatar: {
+          title: this.login ? INDEX_TIPS.LOGGED : INDEX_TIPS.NOT_LOGGED,
+          src: this.login ? '/homepage/' + this.user.uid : constants.wrongLink,
+        },
+        // 头部右侧配置
+        rightEntry: [{
+          description: "历史",
+          svg: `<svg t="1677554746272" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4761" width="200" height="200"><path d="M511.99772445 2.27555555C230.48419555 2.27555555 2.27555555 230.48419555 2.27555555 511.99772445S230.48419555 1021.72444445 511.99772445 1021.72444445 1021.72444445 793.51125333 1021.72444445 511.99772445 793.51125333 2.27555555 511.99772445 2.27555555z m402.60380444 679.75168c-93.5424 221.46616889-348.90752 325.17006222-570.37482667 231.62766223S19.05664 564.74737778 112.59904 343.28007111 461.50656 18.11000889 682.97386667 111.65240889c191.15690667 80.74012445 298.74631111 285.18627555 257.05358222 488.46279111a436.90097778 436.90097778 0 0 1-25.42592 81.91203555z" p-id="4762"></path><path d="M547.62496 496.79815111V220.86656c0-20.08974222-16.28615111-36.37475555-36.37475555-36.37475555s-36.37475555 16.28615111-36.37475556 36.37475555v306.06791111l229.24060444 229.24060444c14.20515555 14.20515555 37.23719111 14.20515555 51.44234667 0s14.20515555-37.23719111 0-51.44234666L547.62496 496.79815111z" p-id="4763"></path></svg>`,
+          url: this.login ? "/history" : constants.wrongLink,
+        }, {
+          description: "消息",
+          svg: `<svg t="1677554846449" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4906" width="200" height="200"><path d="M948.90666667 75.09333333H75.09333333a72.81777778 72.81777778 0 0 0-72.81777778 72.81777778v764.58666667a72.81777778 72.81777778 0 0 0 72.81777778 72.81777777h873.81333334a72.81777778 72.81777778 0 0 0 72.81777778-72.81777777V147.91111111a72.81777778 72.81777778 0 0 0-72.81777778-72.81777778z m0 72.81777778v133.87548444l-429.44284445 290.47011556L75.09333333 271.66492445V147.91111111h873.81333334zM75.09333333 912.49777778V359.59239111l423.98151112 286.75640889a36.37248 36.37248 0 0 0 40.77795555 0L948.90666667 369.67765333V912.49777778H75.09333333z" p-id="4907"></path></svg>`,
+          url: this.login ? "/message" : constants.wrongLink,
+        }],
+        // 未登录面板配置
+        noLogin: [{
+          description: "发布博客",
+          svg: "/svg/blog.svg"
+        }, {
+          description: "发布视频",
+          svg: "/svg/fanju.svg"
+        }, {
+          description: "标记喜欢的番剧",
+          svg: "/svg/fanju.svg"
+        }],
+      }
+    },
+    // 附加样式
     huadiaoHeaderAttachStyle() {
       let blur = this.boardConfig.blur ? 'backdrop-filter: blur(3px);' : '';
       let shadow = this.boardConfig.shadow ? 'box-shadow: var(--box-shadow-min);' : '';
@@ -156,41 +180,47 @@ export default {
       return blur + shadow + background;
     }
   },
-  beforeMount() {
-    // 判断用户是否具有头像
-    this.checkHasAvatar();
+  created() {
+    this.getHuadiaoHeaderUserinfo();
   },
   mounted() {
-    // 设置用户信息
-    this.initialUserInfer();
     // 修改默认配置
     this.modifySrcObject(this.boardConfig, this.huadiaoHeaderStyle);
+    // 修改默认样式
+    this.$bus.$on("modifyHuadiaoHeaderStyle", this.modifyHuadiaoHeaderStyle);
   },
   methods: {
-    // 判断用户头像是否存在, 存在则在 v-if 渲染前设置 hasAvatar, 否则 $refs 中获取不到标签
-    checkHasAvatar() {
-      if (this.user.userAvatar) {
-        this.userConfig.hasAvatar = true;
-      }
+    // 获取花凋头部数据
+    getHuadiaoHeaderUserinfo() {
+      this.sendRequest({
+        path: "huadiaoHeader",
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          this.$store.commit("initialUser", {user: res});
+        },
+        errorCallback: (error) => {
+          console.log(error);
+          this.login = false;
+        },
+      });
     },
-    // 初始化用户信息
-    initialUserInfer() {
-      // 如果登录并且上传了头像
-      if (this.isLogin && this.userConfig.hasAvatar) {
-        this.$refs.avatar.style.backgroundImage = "url('" + this.user.userAvatar + "')";
-      }
+    // 渲染之后再次修改头部样式
+    modifyHuadiaoHeaderStyle(style) {
+      this.modifySrcObject(this.boardConfig, style);
     },
     // 鼠标进入头像
     mouseEnterAvatar() {
-      this.isMouseEnter.enterAvatar = true;
-      if (this.isLogin && this.$refs.avatarBox) {
+      this.isShow.noLoggedOrLoggedBoard.render = true;
+      this.isShow.noLoggedOrLoggedBoard.show = true;
+      if (this.login && this.$refs.avatarBox) {
         this.$refs.avatarBox.classList.add("mouse-enter-logged-avatar");
       }
     },
     // 鼠标离开头像
     mouseLeaveAvatar() {
-      this.isMouseEnter.enterAvatar = false;
-      if (this.isLogin && this.$refs.avatarBox) {
+      this.isShow.noLoggedOrLoggedBoard.show = false;
+      if (this.login && this.$refs.avatarBox) {
         this.$refs.avatarBox.classList.remove("mouse-enter-logged-avatar");
       }
     },

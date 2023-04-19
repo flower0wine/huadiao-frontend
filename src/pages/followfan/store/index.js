@@ -9,20 +9,15 @@ import Vuex from "vuex";
 import Vue from "vue";
 
 const state = {
-    isLogin: true,
     // 用户信息
     user: {
-        isLogin: null,
-        nickname: "花凋大总管",
-        canvases: "今天是花凋一周年!",
-        school: "东华理工大学",
-        userId: "huadiao_01234567890",
-        bornDate: "2003-03-15",
-        sex: "2",
-        uid: "1",
-        fans: 8,
-        follows: 8,
-        userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
+        login: false,
+        nickname: null,
+        userId: null,
+        uid: null,
+        fans: null,
+        follows: null,
+        userAvatar: null,
     },
     // 关注分组
     followGroup: [{
@@ -62,38 +57,38 @@ const state = {
         follow: [{
             canvases: "我是新来的小伙伴，请多多关照！",
             nickname: "我乃国服第一干将",
-            isFriend: true,
+            friend: true,
             uid: "1",
             userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
         }, {
             canvases: "我是新来的小伙伴，请多多关照！",
             nickname: "我乃国服第一干将",
-            isFriend: false,
+            friend: false,
             uid: "2",
             userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
         }, {
             canvases: "我是新来的小伙伴，请多多关照！",
             nickname: "我乃国服第一干将",
-            isFriend: true,
+            friend: true,
             uid: "3",
             userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
         }],
         fan: [{
             canvases: "我是新来的小伙伴，请多多关照！",
             nickname: "我乃国服第一干将",
-            isFriend: true,
+            friend: true,
             uid: "1",
             userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
         }, {
             canvases: "我是新来的小伙伴，请多多关照！",
             nickname: "我乃国服第一干将",
-            isFriend: true,
+            friend: true,
             uid: "3",
             userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
         }, {
             canvases: "我是新来的小伙伴，请多多关照！",
             nickname: "我乃国服第一干将",
-            isFriend: false,
+            friend: false,
             uid: "29",
             userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
         }]
@@ -131,7 +126,7 @@ const actions = {
                 if (typeof followIndex === "number") {
                     state.followFan.fan.forEach((item) => {
                         if (item.uid === uid) {
-                            item.isFriend = false;
+                            item.friend = false;
                         }
                     });
                     // 添加到已经被删除的用户当中
@@ -204,6 +199,10 @@ const actions = {
     },
 };
 const mutations = {
+    // 初始化 user
+    initialUser(state, {user}) {
+        state.user = user;
+    },
     // 删除粉丝
     deleteFan(state, {index}) {
         state.followFan.fan.splice(index, 1);
@@ -227,8 +226,8 @@ const mutations = {
     },
     // 修改关系
     modifyRelationToFriend(state, data) {
-        data.fol.isFriend = true;
-        data.fan.isFriend = true;
+        data.fol.friend = true;
+        data.fan.friend = true;
     },
     // 设置用户账号信息
     setUserAccountInfer(state, data) {

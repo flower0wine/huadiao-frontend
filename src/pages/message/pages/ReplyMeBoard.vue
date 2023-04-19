@@ -33,4 +33,7 @@ export default {
 </script>
 
 <style scoped>
+.reply-me-board {
+  padding: 0 10px;
+}
 </style>

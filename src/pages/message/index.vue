@@ -5,17 +5,16 @@
       <message-navigation-board/>
       <div class="message-content-board">
         <div class="content-title">
-          <template v-if="$route.name === 'likeMeDetails'">
-            <router-link :to="{name: 'likeMeBoard'}">收到的赞</router-link>
+          <template v-if="backNavigation[$route.name]">
+            <router-link :to="{name: backNavigation[$route.name].name}">{{ backNavigation[$route.name].content }}
+            </router-link>
             <span> > </span>
           </template>
-          <span>{{navigator[$route.name]}}</span>
+          <span>{{ navigator[$route.name] }}</span>
         </div>
         <div class="router-view">
           <transition name="top-show" mode="out-in">
-            <keep-alive exclude="LikeMeDetails">
-              <router-view></router-view>
-            </keep-alive>
+            <router-view></router-view>
           </transition>
         </div>
       </div>
@@ -59,13 +58,23 @@ export default {
           background: "-webkit-linear-gradient(left bottom, rgb(0, 0, 0, 0.73), rgb(72, 122, 208, 0.71), #fff)",
         }
       },
+      // 导航
       navigator: {
         replyMeBoard: "回复我的",
-        privateMessageBoard: "私信",
+        whisperBoard: "我的消息",
+        messageChatBoard: "我的消息",
+        unfollow: "未关注的人",
         likeMeBoard: "收到的赞",
         likeMeDetails: "点赞详情",
         systemMessageBoard: "系统消息",
         messageSettingsBoard: "消息设置",
+      },
+      // 回退目录
+      backNavigation: {
+        likeMeDetails: {
+          name: "likeMeBoard",
+          content: "收到的赞",
+        },
       }
     }
   },
@@ -73,11 +82,19 @@ export default {
     ...mapState(["isLogin", "user"]),
   },
   mounted() {
+    this.clickToHidden();
   },
   methods: {
-
+    // 点击隐藏
+    clickToHidden() {
+      window.addEventListener("click", () => {
+        // 隐藏消息操作面板
+        this.$bus.$emit("hiddenMessageOperationBoard");
+      });
+    }
   },
   beforeDestroy() {
+    this.clearAllRefsEvents();
   },
   components: {
     MessageNavigationBoard,
@@ -144,7 +161,6 @@ body {
   height: calc(100% - 50px);
   min-height: 450px;
   border-radius: 6px;
-  padding: 0 10px;
   background-color: rgba(255, 255, 255, 0.712);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);

@@ -9,40 +9,47 @@
 import VueRouter from "vue-router";
 
 export default new VueRouter({
-    mode: "history",
+    mode: "hash",
     routes: [
         {
-            path: "/message",
-            redirect: "/message/reply",
+            path: "/",
+            redirect: "/reply",
         },
         {
             name: "replyMeBoard",
-            path: "/message/reply",
+            path: "/reply",
             component: () => import("@/pages/message/pages/ReplyMeBoard"),
         },
         {
-            name: "privateMessageBoard",
-            path: "/message/private",
-            component: () => import("@/pages/message/pages/PrivateMessageBoard"),
+            name: "whisperBoard",
+            path: "/whisper",
+            component: () => import("@/pages/message/pages/WhisperBoard"),
+            children: [{
+                name: "messageChatBoard",
+                path: ":uid(\\d+)",
+                components: {
+                    whisperChatBoard: () => import("@/pages/message/components/WhisperChatBoard"),
+                }
+            }]
         },
         {
             name: "likeMeBoard",
-            path: "/message/like",
+            path: "/like",
             component: () => import("@/pages/message/pages/LikeMeBoard"),
         },
         {
             name: "likeMeDetails",
-            path: "/message/like/:messageIndex(\\d+)",
+            path: "/like/:messageIndex(\\d+)",
             component: () => import("@/pages/message/pages/LikeMeDetails"),
         },
         {
             name: "systemMessageBoard",
-            path: "/message/system",
+            path: "/system",
             component: () => import("@/pages/message/pages/SystemMessageBoard"),
         },
         {
             name: "messageSettingsBoard",
-            path: "/message/settings",
+            path: "/settings",
             component: () => import("@/pages/message/pages/MessageSettingsBoard"),
         },
     ],

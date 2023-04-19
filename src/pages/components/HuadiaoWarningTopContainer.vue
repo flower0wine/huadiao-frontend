@@ -1,5 +1,7 @@
 <template>
-  <div class="huadiao-warning-tip-container">
+  <div class="huadiao-warning-tip-container"
+       v-if="visible.render"
+       v-show="visible.show">
     <transition-group name="top-slide" tag="div">
       <div class="huadiao-warning-tip"
            v-for="(warningTip) in warningTip"
@@ -24,6 +26,11 @@ export default {
   props: ["tipStyle"],
   data() {
     return {
+      // 可见性
+      visible: {
+        show: false,
+        render: false,
+      },
       // 唯一标识
       warningIndex: 0,
       // 提示信息容器
@@ -54,10 +61,21 @@ export default {
         warningTip,
         warningIndex: this.warningIndex++
       });
+      this.visible.render = true;
+      this.visible.show = true;
       new Timer().timeout(() => {
         this.warningTip.shift();
       }, time);
     },
+  },
+  watch: {
+    "warningTip": {
+      handler(newValue) {
+        if(newValue.length === 0) {
+          this.visible.show = false;
+        }
+      }
+    }
   },
   beforeDestroy() {
   },

@@ -1,33 +1,37 @@
 <template>
   <div class="huadiao-account-info">
-    <div class="account-info-header">我的信息</div>
-    <div class="account-infer">
-      <div class="account-nickname account-infer-item">
-        <label for="nickname">昵称</label>
-        <input type="text"
-               id="nickname"
-               autocomplete="off"
-               minlength="8"
-               maxlength="20"
-               v-model="tempUser.nickname">
-      </div>
-      <div class="account-user-id account-infer-item">
-        <label>用户ID</label>
-        <span>{{ tempUser.userId }}</span>
-      </div>
-      <div class="account-canvases account-infer-item">
-        <label for="canvases">个性签名</label>
-        <textarea id="canvases"
-                  autocomplete="off"
-                  minlength="0"
-                  maxlength="200"
-                  cols="60"
-                  rows="10"
-                  v-model="tempUser.canvases"></textarea>
-      </div>
-      <div class="account-sex account-infer-item">
-        <label>性别</label>
-        <div class="sex-buttons">
+    <transition name="fade" mode="out-in">
+      <request-fail v-if="isShow.loadingFail" :failCallback="getUserInfo"/>
+      <circle-loading v-else-if="isShow.loading"/>
+      <div v-else>
+        <div class="account-info-header">我的信息</div>
+        <div class="account-infer">
+          <div class="account-nickname account-infer-item">
+            <label for="nickname">昵称</label>
+            <input type="text"
+                   id="nickname"
+                   autocomplete="off"
+                   minlength="8"
+                   maxlength="20"
+                   v-model="tempUser.nickname">
+          </div>
+          <div class="account-user-id account-infer-item">
+            <label>用户ID</label>
+            <span>{{ tempUser.userId }}</span>
+          </div>
+          <div class="account-canvases account-infer-item">
+            <label for="canvases">个性签名</label>
+            <textarea id="canvases"
+                      autocomplete="off"
+                      minlength="0"
+                      maxlength="200"
+                      cols="60"
+                      rows="10"
+                      v-model="tempUser.canvases"></textarea>
+          </div>
+          <div class="account-sex account-infer-item">
+            <label>性别</label>
+            <div class="sex-buttons">
           <span class="man-button button"
                 :class="tempUser.sex === '1' ? 'choice-button-sex' : ''"
                 @click="tempUser.sex = '1'"
@@ -35,82 +39,96 @@
           >
             <span>男</span>
           </span>
-          <span class="women-button button"
-                :class="tempUser.sex === '2' ? 'choice-button-sex' : ''"
-                @click="tempUser.sex = '2'"
-                ref="women"
-          >
+              <span class="women-button button"
+                    :class="tempUser.sex === '2' ? 'choice-button-sex' : ''"
+                    @click="tempUser.sex = '2'"
+                    ref="women"
+              >
             <span>女</span>
           </span>
-          <span class="no-known-button button"
-                :class="tempUser.sex === '0' ? 'choice-button-sex' : ''"
-                @click="tempUser.sex = '0'"
-                ref="noKnown"
-          >
+              <span class="no-known-button button"
+                    :class="tempUser.sex === '0' ? 'choice-button-sex' : ''"
+                    @click="tempUser.sex = '0'"
+                    ref="noKnown"
+              >
             <span>保密</span>
           </span>
-          <transition name="no-known-icon"
-                      @after-enter="$refs.noKnowImg.classList.add('no-known-icon-enter-to')"
-                      @after-leave="$refs.noKnowImg.classList.remove('no-known-icon-enter-to')"
-                      appear>
-            <img src="/img/account/noknown.png"
-                 class="no-known-icon"
-                 v-show="tempUser.sex === '0'"
-                 ref="noKnowImg"
-                 alt>
-          </transition>
-          <transition name="man-icon"
-                      @after-enter="$refs.manImg.classList.add('man-icon-enter-to')"
-                      @after-leave="$refs.manImg.classList.remove('man-icon-enter-to')"
-                      appear>
-            <img src="/img/account/man.png"
-                 class="man-icon"
-                 v-show="tempUser.sex === '1'"
-                 ref="manImg"
-                 alt>
-          </transition>
-          <transition name="women-icon"
-                      @after-enter="$refs.womenImg.classList.add('women-icon-enter-to')"
-                      @after-leave="$refs.womenImg.classList.remove('women-icon-enter-to')"
-                      appear>
-            <img src="/img/account/women.png"
-                 class="women-icon"
-                 v-show="tempUser.sex === '2'"
-                 ref="womenImg"
-                 alt>
-          </transition>
+              <transition name="no-known-icon"
+                          @after-enter="$refs.noKnowImg.classList.add('no-known-icon-enter-to')"
+                          @after-leave="$refs.noKnowImg.classList.remove('no-known-icon-enter-to')"
+                          appear>
+                <img src="/img/account/noknown.png"
+                     class="no-known-icon"
+                     v-show="tempUser.sex === '0'"
+                     ref="noKnowImg"
+                     alt>
+              </transition>
+              <transition name="man-icon"
+                          @after-enter="$refs.manImg.classList.add('man-icon-enter-to')"
+                          @after-leave="$refs.manImg.classList.remove('man-icon-enter-to')"
+                          appear>
+                <img src="/img/account/man.png"
+                     class="man-icon"
+                     v-show="tempUser.sex === '1'"
+                     ref="manImg"
+                     alt>
+              </transition>
+              <transition name="women-icon"
+                          @after-enter="$refs.womenImg.classList.add('women-icon-enter-to')"
+                          @after-leave="$refs.womenImg.classList.remove('women-icon-enter-to')"
+                          appear>
+                <img src="/img/account/women.png"
+                     class="women-icon"
+                     v-show="tempUser.sex === '2'"
+                     ref="womenImg"
+                     alt>
+              </transition>
+            </div>
+          </div>
+          <div class="account-born-date account-infer-item">
+            <label for="bornDate">出生日期</label>
+            <input type="text"
+                   v-model="tempUser.bornDate"
+                   id="bornDate"
+                   @click="$refs.datepicker.open()"
+                   readonly>
+          </div>
+          <div class="account-school account-infer-item">
+            <label for="school">学校</label>
+            <input type="text"
+                   id="school"
+                   autocomplete="off"
+                   v-model="tempUser.school">
+          </div>
+          <div class="warning-tip account-infer-item">
+            <label></label>
+            <span>备注: 更换头像请前往个人主页, 单击头像即可更换</span>
+          </div>
         </div>
+        <div class="account-infer-save" @click="clickToUpdateUserInfo">保存</div>
       </div>
-      <div class="account-born-date account-infer-item">
-        <label for="bornDate">出生日期</label>
-        <input type="text"
-               v-model="tempUser.bornDate"
-               id="bornDate"
-               readonly>
-      </div>
-      <div class="account-school account-infer-item">
-        <label for="school">学校</label>
-        <input type="text"
-               id="school"
-               autocomplete="off"
-               v-model="tempUser.school">
-      </div>
-      <div class="warning-tip account-infer-item">
-        <label></label>
-        <span>备注: 更换头像请前往个人主页, 单击头像即可更换</span>
-      </div>
-    </div>
-    <div class="account-infer-save">保存</div>
+    </transition>
   </div>
 </template>
 
 <script>
 import {mapState} from "vuex";
+import CircleLoading from "@/pages/components/CircleLoading";
+import RequestFail from "@/pages/components/RequestFail";
+import constants from "@/assets/js/constants";
+
+let accountInfoResponse = constants.accountInfoResponse;
 
 export default {
   name: "HuadiaoAccountInfo",
+  components: {RequestFail, CircleLoading},
   data() {
     return {
+      selected: new Date(),
+      isShow: {
+        loading: true,
+        loadingFail: false,
+      },
       tempUser: {
         isLogin: null,
         nickname: null,
@@ -124,12 +142,88 @@ export default {
     }
   },
   computed: {
-    ...mapState(["isLogin", "user"]),
+    ...mapState(["isLogin"]),
+  },
+  created() {
+    this.getUserInfo();
   },
   mounted() {
-    this.tempUser = this.user;
   },
   methods: {
+    // 获取用户信息并保存到 vuex 中
+    getUserInfo() {
+      this.isShow.loadingFail = false;
+      this.sendRequest({
+        path: "userInfo",
+        method: "get",
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          this.$store.commit("initialUserInfo", {userInfo: res});
+          this.tempUser = {...res, ...this.$store.state.user};
+          this.isShow.loading = false;
+        },
+        errorCallback: (error) => {
+          console.log(error);
+          this.isShow.loadingFail = true;
+        }
+      })
+    },
+    // 点击修改用户信息
+    clickToUpdateUserInfo() {
+      // 检查昵称
+      let nickname = this.tempUser.nickname ? this.tempUser.nickname.trim() : '';
+      if(nickname === '') {
+        this.huadiaoMiddleTip(accountInfoResponse.wrongNullNickname);
+        return;
+      } else if(!(0 < nickname.length && nickname.length <= 20)) {
+        this.huadiaoMiddleTip(accountInfoResponse.wrongLengthNickname);
+        return;
+      }
+      // 检查出生日期
+      let bornDate = this.tempUser.bornDate ? this.tempUser.bornDate.trim() : '';
+      let bornDateReg = /^\d{4}([-/])\d{1,2}\1\d{1,2}$/;
+      if(bornDate !== '' && !bornDateReg.test(bornDate)) {
+        this.huadiaoMiddleTip(accountInfoResponse.wrongBornDate);
+        return;
+      }
+      // 检查个人简介
+      let canvases = this.tempUser.canvases ? this.tempUser.canvases.trim() : '';
+      if(canvases.length > 50) {
+        this.huadiaoMiddleTip(accountInfoResponse.wrongLengthCanvases);
+        return;
+      }
+      // 检查学校
+      let school = this.tempUser.school ? this.tempUser.school.trim() : '';
+      if(school.length > 30) {
+        this.huadiaoMiddleTip(accountInfoResponse.wrongLengthSchool);
+        return;
+      }
+
+      this.sendRequest({
+        path: "userInfo",
+        method: "post",
+        data: {
+          nickname,
+          canvases,
+          sex: this.tempUser.sex,
+          bornDate,
+          school
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          if(res && accountInfoResponse[res]) {
+            this.huadiaoMiddleTip(accountInfoResponse[res]);
+          } else {
+            this.huadiaoMiddleTip("修改用户信息成功");
+          }
+        },
+        errorCallback: (error) => {
+          console.log(error);
+          this.huadiaoMiddleTip("修改信息失败")
+        },
+      });
+    },
   },
   beforeDestroy() {
     this.clearAllRefsEvents();

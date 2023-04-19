@@ -56,7 +56,7 @@ export default {
 
 <style scoped>
 .system-message-list {
-  padding: 10px 0;
+  padding: 10px;
 }
 
 .system-message-item {

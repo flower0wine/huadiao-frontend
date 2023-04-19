@@ -15,6 +15,7 @@ import $ from "jquery";
 import router from "@/pages/account/router";
 import store from "@/pages/account/store";
 
+
 Vue.config.productionTip = false;  // 生产提示
 
 // 使用路由

@@ -35,5 +35,7 @@ export default {
 </script>
 
 <style scoped>
-
+.like-me-info {
+  padding: 0 10px;
+}
 </style>

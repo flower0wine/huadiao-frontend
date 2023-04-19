@@ -1,7 +1,7 @@
 <template>
   <transition name="upright-slide">
     <div class="huadiao-popup-window-container"
-         v-if="isShow"
+         v-if="visible.render"
          :style="'--cancel-background-hover: ' + defaultTipStyle.cancelBackgroundHover + '; --confirm-background-hover: ' + defaultTipStyle.confirmBackgroundHover"
     >
       <div class="huadiao-popup-window" :style="`color: ${defaultTipStyle.color}; background-color: ${defaultTipStyle.backgroundColor}`">
@@ -28,7 +28,7 @@
           <div class="has-read"
                v-else-if="config.operation.hasRead"
                :style="'background-color: ' + defaultTipStyle.hasRedaBtnBackgroundColor"
-               @click="isShow = false"
+               @click="visible.render = false"
           >已阅</div>
         </div>
       </div>
@@ -43,7 +43,9 @@ export default {
   name: "HuadiaoPopupWindow",
   data() {
     return {
-      isShow: false,
+      visible: {
+        render: false,
+      },
       // 默认值
       iconType: "warning",
       operationType: "confirmOrCancel",
@@ -106,7 +108,7 @@ export default {
      * @param cancelCallback 取消回调
      */
     modifyTipType(iconType, operationType, tip, confirmCallback, cancelCallback) {
-      this.isShow = true;
+      this.visible.render = true;
       // 如果是字符串
       if(typeof iconType === "string") {
         this.iconType = iconType;
@@ -136,18 +138,18 @@ export default {
       // 不选择操作类型
       else if(operationType === this.config.operation.none) {
         this.timer.timeout(() => {
-          this.isShow = false;
+          this.visible.render = false;
         }, 2000);
       }
     },
     // 点击确认
     clickConfirm() {
-      this.isShow = false;
+      this.visible.render = false;
       this.callback.confirmCallback && this.callback.confirmCallback();
     },
     // 点击取消
     clickCancel() {
-      this.isShow = false;
+      this.visible.render = false;
       this.callback.cancelCallback && this.callback.cancelCallback();
     },
   },

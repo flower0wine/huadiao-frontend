@@ -8,13 +8,10 @@
              :key="index"
         >
           <span>{{item.description}}</span>
-          <div class="setting-track"
-               :ref="item.name"
-               :class="userSettings[item.name + 'Status'] === '1' ? 'click-setting-track' : ''"
-               @click="clickSettingItem(item.name)"
-          >
-            <div class="setting-slider"></div>
-          </div>
+          <setting-slider :settingName="item.name"
+                          :settings="userSettings"
+                          :clickSettingSlider="clickSettingItem"
+          />
         </div>
       </div>
     </div>
@@ -26,13 +23,10 @@
              :key="index"
         >
           <span>{{item.description}}</span>
-          <div class="setting-track"
-               :ref="item.name"
-               :class="userSettings[item.name + 'Status'] === '1' ? 'click-setting-track' : ''"
-               @click="clickSettingItem(item.name)"
-          >
-            <div class="setting-slider"></div>
-          </div>
+          <setting-slider :settingName="item.name"
+                          :settings="userSettings"
+                          :clickSettingSlider="clickSettingItem"
+          />
         </div>
       </div>
     </div>
@@ -40,8 +34,14 @@
 </template>
 
 <script>
+import SettingSlider from "@/pages/components/SettingSlider";
+import constants from "@/assets/js/constants";
+
+let accountSettingResponse = constants.accountSettingResponse;
+
 export default {
   name: "HuadiaoAccountSettings",
+  components: {SettingSlider},
   data() {
     return {
       // 隐私设置
@@ -79,25 +79,62 @@ export default {
         description: "点赞消息提醒",
       }],
       userSettings: {
-        messageLikeStatus: "1",
-        messageRemindStatus: "1",
-        messageReplyStatus: "1",
-        publicBornStatus: "0",
-        publicCanvasesStatus: "0",
-        publicFanjuStatus: "0",
-        publicFollowStatus: "1",
-        publicHomepageStatus: "1",
-        publicSchoolStatus: "1",
-        publicStarStatus: "0",
-        uid: "1",
-        userId: "huadiao_012345678910",
-      }
-    }
+        messageLikeStatus: 1,
+        messageRemindStatus: 1,
+        messageReplyStatus: 1,
+        publicBornStatus: 0,
+        publicCanvasesStatus: 0,
+        publicFanjuStatus: 0,
+        publicFollowStatus: 1,
+        publicHomepageStatus: 1,
+        publicSchoolStatus: 1,
+        publicStarStatus: 0,
+      },
+    };
+  },
+  created() {
+    this.getUserAccountSettings();
   },
   methods: {
+    // 获取用户账号设置
+    getUserAccountSettings() {
+      this.sendRequest({
+        path: "accountSettings",
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          this.userSettings = {...res};
+          this.$store.commit("initialUserSettings", {settings: res});
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      });
+    },
     // 点击滑块
-    clickSettingItem(ref) {
-      this.userSettings[ref + "Status"] = this.userSettings[ref + "Status"] === "1" ? "0" : "1";
+    clickSettingItem(settingName) {
+      this.sendRequest({
+        path: "accountSettings",
+        method: "post",
+        data: {
+          [`${settingName}Status`]: `${settingName}Status`,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          if(accountSettingResponse.accountSettingUpdateSucceed === res) {
+            // 改变按钮
+            this.userSettings[settingName + "Status"] = !this.userSettings[settingName + "Status"];
+          } else {
+            this.huadiaoMiddleTip("修改失败");
+          }
+        },
+        errorCallback: (error) => {
+          console.log(error);
+          this.huadiaoMiddleTip("修改失败");
+        }
+      })
+
     }
   },
   beforeDestroy() {
@@ -139,33 +176,6 @@ export default {
   margin-top: 20px;
   padding-right: 150px;
   width: 50%;
-}
-
-/* 滑块轨道 */
-.setting-track {
-  width: 30px;
-  height: 16px;
-  padding: 2px 0 0 2px;
-  border-radius: 8px;
-  background-color: rgba(162, 162, 162, 0.56);
-  cursor: pointer;
-}
-
-.setting-slider {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.77);
-  transition: var(--transition-500ms);
-}
-
-/* 点击滑块后 */
-.click-setting-track .setting-slider {
-  transform: translateX(14px);
-}
-
-.click-setting-track {
-  background-color: rgba(250, 41, 41, 0.56);
 }
 
 .user-private-settings {

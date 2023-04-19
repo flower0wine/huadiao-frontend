@@ -1,5 +1,5 @@
 <template>
-  <div class="huadiao-menu-bar">
+  <div class="huadiao-menu-bar" :style="`background: ${huadiaoMenuStyle.background}; --menu-border-color: ${huadiaoMenuStyle.menuBorderColor}`">
     <div class="huadiao-menu-header">
       <span>菜单栏</span>
     </div>
@@ -8,7 +8,7 @@
          :title="menuConfig.title"
          class="huadiao-menu-item"
     >
-      <a :href="menuConfig.url">
+      <a :href="menuConfig.url" target="_blank">
         <img :src="menuConfig.svg" alt>
         <span>{{ menuConfig.description }}</span>
       </a>
@@ -21,7 +21,7 @@ import constants from "@/assets/js/constants";
 
 export default {
   name: "HuadiaoMenu",
-  props: ["isLogin", "user"],
+  props: ["user", "menuStyle", "login"],
   data() {
     return {
       huadiaoMenuConfig: [{
@@ -60,16 +60,25 @@ export default {
         description: "我的设置",
         url: this.getLinkByUserLogged("/settings")
       }],
+      huadiaoMenuStyle: {
+        background: "-webkit-linear-gradient(top, #9005a97a, #fb424279)",
+        menuBorderColor: "#9f4996",
+      }
     }
   },
   beforeMount() {
   },
   mounted() {
+    this.$bus.$on("modifyHuadiaoMenuStyle", this.modifyHuadiaoMenuStyle);
   },
   methods: {
+    // 在渲染之后再次修改样式
+    modifyHuadiaoMenuStyle(style) {
+      this.modifySrcObject(this.huadiaoMenuStyle, style);
+    },
     // 根据用户登录状态转换链接
     getLinkByUserLogged(url) {
-      return this.isLogin ? url : constants.wrongLink
+      return this.login ? url : constants.wrongLink
     }
   },
   beforeDestroy() {
@@ -87,7 +96,7 @@ export default {
   height: 100vh;
   border-radius: 0 16px 16px 0;
   color: #fff;
-  background: -webkit-linear-gradient(top, #9005a97a, #fb424279);
+  --menu-border-color: "";
   transition: var(--transition-500ms);
 }
 
@@ -109,7 +118,7 @@ export default {
 }
 
 .huadiao-menu-bar .huadiao-menu-item a {
-  border-top: 1px solid #9f4996;
+  border-top: 1px solid var(--menu-border-color);
 }
 
 /* 菜单项解释 */

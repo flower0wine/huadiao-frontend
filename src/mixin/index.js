@@ -8,14 +8,21 @@
 import axios from "axios";
 import constants from "@/assets/js/constants";
 
-// axios.defaults.withCredentials = true;
-
 export const mixin = {
     data() {
-        return {}
+        return {
+            // 是否获取了数据
+            getDataCompleted: false,
+        }
     },
-    mounted() {
-
+    watch: {
+        user: {
+            deep: true,
+            handler(newValue) {
+                this.login = newValue.login;
+                this.getDataCompleted = true;
+            }
+        }
     },
     methods: {
         // 警告提示
@@ -31,30 +38,41 @@ export const mixin = {
             this.$bus.$emit("huadiaoPopupWindow", iconType, operationType, tip, confirmFn, cancelFn);
         },
         // 发送请求
-        sendRequest({path, params, data, headers, fn, errorFn}) {
+        sendRequest({path, method, params, data, headers, thenCallback, errorCallback}) {
+            axios.defaults.withCredentials = true;
+            // 可以选择的文本类型
+            let ContentType = {
+                formData: "application/x-www-form-urlencoded",
+                json: "application/json",
+            };
+            // 请求头
+            let headersProp = headers ? {"Content-Type": ContentType[headers]} : {};
             let srcObj = {
                 url: constants.url + path,
+                method: "get",
                 params: {},
                 data: {},
-                headers: {},
+                headers: headersProp,
             };
             // 修改对象属性
-            this.modifySrcObject(srcObj, {params, data, headers});
+            this.modifySrcObject(srcObj, {params, method, data});
+
+            let defaultThenCallback = (response) => {
+                thenCallback && thenCallback(response);
+            };
+
+            let defaultErrorCallback = (error) => {
+                // 发送请求但无响应
+                if (!error.response) {
+                    this.huadiaoWarningTip("连接服务器失败!可能是网络原因");
+                }
+                // 额外的错误执行函数
+                errorCallback && errorCallback(error);
+            };
             // 发送请求
             axios(srcObj)
-                .then(fn)
-                .catch(errorFn ? errorFn : (error) => {
-                if (error.request) {
-                    // 联网但没有连上服务器
-                    if (!this.isConnectServer) {
-                        this.huadiaoWarningTip("无法连接至服务器!");
-                    }
-                    // 没有联网
-                    else if (!this.isOnLine) {
-                        this.huadiaoWarningTip("请检查网络连接!");
-                    }
-                }
-            });
+                .then(defaultThenCallback)
+                .catch(defaultErrorCallback);
         },
         // 清除 this 的 ref 的事件
         clearAllRefsEvents() {
@@ -72,49 +90,6 @@ export const mixin = {
                     this.$(el[0]).off();
                 }
             }
-        },
-        // 检查是否联网, 如果已联网或服务器出现问题
-        checkOnlineIfConnectingOrBadServer(connectingCallback, badServerCallback) {
-            this.checkOnline(connectingCallback, null, badServerCallback);
-        },
-        // 检查是否联网, 并根据联网状态执行回调函数
-        checkOnline(connectingCallback, disConnectCallback, badServerCallback) {
-            if (navigator.onLine) {
-                this.sendRequest({}, {}, {}, () => {
-                    // 联网回调
-                    connectingCallback && connectingCallback();
-                }, (error) => {
-                    if (error.request) {
-                        this.huadiaoWarningTip("无法连接至服务器!");
-                    } else {
-                        this.huadiaoWarningTip("网络出现未知错误!");
-                    }
-
-                    // 向服务器发送请求, 但没有收到响应
-                    badServerCallback && badServerCallback();
-                });
-            } else {
-                this.huadiaoWarningTip("当前设备未联网!");
-
-                // 未联网回调
-                disConnectCallback && disConnectCallback();
-            }
-        },
-        // 服务器未响应请求通用处理, error.request
-        serverNoResponseError(error) {
-            if (error.request) {
-                this.huadiaoWarningTip("服务器未响应请求!");
-            }
-        },
-        // 服务器错误信息, 及一般信息响应
-        messageResponse(responseData) {
-            if (Object.hasOwnProperty.call(responseData, "code")) {
-                if (responseData.code === 0) {
-                    this.huadiaoWarningTip("不可识别的的请求!");
-                }
-                return true;
-            }
-            return false;
         },
         // 将数字按照顺序插入有序数组中
         insertOrderArray(array, number) {
@@ -171,10 +146,15 @@ export const mixin = {
         // 修改源对象指定属性为提供的对象的属性
         modifySrcObject(srcConfig, config) {
             for (let c in config) {
-                if (typeof srcConfig[c] === "object") {
+                if (typeof config[c] === "object") {
+                    if (!srcConfig[c]) {
+                        srcConfig[c] = {};
+                    }
                     this.modifySrcObject(srcConfig[c], config[c]);
                 } else {
-                    srcConfig[c] = config[c];
+                    if (config[c]) {
+                        srcConfig[c] = config[c]
+                    }
                 }
             }
         },

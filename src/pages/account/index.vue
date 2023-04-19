@@ -1,12 +1,15 @@
 <template>
   <div class="huadiao-account">
-    <huadiao-header :isLogin="isLogin" :user="user"/>
+    <huadiao-header/>
     <huadiao-account-options/>
     <transition name="fade" mode="out-in">
       <keep-alive>
         <router-view name="mainBoard"></router-view>
       </keep-alive>
     </transition>
+    <huadiao-warning-top-container/>
+    <huadiao-middle-tip/>
+    <huadiao-popup-window/>
   </div>
 </template>
 
@@ -14,6 +17,9 @@
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
 import HuadiaoAccountOptions from "@/pages/account/components/HuadiaoAccountOptions";
 import {mapState} from "vuex";
+import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
+import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
+import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 
 export default {
   name: "HuadiaoAccount",
@@ -22,9 +28,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["isLogin", "user"]),
-  },
-  mounted() {
+    ...mapState(["user"]),
   },
   methods: {
   },
@@ -32,6 +36,9 @@ export default {
     this.clearAllRefsEvents();
   },
   components: {
+    HuadiaoPopupWindow,
+    HuadiaoMiddleTip,
+    HuadiaoWarningTopContainer,
     HuadiaoAccountOptions,
     HuadiaoHeader
   },

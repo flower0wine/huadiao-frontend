@@ -43,7 +43,7 @@
         <span class="reply-text"
               v-else>{{replyText[item.type]}}</span>
       </div>
-      <div class="message-content"></div>
+      <div class="message-content" v-text="item.messageContent"></div>
       <div class="message-fields">
         <div class="message-date">2021年03月15日</div>
         <div class="delete-message" @click="deleteLikeOrReplyMessage">
@@ -105,7 +105,7 @@ export default {
     // 点击查看更多点赞用户
     lookOverMoreUser() {
       this.$router.push({
-        path: `/message/like/${this.index}`,
+        path: `/like/${this.index}`,
       });
     },
     // 前往点击的 url 地址
@@ -174,13 +174,15 @@ export default {
   margin-left: 10px;
 }
 
+.message-content {
+  margin: 7px 0 7px 0;
+  font-size: 14px;
+  color: #4d4d4d;
+}
+
 .message-date {
   color: #8d8d8d;
   font-size: 12px;
-}
-
-.message-abstract-box {
-  margin-bottom: 10px;
 }
 
 .message-abstract a {

@@ -22,6 +22,7 @@ export default {
                     }
                     // 文档下移
                     else if(e.wheelDeltaY && e.wheelDeltaY > 0) {
+                        console.log(window.scrollY, element.children[0].clientHeight - 20, window.scrollY < element.children[0].clientHeight - 20)
                         // 指定区域文档自动滚动到指定位置
                         if(element.children[0].clientHeight - 20 < window.scrollY &&
                             window.scrollY < element.children[0].clientHeight + 200) {

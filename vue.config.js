@@ -22,21 +22,21 @@ module.exports = defineConfig({
             entry: "./src/pages/homepage/index.js",
             template: './src/pages/homepage/index.html',
             filename: "homepage.html",
-            title: '花凋~~展示身份的地方'
+            title: '花凋~~个人主页'
         },
         // 账号信息
         account: {
             entry: "./src/pages/account/index.js",
             template: './src/pages/account/index.html',
             filename: "account.html",
-            title: '花凋~~账号也有身份证'
+            title: '花凋~~账号信息'
         },
         // 关注与粉丝
         followfan: {
             entry: "./src/pages/followfan/index.js",
             template: './src/pages/followfan/index.html',
             filename: "followfan.html",
-            title: '花凋~~情感的延续'
+            title: '花凋~~关注与粉丝'
         },
         // 收藏笔记或番剧
         star: {
@@ -57,14 +57,14 @@ module.exports = defineConfig({
             entry: "./src/pages/buildnote/index.js",
             template: './src/pages/buildnote/index.html',
             filename: "buildnote.html",
-            title: '花凋~~爱你所爱>>记你所想'
+            title: '花凋~~记你所想'
         },
         // 展示单个笔记
         singlenote: {
             entry: "./src/pages/singlenote/index.js",
             template: './src/pages/singlenote/index.html',
             filename: "note.html",
-            title: '花凋~~一个人的才华是无限的'
+            title: '花凋~~曾经的记录'
         },
         // 展示多个笔记
         notes: {

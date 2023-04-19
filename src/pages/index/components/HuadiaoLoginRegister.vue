@@ -29,7 +29,8 @@
                   @after-enter="transitioned = true"
       >
         <div class="login-container"
-             v-show="isShow.loginCard"
+             v-if="isShow.loginCard.render"
+             v-show="isShow.loginCard.show"
         >
           <transition name="fade">
             <img src="/svg/invisible.svg"
@@ -68,7 +69,8 @@
                   @after-enter="transitioned = true"
       >
         <div class="register-container"
-             v-show="isShow.registerCard"
+             v-if="isShow.registerCard.render"
+             v-show="isShow.registerCard.show"
         >
           <transition name="fade">
             <img src="/svg/invisible.svg"
@@ -147,13 +149,12 @@
 
 <script>
 import {Timer} from "@/assets/js/utils";
-import {mapState} from "vuex";
+import constants from "@/assets/js/constants";
+
+let registerResponse = constants.registerResponse;
 
 export default {
   name: "HuadiaoLoginRegister",
-  props: {
-    openLoginRegisterBoard: Function
-  },
   data() {
     return {
       // 用户输入
@@ -167,10 +168,16 @@ export default {
         confirmPassword: "",
         checkCode: "",
       },
-      checkCodeImgSrc: "http://localhost:9090/huadiao/checkCodeServlet",
+      checkCodeImgSrc: "http://localhost:9090/huadiao/common/registerCode",
       isShow: {
-        loginCard: false,
-        registerCard: false,
+        loginCard: {
+          render: false,
+          show: false,
+        },
+        registerCard: {
+          render: false,
+          show: false,
+        },
         // 小眼睛是否可见
         loginEye: false,
         registerEye: false,
@@ -188,9 +195,6 @@ export default {
         registerReveal: new Timer(),
       }
     }
-  },
-  computed: {
-    ...mapState(["isOnLine", "isConnectServer"])
   },
   mounted() {
     // 打开登录面板
@@ -217,31 +221,31 @@ export default {
           this.checkPassword(this.register.password) &&
           this.sameRegisterPassword() &&
           this.checkCheckCode()) {
-        let params = {
-          requestType: "ordinary",
-          operation: "register",
-          username: this.register.username,
-          password: this.register.password,
-          checkCode: this.register.checkCode
-        };
-        this.sendRequest(params, {}, {}, (response) => {
-          console.log(response.data);
-          let res = response.data;
-          // 注册响应处理
-          let registerResponse = {
-            sameUsername: "这个用户名太受欢迎了, 已经有人使用, 换一个吧!",
-            succeedRegister: "恭喜! 注册成功!",
-            wrongUsername: "用户名不能包含数字、字母和下划线以外的字符!",
-            wrongPassword: "密码不能包含数字、字母和下划线以及 !, -, @ 以外的字符!",
-            wrongCode: "验证码错误!",
-            nullUsername: "请填写用户名!",
-            nullPassword: "请填写密码!",
-            nullCheckCode: "请填写验证码!"
-          };
-          if (registerResponse[res]) {
-            this.huadiaoWarningTip(registerResponse[res]);
-          } else {
-            this.huadiaoWarningTip("出现未知错误!");
+        this.sendRequest({
+          path: "common/register",
+          method: "post",
+          data: {
+            username: this.register.username,
+            password: this.register.password,
+            confirmPassword: this.register.confirmPassword,
+            checkCode: this.register.checkCode
+          },
+          thenCallback: (response) => {
+            console.log(response.data);
+            let res = response.data;
+            // 注册响应处理
+            if (registerResponse[res]) {
+              if(res === "succeedRegister") {
+                this.$refs.loginBtn.click();
+                this.register.username = this.register.password = this.register.confirmPassword = this.register.checkCode = "";
+              }
+              this.huadiaoWarningTip(registerResponse[res]);
+            } else {
+              this.huadiaoWarningTip("出现未知错误!");
+            }
+          },
+          errorCallback: () => {
+            this.huadiaoMiddleTip("可能由于服务器的原因导致注册失败");
           }
         });
       }
@@ -249,30 +253,40 @@ export default {
     // 点击登录按钮
     clickToLoginHuadiao() {
       if (this.checkUsername(this.login.username) && this.checkPassword(this.login.password)) {
-        let params = {
-          requestType: "ordinary",
-          operation: "login",
-          username: this.login.username,
-          password: this.login.password
-        };
-        this.sendRequest(params, {}, {}, (response) => {
-          console.log(response.data);
-        })
+        this.sendRequest({
+          path: "common/login",
+          method: "post",
+          headers: "json",
+          data: {
+            username: this.login.username,
+            password: this.login.password
+          },
+          thenCallback: () => {
+            // 刷新网页
+            window.location.reload();
+          },
+          errorCallback: (error) => {
+            console.log(error);
+            if(error.response.status === 404) {
+              this.huadiaoMiddleTip("用户名或密码输入错误!");
+            }
+          }
+        });
       }
     },
     // 检查用户名是否符合标准
     checkUsername(username) {
       if (!username) {
-        this.huadiaoWarningTip("请输入用户名!");
+        this.huadiaoWarningTip(registerResponse.nullUsername);
         return false;
       }
       if (!(8 <= username.length && username.length <= 20)) {
-        this.huadiaoWarningTip("用户名长度应为 8 至 20 之间!");
+        this.huadiaoWarningTip(registerResponse.wrongUsernameLength);
         return false;
       }
       let reg = /[^0-9a-zA-Z_]/;
       if (reg.test(username)) {
-        this.huadiaoWarningTip("用户名要求只含有数字、字母或下划线!");
+        this.huadiaoWarningTip(registerResponse.wrongUsername);
         return false;
       }
       return true;
@@ -290,7 +304,7 @@ export default {
       if(this.register.password === this.register.confirmPassword) {
         return true;
       }
-      this.huadiaoWarningTip("两次输入的密码不一样! 按下 ctrl + alt 可以返回重新输入!");
+      this.huadiaoWarningTip(registerResponse.noSamePassword);
       return false;
     },
     // 根据前后输入的密码来给出相应的提示
@@ -304,16 +318,16 @@ export default {
     // 检查密码是否符合标准
     checkPassword(password) {
       if (!password) {
-        this.huadiaoWarningTip("请输入密码!");
+        this.huadiaoWarningTip(registerResponse.nullPassword);
         return false;
       }
       if (!(8 <= password.length && password.length <= 32)) {
-        this.huadiaoWarningTip("密码长度应为 8 至 32 之间!");
+        this.huadiaoWarningTip(registerResponse.wrongPasswordLength);
         return false;
       }
-      let reg = /[^0-9a-zA-Z_!-@]/;
+      let reg = /[^0-9a-zA-Z_!@-]/;
       if (reg.test(password)) {
-        this.huadiaoWarningTip("密码要求不能出现除数字、字母、下划线以及 !, -, @ 的字符!");
+        this.huadiaoWarningTip(registerResponse.wrongPassword);
         return false;
       }
       // 密码要求下面三种都必须要有
@@ -332,21 +346,18 @@ export default {
           requireChar.capital--;
         } else if ('a' <= c && c <= 'z') {
           requireChar.ordinary--;
-        } else {
-          this.huadiaoWarningTip("密码必须包含并且只包含大写字母、小写字母和数字!");
-          return false;
         }
       }
       if (requireChar.ordinary <= 0 && requireChar.capital <= 0 && requireChar.number <= 0) {
         return true;
       }
-      this.huadiaoWarningTip( "密码必须包含并且只包含大写字母、小写字母和数字!");
+      this.huadiaoWarningTip(registerResponse.wrongPassword);
       return false;
     },
     // 检查验证码
     checkCheckCode() {
       if (!this.register.checkCode) {
-        this.huadiaoWarningTip("请输入验证码!")
+        this.huadiaoWarningTip(registerResponse.nullCheckCode)
         return false;
       }
       return true;
@@ -386,23 +397,25 @@ export default {
     // 点击跳转登录
     clickToDumpLogin() {
       // 打开注册登录面板
-      this.openLoginRegisterBoard();
+      this.$bus.$emit("openLoginRegisterBoard");
       // 过度完成并且登录面板未展示
-      if (this.transitioned && !this.isShow.loginCard) {
+      if (this.transitioned && !this.isShow.loginCard.show) {
         this.transitioned = false;
-        this.isShow.loginCard = true;
-        this.isShow.registerCard = false;
+        this.isShow.loginCard.render = true;
+        this.isShow.loginCard.show = true;
+        this.isShow.registerCard.show = false;
       }
     },
     // 点击跳转注册
     clickToDumpRegister() {
       // 打开登录注册面板
-      this.openLoginRegisterBoard();
+      this.$bus.$emit("openLoginRegisterBoard");
       // 过度完成并且注册面板未展示
-      if (this.transitioned && !this.isShow.registerCard) {
+      if (this.transitioned && !this.isShow.registerCard.show) {
         this.transitioned = false;
-        this.isShow.loginCard = false;
-        this.isShow.registerCard = true;
+        this.isShow.loginCard.show = false;
+        this.isShow.registerCard.render = true;
+        this.isShow.registerCard.show = true;
       }
     }
   },
@@ -431,18 +444,18 @@ export default {
   height: 375px;
   border-radius: 8px;
   box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.20);
-  background: url('@/../public/img/index/loginRegisterBackground.png') no-repeat;
+  background: url('~@/../public/img/index/loginRegisterBackground.png') no-repeat;
   background-size: cover;
 }
 
 .login-container {
   left: 25px;
-  background: url('@/../public/img/index/login.png') no-repeat;
+  background: url('~@/../public/img/index/login.png') no-repeat;
 }
 
 .register-container {
   right: 25px;
-  background: url('@/../public/img/index/register.png') no-repeat;
+  background: url('~@/../public/img/index/register.png') no-repeat;
 }
 
 .login-container,

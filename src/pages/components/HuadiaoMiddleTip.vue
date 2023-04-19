@@ -2,7 +2,9 @@
   <transition name="fade">
     <div class="huadiao-mark-tip-container"
          ref="huadiaoMarkTipContainer"
-         v-show="show"
+         :style="`color: ${defaultTipStyle.color}; background-color: ${defaultTipStyle.backgroundColor};`"
+         v-show="visible.show"
+         v-if="visible.render"
     >
       <span>{{ tip }}</span>
     </div>
@@ -18,8 +20,10 @@ export default {
   data() {
     return {
       tip: "屏中提示组件",
-      // 展示
-      show: false,
+      visible: {
+        render: false,
+        show: false
+      },
       timer: new Timer(),
       // 默认样式
       defaultTipStyle: {
@@ -33,10 +37,6 @@ export default {
     this.$bus.$on("huadiaoMiddleTip", this.addHuadiaoMiddleTip);
     this.modifyDefaultStyle();
   },
-  mounted() {
-    this.$refs.huadiaoMarkTipContainer.style.color = this.defaultTipStyle.color;
-    this.$refs.huadiaoMarkTipContainer.style.backgroundColor = this.defaultTipStyle.backgroundColor;
-  },
   methods: {
     // 修改默认样式
     modifyDefaultStyle() {
@@ -48,9 +48,10 @@ export default {
       let time = middleTip.length / 12 * 1000;
       time = time > 2000 ? time : 2000;
       this.tip = middleTip;
-      this.show = true;
+      this.visible.show = true;
+      this.visible.render = true;
       this.timer.timeout(() => {
-        this.show = false;
+        this.visible.show = false;
       }, time);
     },
   },

@@ -1,5 +1,5 @@
 <template>
-  <div class="no-login-board">
+  <div class="no-login-board" :style="`background: ${boardStyle.background}; --no-login-board-color: ${boardStyle.boardTextColor}`">
     <h6>登陆后你可以:</h6>
     <div class="huadiao-introduce">
       <span v-for="(intro, index) in noLogin"
@@ -11,12 +11,14 @@
       </span>
     </div>
     <div class="immediately-login"
+         :style="`background-color: ${boardStyle.ImmediatelyBtnBackgroundColor}`"
          @click="openLoginBoard"
          ref="immediatelyLogin"
     >立即登录</div>
     <div class="no-login-board-lower">
       <i>首次使用？</i>
       <span class="click-register"
+            :style="`color: ${boardStyle.registerTextColor}`"
             @click="openRegisterBoard"
             ref="immediatelyRegister"
       >点我注册</span>
@@ -27,7 +29,7 @@
 <script>
 export default {
   name: "NoLoginBoard",
-  props: ["noLogin"],
+  props: ["noLogin", "boardStyle"],
   data() {
     return {
     }
@@ -41,11 +43,15 @@ export default {
   methods: {
     // 打开登录面板
     openLoginBoard() {
-      this.$bus.$emit("openLoginBoard");
+      this.$bus.$emit("openLoginRegisterBoard", () => {
+        this.$bus.$emit("openLoginBoard");
+      });
     },
     // 打开注册面板
     openRegisterBoard() {
-      this.$bus.$emit("openRegisterBoard");
+      this.$bus.$emit("openLoginRegisterBoard", () => {
+        this.$bus.$emit("openRegisterBoard");
+      });
     }
   },
   beforeDestroy() {
@@ -65,15 +71,15 @@ export default {
   right: -74px;
   width: 230px;
   height: 180px;
-  background: -webkit-linear-gradient(left bottom, #454440b4, #84041bb9);
   transition: var(--transition-400ms);
+  --no-login-board-color: "";
 }
 
 /* 共同样式 */
 .no-login-board h6,
 .no-login-board div span,
 .immediately-login {
-  color: #cecaca;
+  color: var(--no-login-board-color);
   font-size: 14px;
 }
 
@@ -117,20 +123,14 @@ export default {
   border-radius: 15px;
   text-align: center;
   line-height: 30px;
-  background-color: #4c829e;
 }
 
 /* 框尾部 */
 .no-login-board-lower {
   margin-top: 7px;
   text-align: center;
-  color: #cecaca;
+  color: var(--no-login-board-color);
   font-size: 12px;
-}
-
-/* 立即注册 */
-.no-login-board-lower .click-register {
-  color: #4c829e
 }
 
 </style>

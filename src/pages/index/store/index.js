@@ -8,32 +8,38 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-// 用于响应组件中的动作
-const actions = {
-
-}
-// 用于操作数据
-const mutations = {
-    // 修改网络连接状态
-    modifyOnLineState(state, bool) {
-        state.isOnLine = bool;
-    },
-    // 修改是否连接上服务器
-    modifyConnectServerState(state, bool) {
-        state.isConnectServer = bool;
-    }
-}
 // 用于存储数据
 const state = {
-    // 是否联网
-    isOnLine: true,
-    // 是否连接上服务器
-    isConnectServer: true,
     refs: {
         immediatelyLogin: null,
         immediatelyRegister: null,
+    },
+    // 用户信息
+    user: {
+        login: false,
+        fans: 0,
+        follows: 0,
+        nickname: "",
+        uid: 0,
+        userAvatar: ""
+    },
+    // 诗句
+    poem: {
+
     }
 }
+
+// 用于响应组件中的动作
+const actions = {
+}
+// 用于操作数据
+const mutations = {
+    // 初始化 user 的信息
+    initialUser(state, {user}) {
+        state.user = user;
+    },
+}
+
 // 获取
 const getters = {
 }

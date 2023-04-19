@@ -20,7 +20,7 @@ export default new VueRouter({
             components: {
                 // mainBoard 是指定的 router-view 的 name, 必须配合 components 属性使用
                 mainBoard: () => import("@/pages/account/pages/HuadiaoAccountInfo")
-            }
+            },
         },
         {
             name: "accountSettings",

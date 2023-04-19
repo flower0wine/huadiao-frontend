@@ -1,6 +1,6 @@
 <template>
   <div class="huadiao-follow-fan">
-    <huadiao-header :isLogin="isLogin" :user="user"/>
+    <huadiao-header/>
     <huadiao-follow-fan-board/>
     <div class="follow-fan-foreground foreground-animation"
          ref="followFanForeground"
@@ -30,7 +30,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(["isLogin", "user"]),
   },
   beforeMount() {
     this.getViewedUid();
@@ -42,7 +41,7 @@ export default {
     getViewedUid() {
       if (!this.viewedUid) {
         // let url = window.location.href;
-        let url = "http://localhost:9090/huadiao/1/follow/follow";
+        let url = "http://localhost:9090/huadiao/9/follow/follow";
         this.viewedUid = url.split(/\//)[4];
       }
       return this.viewedUid;
