@@ -2,10 +2,12 @@
   <div class="huadiao-follow-fan-item">
     <a class="user-avatar-box"
        :title="'前往' + item.nickname + '的个人主页'"
-       :href="isLogin ? '/homepage/' + uid : wrongLink"
+       :href="login ? '/homepage/' + uid : wrongLink"
     >
       <img src="/svg/noLoginAvatar.svg" alt="">
-      <div class="user-avatar" ref="userAvatar"></div>
+      <div class="user-avatar"
+           :style="`background-image: ${addBackground(item.userAvatar)}`"
+      ></div>
     </a>
     <div class="user-infer">
       <div class="nickname"
@@ -25,16 +27,16 @@
               :follow="follow"
         ></slot>
         <img src="/svg/more.svg"
-             @mouseenter="isShow.toolMenu = true"
-             @mouseleave="isShow.toolMenu = false"
+             @mouseenter="visible.toolMenu = true"
+             @mouseleave="visible.toolMenu = false"
              ref="more"
              alt="">
       </div>
       <transition name="fade">
         <div class="tool-menu"
-             v-show="isShow.toolMenu"
-             @mouseenter="isShow.toolMenu = true"
-             @mouseleave="isShow.toolMenu = false"
+             v-show="visible.toolMenu"
+             @mouseenter="visible.toolMenu = true"
+             @mouseleave="visible.toolMenu = false"
              ref="toolMenu"
         >
           <div>发消息</div>
@@ -47,7 +49,6 @@
 
 <script>
 import constants from "@/assets/js/constants";
-import {mapState} from "vuex";
 
 export default {
   name: "HuadiaoFollowFanItem",
@@ -55,34 +56,56 @@ export default {
   data() {
     return {
       // 是否关注
-      follow: this.type === "follow" ? true : (this.type === "fan" && this.item.isFriend),
-      isShow: {
+      follow: this.type === "follow" ? true : (this.type === "fan" && this.item.friend),
+      visible: {
         toolMenu: false,
       },
       wrongLink: constants.wrongLink,
     }
   },
   computed: {
-    ...mapState(["isLogin"]),
+    login() {
+      return this.$store.state.user.login;
+    },
     me() {
-      return this.$store.state.followFan.me;
+      return this.$store.state.me;
     }
   },
-  mounted() {
-    this.initialFollowUser();
-  },
   methods: {
-    // 初始化
-    initialFollowUser() {
-      this.$refs.userAvatar.style.backgroundImage = "url(" + this.item.userAvatar + ")"
-    },
     // 改变关注状态
-    changeFollowStatus() {
-      this.follow = !this.follow;
-      // 刷新关注
-      if(this.type === "follow") {
-        this.$store.dispatch("flushUserFollow", {increment: this.follow ? 1 : -1, followUid: this.uid});
+    changeFollowStatus(uid) {
+      // 根据不同的关注状态选择不同的后端接口
+      let path;
+      if(this.follow) {
+        path = "relation/modify";
+      } else {
+        path = "relation/newFriend";
       }
+      // 如果是全部关注, 转换为默认关注
+      this.sendRequest({
+        path,
+        params: {
+          uid,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          // 刷新关注数量
+          this.$store.dispatch("flushUserFollow", {follow: this.follow, followUid: this.uid});
+          this.follow = !this.follow;
+        },
+        errorCallback: (error) => {
+          console.log(error);
+          console.log('hhhh')
+          let tip;
+          if(this.follow) {
+            tip = "取消关注失败";
+          } else {
+            tip = "关注失败";
+          }
+          this.huadiaoMiddleTip(tip);
+        },
+      });
     },
   },
   beforeDestroy() {
@@ -116,7 +139,6 @@ export default {
 
 .user-avatar-box img:hover,
 .user-avatar:hover {
-  transform: translateY(-3px);
   box-shadow: var(--box-shadow-min);
 }
 

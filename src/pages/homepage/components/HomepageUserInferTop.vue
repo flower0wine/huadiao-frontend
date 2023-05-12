@@ -1,42 +1,42 @@
 <template>
   <div class="homepage-user-infer">
     <label for="userAvatar"
-           :title="userInfer.me ? '更换头像' : ''"
+           :title="me ? '更换头像' : ''"
     >
-      <div class="user-avatar-container">
+      <span class="user-avatar-container">
         <img src="/svg/noLoginAvatar.svg"
              class="user-default-avatar"
              alt>
-        <div class="user-avatar" ref="userAvatar"></div>
-      </div>
+        <span class="user-avatar" :style="`background-image: ${addBackground(homepageInfo.userAvatar)}`" ref="userAvatar"></span>
+      </span>
       <input type="file"
-             v-if="userInfer.me"
+             v-if="me"
              id="userAvatar">
     </label>
-    <div class="homepage-nickname">{{userInfer.nickname}}</div>
+    <div class="homepage-nickname">{{userInfo.nickname}}</div>
     <div class="homepage-sex">
-      <img :src="sexSvg[userInfer.sex]"
+      <img :src="sexSvg[userInfo.sex]"
            class="sex-icon"
            alt>
     </div>
     <div class="born-date-school">
-      <span class="born-date">{{userInfer.bornDate}}</span>
-      <a :href="baiduSearch + userInfer.school"
+      <span class="born-date">{{userInfo.bornDate}}</span>
+      <a :href="baiduSearch + userInfo.school"
          target="_blank">
-        <span class="school">{{userInfer.school}}</span>
+        <span class="school">{{userInfo.school}}</span>
       </a>
     </div>
     <div class="homepage-canvases"
-         :title="userInfer.canvases">
-      {{userInfer.canvases.length < 200 ? userInfer.canvases : userInfer.canvases.slice(0, 200) + "..."}}
+         :title="userInfo.canvases">
+      {{userInfo.canvases.length < 200 ? userInfo.canvases : userInfo.canvases.slice(0, 200) + "..."}}
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "HomepageUserInfer",
-  props: ["userInfer"],
+  name: "HomepageUserInferTop",
+  props: ["userInfo", "homepageInfo", "me"],
   data() {
     return {
       sexSvg: {
@@ -51,13 +51,8 @@ export default {
     }
   },
   mounted() {
-    this.initialUserInfer();
   },
   methods: {
-    // 初始化用户信息
-    initialUserInfer() {
-      this.$refs.userAvatar.style.backgroundImage = "url(" + this.userInfer.userAvatar + ")";
-    }
   },
   beforeDestroy() {
   }
@@ -74,6 +69,7 @@ export default {
 
 .user-avatar-container {
   position: relative;
+  display: inline-block;
   border-radius: 50%;
   box-shadow: var(--box-shadow);
 }
@@ -81,19 +77,23 @@ export default {
 .user-avatar {
   position: absolute;
   top: 0;
+  left: 0;
   width: 80px;
   height: 80px;
   border-radius: 50%;
   border: 2px solid #fff;
-  transform: rotateZ(0deg);
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   transition: var(--transition-500ms);
 }
 
-.user-avatar:hover {
-  animation: circleRotate 5s linear infinite;
+.user-avatar-container {
+  transition: all linear 60s;
+}
+
+.user-avatar-container:hover {
+  transform: rotateZ(3600deg);
 }
 
 .user-default-avatar {

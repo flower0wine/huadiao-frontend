@@ -44,7 +44,7 @@
                  alt=""
             >
             <div v-if="login && user.userAvatar"
-                 :style="`border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}; background-image: ${user.userAvatar}`"
+                 :style="`border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}; background-image: ${addBackground(user.userAvatar)}`"
                  class="user-avatar-box logged-avatar"
                  ref="avatar"
             ></div>
@@ -81,6 +81,7 @@ import LoggedBoard from "@/pages/components/LoggedBoard";
 import {INDEX_TIPS} from "@/assets/js/tips";
 import HuadiaoSearch from "@/pages/components/HuadiaoSearch";
 import constants from "@/assets/js/constants";
+import {mapState} from "vuex";
 
 export default {
   name: "HuadiaoHeader",
@@ -136,9 +137,7 @@ export default {
       set() {
       }
     },
-    user() {
-      return this.$store.state.user;
-    },
+    ...mapState(["user"]),
     // 首页头部配置
     huadiaoIndexHeaderConfig() {
       return {
@@ -196,7 +195,7 @@ export default {
         path: "huadiaoHeader",
         thenCallback: (response) => {
           let res = response.data;
-          console.log(res);
+          console.log(res)
           this.$store.commit("initialUser", {user: res});
         },
         errorCallback: (error) => {

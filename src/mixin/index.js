@@ -16,6 +16,7 @@ export const mixin = {
         }
     },
     watch: {
+        // 监听 user 来判断是否获取了数据
         user: {
             deep: true,
             handler(newValue) {
@@ -159,8 +160,18 @@ export const mixin = {
             }
         },
         // 判断我和他人的关系
-        judgeMeAndOtherRelation(followed, following) {
-            return following ? followed ? "已互粉" : "已关注" : "关注";
+        judgeMeAndOtherRelation(relation) {
+            if(relation === "friend") {
+                this.follow = this.fan = true;
+            } else if(relation === "follow") {
+                this.follow = true;
+                this.fan = false;
+            } else if(relation === "fan") {
+                this.follow = false;
+                this.fan = true;
+            } else if(relation === "stranger") {
+                this.follow = this.fan = false;
+            }
         },
         // 获取指定长度的随机字符串, 可能包含字母, 数字, !, _, :, =
         getUniqueString(length) {
@@ -181,6 +192,25 @@ export const mixin = {
         // 添加背景
         addBackground(url) {
             return "url('" + url + "')";
+        },
+        // 根据性别以及是否是我来更新称呼, 他, 她, 我
+        accordingSexToSetName(me, sex) {
+            if (me) {
+                return "我的";
+            } else {
+                // 陌生人
+                if (sex === "0") {
+                    return "";
+                } else if (sex === "1") {
+                    return "他的";
+                } else if (sex === "2") {
+                    return "她的";
+                }
+            }
+        },
+        // 如果数字大于一万
+        numberGreaterThenTenThousand(number) {
+            return number > 10000 ? number.toFixed(1) + "万" : number;
         },
     },
 }

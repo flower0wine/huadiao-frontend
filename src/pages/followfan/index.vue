@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
 import HuadiaoFollowFanBoard from "@/pages/followfan/components/HuadiaoFollowFanBoard";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
@@ -26,73 +25,15 @@ export default {
   name: "HuadiaoFollowFan",
   data() {
     return {
-      viewedUid: null,
+
     }
   },
-  computed: {
+  watch: {
   },
-  beforeMount() {
-    this.getViewedUid();
-    this.getUserAccountInfer();
-    this.getUserFollowInfer();
+  mounted() {
   },
   methods: {
-    // 获取被观察的用户 uid
-    getViewedUid() {
-      if (!this.viewedUid) {
-        // let url = window.location.href;
-        let url = "http://localhost:9090/huadiao/9/follow/follow";
-        this.viewedUid = url.split(/\//)[4];
-      }
-      return this.viewedUid;
-    },
-    // 获取用户账号信息
-    getUserAccountInfer() {
-      let params = {
-        requestType: "ordinary",
-        operation: "status",
-      };
-      this.sendRequest(params, {}, {}, (response) => {
-        let res = response.data;
-        console.log(res)
-        // 对象
-        if (typeof res === "object") {
-          if (this.messageResponse(res)) {
-            // no things
-          }
-          // 如果是用户信息
-          else if (Object.hasOwnProperty.call(res, "uid")) {
-            this.$store.commit("setUserAccountInfer", res);
-          }
-        }
-      }, this.serverNoResponseError);
-    },
-    // 获取该用户关注信息
-    getUserFollowInfer() {
-      let params = {
-        requestType: "followsFans",
-        operation: "getFollowsFans",
-        viewedUid: this.getViewedUid(),
-      };
-      this.sendRequest(params, {}, {}, (response) => {
-        let res = response.data;
-        console.log(res);
-        if (typeof res === "object") {
-          if (Object.hasOwnProperty.call(res, "code")) {
-            if (res.code === 0) {
-              this.huadiaoWarningTip("不可识别的的请求!");
-            }
-          }
-          // 如果是用户信息
-          else if (Object.hasOwnProperty.call(res, "me")) {
-            // 存储数据到 vuex
-            this.$store.commit("setUserAccountInfer", res);
-            // 分析关注和粉丝是否是同一个人, 判断是否互粉
-            this.$store.dispatch("searchSameUser");
-          }
-        }
-      }, this.serverNoResponseError);
-    },
+
   },
   beforeDestroy() {
   },

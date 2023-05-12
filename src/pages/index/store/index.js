@@ -17,11 +17,11 @@ const state = {
     // 用户信息
     user: {
         login: false,
-        fans: 0,
-        follows: 0,
         nickname: "",
         uid: 0,
-        userAvatar: ""
+        userAvatar: "",
+        follows: 0,
+        fans: 0,
     },
     // 诗句
     poem: {

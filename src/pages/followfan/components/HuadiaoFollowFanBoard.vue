@@ -3,7 +3,7 @@
     <div class="follow-fan-group">
       <div class="follow-group">
         <div class="group-header">
-          <span>{{$store.getters.call}}的关注</span>
+          <span>{{ $store.getters.call }}的关注</span>
           <img src="/svg/add.svg"
                title="新建分组"
                v-if="me"
@@ -12,7 +12,7 @@
                alt>
         </div>
         <router-link :to="{
-          path: `/followfan/follow/${item.groupId}`
+          path: `/followfan/follow/${item.groupId}`,
         }"
                      v-for="(item, index) in followGroup"
                      class="group-link"
@@ -25,21 +25,21 @@
                      tag="div"
         >
           <span class="group-name">{{ item.groupName }}</span>
-          <span class="group-number">{{ item.number }}</span>
+          <span class="group-number">{{ item.count }}</span>
           <span class="group-more"
                 v-if="item.allowOperate && me"
-                @mouseenter="isShow.groupMore.splice(index, 1, true)"
-                @mouseleave="isShow.groupMore.splice(index, 1, false)"
-                @click="isShow.groupMore.splice(index, 1, false)"
+                @mouseenter="visible.groupMore.splice(index, 1, true)"
+                @mouseleave="visible.groupMore.splice(index, 1, false)"
+                @click="visible.groupMore.splice(index, 1, false)"
                 ref="GroupMore"
           >
             <img src="/svg/more.svg" title="更多操作" alt="">
             <transition name="fade">
               <div class="group-more-board"
                    title=""
-                   v-show="isShow.groupMore[index]">
-                <div @click="modifyGroupName(index, item.groupName)">修改组名</div>
-                <div @click="deleteGroup(index)">删除分组</div>
+                   v-show="visible.groupMore[index]">
+                <div @click="modifyGroupName(index, item.groupName, item.groupId)">修改组名</div>
+                <div @click="deleteGroup(index, item.groupId)">删除分组</div>
               </div>
             </transition>
           </span>
@@ -52,15 +52,16 @@
                      class="group-link"
                      :title="item.groupName"
                      active-class="group-link-active"
-                     :key="index"
-                     tag="div">
+                     :key="index">
           <span class="group-name">{{ item.groupName }}</span>
-          <span class="group-number">{{ item.number }}</span>
+          <span class="group-number">{{ item.count }}</span>
         </router-link>
       </div>
     </div>
     <div class="follow-fan-exhibit">
-      <router-view name="followFanExhibit"></router-view>
+      <keep-alive>
+        <router-view name="followFanExhibit"></router-view>
+      </keep-alive>
     </div>
   </div>
 </template>
@@ -73,51 +74,116 @@ export default {
   computed: {
     ...mapState(["followGroup", "fanGroup"]),
     me() {
-      return this.$store.state.followFan.me;
+      return this.$store.state.me;
     },
   },
   data() {
     return {
-      isShow: {
+      viewedUid: 1,
+      visible: {
         groupMore: [],
+      },
+      loadingCircleStyle: {
+        circleColor: "#a6a6a6",
       }
     }
   },
-  beforeMount() {
-    this.initial();
+  created() {
+    this.getCurrentUserFollowFanInfo();
   },
   methods: {
+    // 获取当前用户的关注与粉丝信息
+    getCurrentUserFollowFanInfo() {
+      this.getFollowFanCount();
+      // 先判断当前用户是否为本人访问
+      this.sendRequest({
+        path: "share",
+        thenCallback: (response) => {
+          let res = response.data;
+          // 仅当当前用户为本人才获取关注分组
+          if (this.viewedUid === res.uid) {
+            this.getUserFollowGroup();
+          }
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      });
+    },
+    // 获取用户关注分组
+    getUserFollowGroup() {
+      this.sendRequest({
+        path: "relation/follow/group",
+        thenCallback: (response) => {
+          let res = response.data;
+          this.$store.commit("initialFollowGroup", {followGroup: res});
+          this.initial();
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      });
+    },
+    // 获取用户关注和粉丝统计信息
+    getFollowFanCount() {
+      this.sendRequest({
+        path: "relation/stat",
+        params: {
+          viewedUid: this.viewedUid,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          this.$store.commit("initialFollowFanCount", {stat: res});
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      })
+    },
     // 初始化
     initial() {
-      // 全部填充为 false
+      // 全部填充为 false, 与关注分组操作面板显示有关
       let array = new Array(this.followGroup.length);
-      this.isShow.groupMore = array.fill(false);
+      this.visible.groupMore = array.fill(false);
     },
     // 打开新建面板
     openAddNewGroupBoard() {
       this.$bus.$emit('openAddNewGroupBoard');
     },
     // 修改组名
-    modifyGroupName(modifyIndex, groupName) {
-      this.$bus.$emit("openModifyGroupBoard", modifyIndex, groupName);
+    modifyGroupName(modifyIndex, groupName, groupId) {
+      this.$bus.$emit("openModifyGroupBoard", modifyIndex, groupName, groupId);
     },
     // 删除分组
-    deleteGroup(deleteIndex) {
-      this.huadiaoPopupWindow(
-          "warning",
-          "confirmOrCancel",
-          "确认删除吗？删除后该收藏夹下的所有收藏都将删除!",
-          () => {
-        this.$store.dispatch("deleteFollowGroup", {
-          deleteIndex,
-          succeedCallback: () => {
-            this.huadiaoMiddleTip("删除成功!");
-          },
-          failCallback: () => {
-            this.huadiaoMiddleTip("分组不存在或不允许删除")
-          }
-        });
-      });
+    deleteGroup(deleteIndex, groupId) {
+      this.sendRequest({
+        path: "relation/deleteFollowGroup",
+        params: {
+          groupId,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          this.huadiaoPopupWindow(
+              "warning",
+              "confirmOrCancel",
+              "确认删除吗？删除后该收藏夹下的所有收藏都将删除!",
+              () => {
+                this.$store.dispatch("deleteFollowGroup", {
+                  deleteIndex,
+                  succeedCallback: () => {
+                    this.huadiaoMiddleTip("删除成功!");
+                  },
+                  failCallback: () => {
+                    this.huadiaoMiddleTip("分组不存在或不允许删除")
+                  },
+                });
+              });
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      })
     },
   },
   beforeDestroy() {
@@ -196,6 +262,9 @@ export default {
 .group-more {
   position: relative;
   display: none;
+  width: 20px;
+  height: 30px;
+  padding: 4px 0 0 4px;
 }
 
 /* 管理分组 */

@@ -1,12 +1,14 @@
 <template>
   <transition name="fade">
-    <div class="add-new-group-mark" v-show="isShow">
+    <div class="add-new-group-mark"
+         v-if="visible.render"
+         v-show="visible.show">
       <div class="add-new-group-board">
         <div class="add-new-group-header">{{ modify ? "修改组名" : "新建分组" }}</div>
         <div class="new-group-name">
           <input type="text"
                  placeholder="请输入组名"
-                 v-model="groupName"
+                 v-model="tempGroupName"
                  maxlength="16"
           >
           <div class="group-name-require">{{ groupNameWordNumber }}/16</div>
@@ -26,74 +28,94 @@ export default {
   name: "AddNewGroupBoard",
   data() {
     return {
-      isShow: false,
+      visible: {
+        render: false,
+        show: false,
+      },
       // 修改组名？
       modify: false,
-      // 组名
-      groupName: "",
+      // 组名, 原本的组名
+      groupName: null,
+      // 修改后的组名
+      tempGroupName: null,
+      groupId: null,
       groupNameWordNumber: 0,
       // 待修改组名的索引
       modifyIndex: null,
     }
   },
   watch: {
-    groupName: {
+    tempGroupName: {
       handler(newValue) {
         this.groupNameWordNumber = newValue.length;
       }
     },
   },
   beforeMount() {
+    // 打开新建关注分组面板
     this.$bus.$on("openAddNewGroupBoard", () => {
       this.modify = false;
-      this.isShow = true;
+      this.visible.render = true;
+      this.visible.show = true;
     });
-    this.$bus.$on("openModifyGroupBoard", (modifyIndex, groupName) => {
+    // 打开修改已创建关注分组面板
+    this.$bus.$on("openModifyGroupBoard", (modifyIndex, groupName, groupId) => {
       this.modifyIndex = modifyIndex;
-      this.groupName = groupName;
+      this.groupName = this.tempGroupName = groupName;
+      this.groupId = groupId;
       this.modify = true;
-      this.isShow = true;
-    })
+      this.visible.render = true;
+      this.visible.show = true;
+    });
   },
   methods: {
     // 修改组名
     modifyGroupName() {
-      // 发出更改
-      this.$store.dispatch("modifyGroupName", {
-        modifyIndex: this.modifyIndex,
-        groupName: this.groupName,
-        succeedCallback: () => {
-          this.isShow = false;
-          // 提示
-          this.huadiaoMiddleTip("组名修改成功!");
+      // 相同的组名不发送请求
+      if (this.groupName === this.tempGroupName) {
+        this.visible.show = false;
+        return;
+      }
+      this.sendRequest({
+        path: "relation/modifyFollowGroupName",
+        params: {
+          groupName: this.tempGroupName,
+          groupId: this.groupId,
         },
-        failCallback: () => {
-          this.huadiaoMiddleTip("该组不存在或该组不允许操作导致组名修改失败!");
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          // 发出更改
+          this.$store.dispatch("modifyGroupName", {
+            modifyIndex: this.modifyIndex,
+            groupName: this.tempGroupName,
+            succeedCallback: () => {
+              this.visible.show = false;
+              this.huadiaoMiddleTip("组名修改成功!");
+            },
+          });
+        },
+        errorCallback: (error) => {
+          console.log(error);
         }
-      });
+      })
     },
     // 添加新组
     addNewGroup() {
-      if (typeof this.groupName === "string") {
-        if(this.groupName.length !== 0 && this.groupName.length <= 16) {
-          this.$store.commit("addNewFollowGroup", this.groupName);
-          // 关闭面板
-          this.isShow = false;
-          this.groupName = "";
-        }
-        else if(this.groupName.length === 0){
-          this.huadiaoMiddleTip("组名不能为空哦!");
-        }
-        else if (this.groupName.length > 16) {
-          this.huadiaoMiddleTip("组名长度最大为 16 个字符!");
-        }
-      } else {
-        this.huadiaoMiddleTip("请检查输入是否有误!");
+      if (this.groupName.length !== 0 && this.groupName.length <= 16) {
+        this.$store.commit("addNewFollowGroup", {groupName: this.groupName});
+        // 关闭面板
+        this.visible.show = false;
+        this.groupName = "";
+      } else if (this.groupName.length === 0) {
+        this.huadiaoMiddleTip("组名不能为空哦!");
+      } else if (this.groupName.length > 16) {
+        this.huadiaoMiddleTip("组名长度最大为 16 个字符!");
       }
     },
     // 关闭面板
     closeBoard() {
-      this.isShow = false;
+      this.visible.show = false;
       this.groupName = "";
     }
   },

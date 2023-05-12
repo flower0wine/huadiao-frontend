@@ -1,5 +1,5 @@
 /**
- * 功能描述：
+ * 功能描述：VueRouter
  * 创建日期：2023 年 02 月 27 日
  */
 
@@ -11,12 +11,12 @@ export default new VueRouter({
     mode: "history",
     routes: [
         {
-            path: "/followfan",
+            path: "/followfan/follow",
             redirect: "/followfan/follow/-1",
         },
         {
             name: "followBoard",
-            path: "/followfan/follow/:groupId(-?\\d+)",
+            path: "/followfan/follow/:groupId(-?\\d+)?",
             components: {
                 followFanExhibit: () => import("@/pages/followfan/pages/HuadiaoFollowBoard"),
             },

@@ -12,6 +12,7 @@ import "@/assets/css/common.css";
 import "@/assets/css/animation.css";
 import {mixin} from "@/mixin";
 import $ from "jquery";
+import store from "@/pages/homepage/store";
 
 Vue.config.productionTip = false;  // 生产提示
 
@@ -31,5 +32,6 @@ new Vue({
     },
     // 渲染
     render: h => h(index),
+    store,
     // 挂载
 }).$mount('#app');

@@ -235,7 +235,7 @@ export default {
             let res = response.data;
             // 注册响应处理
             if (registerResponse[res]) {
-              if(res === "succeedRegister") {
+              if (res === "succeedRegister") {
                 this.$refs.loginBtn.click();
                 this.register.username = this.register.password = this.register.confirmPassword = this.register.checkCode = "";
               }
@@ -267,9 +267,7 @@ export default {
           },
           errorCallback: (error) => {
             console.log(error);
-            if(error.response.status === 404) {
-              this.huadiaoMiddleTip("用户名或密码输入错误!");
-            }
+            this.huadiaoMiddleTip("用户名或密码输入错误!");
           }
         });
       }
@@ -301,7 +299,7 @@ export default {
     },
     // 是否是相同的密码
     sameRegisterPassword() {
-      if(this.register.password === this.register.confirmPassword) {
+      if (this.register.password === this.register.confirmPassword) {
         return true;
       }
       this.huadiaoWarningTip(registerResponse.noSamePassword);
@@ -309,7 +307,7 @@ export default {
     },
     // 根据前后输入的密码来给出相应的提示
     ConfirmRegisterPassword() {
-      if(this.sameRegisterPassword()) {
+      if (this.sameRegisterPassword()) {
         this.huadiaoWarningTip("密码一致!");
         return true;
       }
