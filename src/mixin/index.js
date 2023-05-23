@@ -212,5 +212,14 @@ export const mixin = {
         numberGreaterThenTenThousand(number) {
             return number > 10000 ? number.toFixed(1) + "万" : number;
         },
+        // 将时间戳转换为年月日
+        dateFormat(timestamp) {
+            let date = new Date(timestamp);
+            return `${date.getFullYear()}年${this.numberFormat(date.getMonth() + 1)}月${this.numberFormat(date.getDate())}日 ${this.numberFormat(date.getHours())}:${this.numberFormat(date.getMinutes())}`;
+        },
+        // 辅助上一个方法, 将 一位数转换为两位数
+        numberFormat(number) {
+            return number < 10 ? '0' + number : number;
+        }
     },
 }

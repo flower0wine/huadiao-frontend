@@ -1,6 +1,7 @@
 <template>
   <div class="huadiao-build-note">
-    <huadiao-header :user="user" :isLogin="isLogin"/>
+    <huadiao-header :huadiaoHeaderStyle="huadiaoHeaderStyle"/>
+    <router-view></router-view>
     <huadiao-middle-tip/>
     <huadiao-warning-top-container/>
     <huadiao-popup-window/>
@@ -8,7 +9,6 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
@@ -17,21 +17,22 @@ import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 export default {
   name: "HuadiaoBuildNote",
   data() {
-    return {}
+    return {
+      huadiaoHeaderStyle: {
+        blur: true,
+        shadow: true,
+        backgroundColor: "#fff",
+        entryColor: "#4b4b4b",
+      }
+    }
   },
-  computed: {
-    ...mapState(["isLogin", "user"]),
-  },
-  beforeMount() {
-  },
-  methods: {},
-  beforeDestroy() {
+  methods: {
   },
   components: {
     HuadiaoPopupWindow,
     HuadiaoWarningTopContainer,
     HuadiaoMiddleTip,
-    HuadiaoHeader
+    HuadiaoHeader,
   },
 }
 </script>
@@ -39,6 +40,8 @@ export default {
 <style>
 body {
   min-width: 1200px;
+  margin: 0 !important;
+  overflow: hidden;
 }
 </style>
 
@@ -46,6 +49,6 @@ body {
 .huadiao-build-note {
   width: 100%;
   min-height: 100vh;
-  background: -webkit-linear-gradient(left, #12c2e9, #c471ed, #f64f59);
+  background-color: #f6f6f6;
 }
 </style>

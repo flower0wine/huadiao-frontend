@@ -5,24 +5,26 @@
   >
     <div class="user-avatar-box">
       <a href="#">
-        <div v-html="svg.avatar" class="user-avatar-icon"></div>
-        <div class="user-avatar" ref="userAvatar"></div>
+        <div v-html="svg.avatar"
+             class="user-avatar-icon"></div>
+        <div class="user-avatar"
+             :style="`background-image: ${addBackground(authorInfo.userAvatar)}`"></div>
       </a>
     </div>
     <transition name="fade">
       <template v-if="isShow.userInfer">
         <div class="user-info">
-          <div class="author-nickname">{{ author.nickname }}</div>
+          <div class="author-nickname">{{ authorInfo.nickname }}</div>
           <div class="author-follow-fan">
-            <a href="#">
+            <a href="/followfan/follow">
               <div class="follow">
-                <div>{{ author.follow }}</div>
+                <div>{{ authorInfo.follow }}</div>
                 <div>关注</div>
               </div>
             </a>
-            <a href="#">
+            <a href="/followfan/fan">
               <div class="fan">
-                <div>{{ author.fan }}</div>
+                <div>{{ authorInfo.fan }}</div>
                 <div>粉丝</div>
               </div>
             </a>
@@ -35,9 +37,10 @@
 
 <script>
 
+import {mapState} from "vuex";
+
 export default {
   name: "NoteLeftSliderBoard",
-  props: ["author"],
   data() {
     return {
       isShow: {
@@ -48,14 +51,16 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState({
+      authorInfo(state) {
+        return state.author.authorInfo;
+      }
+    }),
+  },
   mounted() {
-    this.initial();
   },
   methods: {
-    // 初始化
-    initial() {
-      this.$refs.userAvatar.style.backgroundImage = "url('" + this.author.userAvatar + "')";
-    },
   },
   beforeDestroy() {
   }

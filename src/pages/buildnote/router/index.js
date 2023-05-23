@@ -10,7 +10,10 @@ import VueRouter from "vue-router";
 
 export default new VueRouter({
     mode: "history",
-    routes: [{
-        path: "/buildnote"
-    }],
+    routes: [
+        {
+            path: "/buildnote/:noteId(\\d+)?",
+            component: () => import("@/pages/buildnote/components/HuadiaoEditor"),
+        }
+    ],
 })

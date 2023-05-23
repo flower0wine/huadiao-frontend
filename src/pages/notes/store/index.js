@@ -27,92 +27,32 @@ const state = {
     },
     // 作者
     author: {
-        nickname: "花凋大总管",
-        userAvatar: "https://img2.baidu.com/it/u=2887833645,2834576538&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1679677200&t=9691b915847b2697e6f5ffc546cee982",
-        canvases: "今天是花凋一周年!",
-        userId: "huadiao_01234567890",
-        bornDate: "2003-03-15",
-        sex: "2",
-        uid: "1",
-        fans: 8,
-        follows: 8,
-        noteList: [{
-            buildDate: "2022-08-22 08:58:41.0",
-            likeNumber: "0",
-            markNumber: "0",
-            noteAbstract: "如果说爱有阴晴圆缺",
-            noteId: "155",
-            noteTitle: "风萧萧兮易水寒，壮士一去兮不复还",
-            starNumber: "0",
-            viewNumber: "0",
-        },{
-            buildDate: "2022-08-22 08:58:41.0",
-            likeNumber: "0",
-            markNumber: "0",
-            noteAbstract: "如果说爱有阴晴圆缺",
-            noteId: "143",
-            noteTitle: "风萧萧兮易水寒，壮士一去兮不复还",
-            starNumber: "0",
-            viewNumber: "0",
-        },{
-            buildDate: "2022-08-22 08:58:41.0",
-            likeNumber: "0",
-            markNumber: "0",
-            noteAbstract: "如果说爱有阴晴圆缺",
-            noteId: "123",
-            noteTitle: "风萧萧兮易水寒，壮士一去兮不复还",
-            starNumber: "0",
-            viewNumber: "0",
-        },{
-            buildDate: "2022-08-22 08:58:41.0",
-            likeNumber: "0",
-            markNumber: "0",
-            noteAbstract: "如果说爱有阴晴圆缺",
-            noteId: "145",
-            noteTitle: "风萧萧兮易水寒，壮士一去兮不复还",
-            starNumber: "0",
-            viewNumber: "0",
-        },{
-            buildDate: "2022-08-22 08:58:41.0",
-            likeNumber: "0",
-            markNumber: "0",
-            noteAbstract: "如果说爱有阴晴圆缺",
-            noteId: "11",
-            noteTitle: "风萧萧兮易水寒，壮士一去兮不复还",
-            starNumber: "0",
-            viewNumber: "0",
-        },{
-            buildDate: "2022-08-22 08:58:41.0",
-            likeNumber: "0",
-            markNumber: "0",
-            noteAbstract: "如果说爱有阴晴圆缺",
-            noteId: "13",
-            noteTitle: "风萧萧兮易水寒，壮士一去兮不复还",
-            starNumber: "0",
-            viewNumber: "0",
-        },{
-            buildDate: "2022-08-22 08:58:41.0",
-            likeNumber: "0",
-            markNumber: "0",
-            noteAbstract: "如果说爱有阴晴圆缺",
-            noteId: "12",
-            noteTitle: "风萧萧兮易水寒，壮士一去兮不复还",
-            starNumber: "0",
-            viewNumber: "0",
-        },{
-            buildDate: "2022-08-22 08:58:41.0",
-            likeNumber: "0",
-            markNumber: "0",
-            noteAbstract: "如果说爱有阴晴圆缺",
-            noteId: "2",
-            noteTitle: "风萧萧兮易水寒，壮士一去兮不复还",
-            starNumber: "0",
-            viewNumber: "0",
-        }]
+        me: false,
+        authorInfo: {
+            nickname: "花凋大总管",
+            userAvatar: "https://img2.baidu.com/it/u=2887833645,2834576538&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1679677200&t=9691b915847b2697e6f5ffc546cee982",
+            canvases: "今天是花凋一周年!",
+            userId: "huadiao_01234567890",
+            bornDate: "2003-03-15",
+            sex: "2",
+            uid: "1",
+            fan: 8,
+            follow: 8,
+        },
+        noteList: []
     }
 };
 const actions = {};
-const mutations = {};
+const mutations = {
+    // 初始化 user
+    initialUser(state, {user}) {
+        state.user = user;
+    },
+    // 初始化作者信息和笔记信息
+    initialNoteAndAuthor(state, {author}) {
+        state.author = author;
+    },
+};
 const getters = {};
 
 Vue.use(Vuex);

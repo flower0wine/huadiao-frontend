@@ -27,7 +27,12 @@ const state = {
     },
 };
 const actions = {};
-const mutations = {};
+const mutations = {
+    // 初始化 user
+    initialUser(state, {user}) {
+        state.user = user;
+    },
+};
 const getters = {};
 
 Vue.use(Vuex);

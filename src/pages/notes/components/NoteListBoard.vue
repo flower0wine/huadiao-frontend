@@ -4,13 +4,13 @@
          v-for="(noteItem, index) in noteList"
          :key="index"
     >
-      <a href="#">
+      <a :href="`/singlenote/${noteItem.noteId}`">
         <div class="note-title">{{noteItem.noteTitle}}</div>
-        <div class="note-abstract">{{noteItem.noteAbstract}}</div>
+        <div class="note-abstract" v-html="noteItem.noteContent"></div>
         <div class="note-infer">
           <div>
             <span v-html="svg.time"></span>
-            <span>{{transformDateFormat(noteItem.buildDate)}}</span>
+            <span>{{dateFormat(noteItem.publishTime)}}</span>
           </div>
           <div>
             <span v-html="svg.eye"></span>
@@ -58,11 +58,6 @@ export default {
     })
   },
   methods: {
-    // 转换日期格式
-    transformDateFormat(date) {
-      date = date.split(/\./);
-      return date[0];
-    }
   },
   beforeDestroy() {
   }
@@ -96,10 +91,10 @@ export default {
 }
 
 .note-infer /deep/ svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   fill: #807d7d;
-  vertical-align: -4px;
+  vertical-align: -3px;
 }
 
 .note-title {
@@ -123,10 +118,8 @@ export default {
   margin-top: 10px;
 }
 
-.note-infer>div:hover span,
-.note-infer>div:hover /deep/ svg {
-  color: #c93737;
-  fill: #c93737;
+.note-infer>div span {
+  font-size: 14px;
 }
 
 .note-infer span:first-child {

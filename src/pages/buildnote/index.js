@@ -14,6 +14,7 @@ import {mixin} from "@/mixin";
 import $ from "jquery";
 import router from "@/pages/buildnote/router";
 import store from "@/pages/buildnote/store";
+import tinymce from "tinymce";
 
 Vue.config.productionTip = false;  // 生产提示
 
@@ -30,6 +31,8 @@ new Vue({
         Vue.prototype.$bus = this;
         // 全局 jquery
         Vue.prototype.$ = $;
+        // 配置 tinymce
+        window.tinymce = tinymce;
     },
     // 渲染
     render: h => h(index),

@@ -1,6 +1,6 @@
 <template>
   <div class="huadiao-note-container">
-    <huadiao-header :user="user" :isLogin="isLogin"/>
+    <huadiao-header/>
     <left-slider-board/>
     <note-list-board/>
     <sun-light-theme/>
@@ -28,9 +28,28 @@ export default {
   computed: {
     ...mapState(["isLogin", "user"]),
   },
-  beforeMount() {
+  created() {
+    this.getUserNotesByUid();
   },
-  methods: {},
+  methods: {
+    // 获取用户所有笔记
+    getUserNotesByUid() {
+      this.sendRequest({
+        path: "note/all",
+        params: {
+          authorUid: 1,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          this.$store.commit("initialNoteAndAuthor", {author: res});
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      })
+    },
+  },
   beforeDestroy() {
   },
   components: {
