@@ -64,7 +64,7 @@ export default {
       this.sendRequest({
         path: "logoutHuadiao",
         thenCallback: () => {
-          window.location.reload();
+          window.location.href = "/";
         },
         errorCallback: (error) => {
           if (error.response.status === 500) {

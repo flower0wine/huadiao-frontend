@@ -2,33 +2,34 @@
   <div class="author-infer-box">
     <div class="author-infer">
       <div class="author-avatar-box">
-        <a href="#">
+        <a :href="`/homepage/${authorInfo.uid}`">
           <div v-html="svg.avatar" class="default-author-avatar"></div>
           <div class="author-avatar" ref="authorAvatar"></div>
         </a>
       </div>
-      <div class="author-nickname">{{ noteInfer.authorInfer.nickname }}</div>
+      <div class="author-nickname">{{ noteInfo.authorInfo.nickname }}</div>
       <div class="follow-or-cancel"
+           v-if="!me"
            @click="clickToFollowOrCancelFollow"
            ref="followOrCancelBtn"
-      >{{judgeMeAndOtherRelation(followed, following)}}</div>
+      >{{judgeRelation(fan, follow)}}</div>
     </div>
     <div class="note-infer">
       <div class="note-infer-item">
         <span v-html="svg.like" class="icon" @click="clickNoteLikeIcon" ref="likeIcon"></span>
-        <span>{{ noteInfer.likeNumber }}</span>
+        <span>{{ noteInfo.likeNumber }}</span>
       </div>
       <div class="note-infer-item">
         <span v-html="svg.like" class="icon" @click="clickNoteUnlikeIcon" ref="unlikeIcon"></span>
       </div>
       <div class="note-infer-item">
         <span v-html="svg.star" class="icon" @click="clickNoteStarIcon" ref="starIcon"></span>
-        <span>{{ noteInfer.starNumber }}</span>
+        <span>{{ noteInfo.starNumber }}</span>
       </div>
       <div class="note-infer-item">
         <a href="#comment-title">
           <span v-html="svg.comment" class="icon"></span>
-          <span>{{ noteInfer.commentNumber }}</span>
+          <span>{{ noteInfo.commentNumber }}</span>
         </a>
       </div>
     </div>
@@ -48,12 +49,20 @@ export default {
         avatar: `<svg t="1657536982283" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3627" width="200" height="200"><path d="M510.77050482 2.21923328c281.4240859 0 509.56537287 228.14128697 509.56537173 509.56653682 0 281.42757888-228.14128697 509.56653682-509.56537173 509.56653681-281.42757888 0-509.56886585-228.14012302-509.56886585-509.56653681 0-281.4240859 228.14128697-509.56653682 509.56886585-509.56653682z" fill="#EEEEEE" p-id="3628"></path><path d="M510.77050482 516.51164387c90.0558939 0 163.05952199-73.30168832 163.05952199-163.72549973 0-90.42264633-73.00362809-163.72433465-163.05952199-163.72433465-90.05705785 0-163.06301497 73.30168832-163.06301497 163.72433465-0.00116395 90.42497536 73.00479317 163.72549859 163.06301497 163.72549973z m251.51800206 200.09807531l1.21552441-0.45756757c-39.85964146-100.90130205-137.98992099-172.25861689-252.73352647-172.25861689-113.31967317 0-210.42537358 69.60155875-251.2141221 168.51890176l0.56235463 0.22820181a39.9609344 39.9609344 0 0 0-2.9188881 15.01940622c0 22.15886393 17.97555086 40.12510094 40.15420757 40.12509981 16.79146325 0 31.16701469-10.30401138 37.16196921-24.92522837l0.65433486 0.26545948c28.69987328-68.84360192 96.50958109-117.22355485 175.60014393-117.22355484 79.76934741 0 148.05874461 49.21940878 176.32433493 119.00725475l0.2875813-0.10828003c6.4338944 13.58499499 20.27037696 22.98434901 36.30970538 22.98434901 22.17516373 0 40.15187968-17.96507307 40.15187968-40.12509981a40.14256469 40.14256469 0 0 0-1.55549923-11.05032533z" fill="#CCCCCC" p-id="3629"></path></svg>`,
         comment: `<svg t="1679821313732" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5510" width="200" height="200"><path d="M509.84459378 509.37856m-491.89865245 0a491.89865245 491.89865245 0 1 0 983.79730489 0 491.89865245 491.89865245 0 1 0-983.79730489 0Z" fill="#FAD400" p-id="5511"></path><path d="M253.93379555 402.30729955c-96.76026311 0-182.51047822 47.06941155-235.63832888 119.537664 5.18462578 207.90931911 139.22759111 383.778816 325.34983111 450.5964089 117.440512-37.86524445 202.43342222-147.96572445 202.43342222-278.04740267-0.05825422-161.30594133-130.83898311-292.08667022-292.14492445-292.08667023z" fill="#FFE771" p-id="5512"></path><path d="M282.12883911 632.99401955l-17.88404622 144.58697956c-4.60208355 37.04968533 30.35044978 66.70108445 66.17679644 56.15707022l181.57841067-53.477376-229.87116089-147.26667378z" fill="#FFF4C5" p-id="5513"></path><path d="M509.84459378 206.864384c-167.07310933 0-302.57243022 135.44106667-302.57243023 302.57243022s135.44106667 302.57243022 302.57243023 302.57243023 302.57243022-135.44106667 302.57243022-302.57243023-135.44106667-302.57243022-302.57243022-302.57243022z m-158.10195911 351.27296c-26.91345067 0-48.70052978-21.78707911-48.70052978-48.70052978s21.78707911-48.70052978 48.70052978-48.70052977 48.70052978 21.78707911 48.70052978 48.70052977-21.84533333 48.70052978-48.70052978 48.70052978z m157.40290844 0c-26.91345067 0-48.70052978-21.78707911-48.70052978-48.70052978s21.78707911-48.70052978 48.70052978-48.70052977 48.70052978 21.78707911 48.70052978 48.70052977-21.78707911 48.70052978-48.70052978 48.70052978z m157.40290844 0c-26.91345067 0-48.70052978-21.78707911-48.70052977-48.70052978s21.78707911-48.70052978 48.70052977-48.70052977c26.91345067 0 48.70052978 21.78707911 48.70052978 48.70052977s-21.78707911 48.70052978-48.70052978 48.70052978z" fill="#FFFFFF" p-id="5514"></path></svg>`,
       },
-      followed: null,
-      following: null,
+      follow: null,
+      fan: null,
     }
   },
   computed: {
-    ...mapState(["noteInfer"]),
+    ...mapState(["noteInfo"]),
+    ...mapState({
+      authorInfo(state) {
+        return state.noteInfo.authorInfo;
+      },
+      me(state) {
+        return state.noteInfo.noteAndMeRelation.me;
+      },
+    }),
   },
   mounted() {
     this.initial();
@@ -61,57 +70,124 @@ export default {
   methods: {
     // 初始化
     initial() {
-      this.$refs.authorAvatar.style.backgroundImage = "url('" + this.noteInfer.authorInfer.userAvatar + "')";
-      !this.noteInfer.noteAndMeRelation.myLike && this.$refs.likeIcon.classList.add("like-unlike-icon");
-      !this.noteInfer.noteAndMeRelation.myUnlike && this.$refs.unlikeIcon.classList.add("like-unlike-icon");
-      !this.noteInfer.noteAndMeRelation.myStar && this.$refs.starIcon.classList.add("star-icon");
-      this.followed = this.noteInfer.authorAndMeRelation.followed;
-      this.following = this.noteInfer.authorAndMeRelation.following;
-      if(this.following) {
+      // 初始化点赞, 不喜欢, 收藏, 关注信息及关注按钮等
+      this.$refs.authorAvatar.style.backgroundImage = "url('" + this.authorInfo.userAvatar + "')";
+      !this.noteInfo.noteAndMeRelation.myLike && this.$refs.likeIcon.classList.add("like-unlike-icon");
+      !this.noteInfo.noteAndMeRelation.myUnlike && this.$refs.unlikeIcon.classList.add("like-unlike-icon");
+      !this.noteInfo.noteAndMeRelation.myStar && this.$refs.starIcon.classList.add("star-icon");
+      this.judgeMeAndOtherRelation(this.$store.state.noteInfo.authorAndMeRelation);
+      if(this.follow) {
         this.$refs.followOrCancelBtn.classList.add("following");
       }
     },
     // 点击关注或者取消关注
     clickToFollowOrCancelFollow() {
-      this.following = !this.following;
-      if(this.following) {
-        this.$refs.followOrCancelBtn.classList.add("following");
-      } else {
-        this.$refs.followOrCancelBtn.classList.remove("following");
-      }
-    },
-    // 点击喜欢笔记图标, yesCallback
-    clickNoteLikeIcon() {
-      this.$store.commit("clickNoteLikeIcon", {
-        likeCallback: () => {
-          this.$refs.likeIcon.classList.add("like-unlike-icon");
+      this.follow = !this.follow;
+      // 根据点击后的关系来判断是关注还是取消关注
+      let path = this.follow ? "newFriend" : "modify";
+
+      this.sendRequest({
+        path: `relation/${path}`,
+        params: {
+          uid: this.noteInfo.authorInfo.uid,
         },
-        cancelLikeCallback: () => {
-          this.$refs.likeIcon.classList.remove("like-unlike-icon");
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          if (this.follow) {
+            this.$refs.followOrCancelBtn.classList.add("following");
+          } else {
+            this.$refs.followOrCancelBtn.classList.remove("following");
+          }
+        },
+        errorCallback: (error) => {
+          console.log(error);
         }
-      });
+      })
+    },
+    // 点击喜欢笔记图标
+    clickNoteLikeIcon() {
+      let path = this.$store.state.noteInfo.noteAndMeRelation.myLike ? "delete" : "new";
+
+      this.sendRequest({
+        path: `note/like/${path}`,
+        params: {
+          uid: this.$route.params.authorUid,
+          noteId: this.$route.params.noteId
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+
+          this.$store.commit("clickNoteLikeIcon", {
+            likeCallback: () => {
+              this.$refs.likeIcon.classList.remove("like-unlike-icon");
+            },
+            cancelLikeCallback: () => {
+              this.$refs.likeIcon.classList.add("like-unlike-icon");
+            }
+          });
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      })
     },
     // 点击不喜欢笔记图标
     clickNoteUnlikeIcon() {
-      this.$store.commit("clickNoteUnLikeIcon", {
-        unlikeCallback: () => {
-          this.$refs.unlikeIcon.classList.add("like-unlike-icon");
+      let path = this.$store.state.noteInfo.noteAndMeRelation.myUnlike ? "delete" : "new";
+
+      this.sendRequest({
+        path: `note/unlike/${path}`,
+        params: {
+          uid: this.$route.params.authorUid,
+          noteId: this.$route.params.noteId
         },
-        cancelUnlikeCallback: () => {
-          this.$refs.unlikeIcon.classList.remove("like-unlike-icon");
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+
+          this.$store.commit("clickNoteUnLikeIcon", {
+            unlikeCallback: () => {
+              this.$refs.unlikeIcon.classList.remove("like-unlike-icon");
+            },
+            cancelUnlikeCallback: () => {
+              this.$refs.unlikeIcon.classList.add("like-unlike-icon");
+            }
+          });
+        },
+        errorCallback: (error) => {
+          console.log(error);
         }
-      });
+      })
     },
     // 点击收藏笔记图标
     clickNoteStarIcon() {
-      this.$store.commit("clickNoteStarIcon", {
-        starCallback: () => {
-          this.$refs.starIcon.classList.add("star-icon");
+      let path = this.$store.state.noteInfo.noteAndMeRelation.myStar ? "delete" : "new";
+
+      this.sendRequest({
+        path: `note/star/${path}`,
+        params: {
+          uid: this.$route.params.authorUid,
+          noteId: this.$route.params.noteId,
         },
-        cancelStarCallback: () => {
-          this.$refs.starIcon.classList.remove("star-icon");
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+
+          this.$store.commit("clickNoteStarIcon", {
+            starCallback: () => {
+              this.$refs.starIcon.classList.remove("star-icon");
+            },
+            cancelStarCallback: () => {
+              this.$refs.starIcon.classList.add("star-icon");
+            }
+          });
+        },
+        errorCallback: (error) => {
+          console.log(error);
         }
-      });
+      })
     },
   },
   beforeDestroy() {

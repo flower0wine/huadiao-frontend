@@ -2,7 +2,7 @@
   <div class="huadiao-pages" v-huadiao-full-page>
     <div class="huadiao-index-page" ref="indexPage">
       <huadiao-header/>
-      <huadiao-below :openMenu="clickIconToOpenMenu" ref="huadiaoBelow"/>
+      <huadiao-below :openMenu="clickIconToOpenMenu" :login="login" ref="huadiaoBelow"/>
       <transition name="left-slide">
         <huadiao-menu v-if="getDataCompleted && visible.huadiaoMenu.render"
                       v-show="visible.huadiaoMenu.show"

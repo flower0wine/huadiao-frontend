@@ -1,10 +1,10 @@
 <template>
   <div class="left-slider-board"
-       @mouseenter="isShow.userInfer = true"
-       @mouseleave="isShow.userInfer = false"
+       @mouseenter="visible.userInfer = true"
+       @mouseleave="visible.userInfer = false"
   >
     <div class="user-avatar-box">
-      <a href="#">
+      <a :href="`/homepage/${authorInfo.uid}`">
         <div v-html="svg.avatar"
              class="user-avatar-icon"></div>
         <div class="user-avatar"
@@ -12,9 +12,9 @@
       </a>
     </div>
     <transition name="fade">
-      <template v-if="isShow.userInfer">
+      <template v-if="visible.userInfer">
         <div class="user-info">
-          <div class="author-nickname">{{ authorInfo.nickname }}</div>
+          <div class="author-nickname">{{ cutStringByLength(authorInfo.nickname, 14) }}...</div>
           <div class="author-follow-fan">
             <a href="/followfan/follow">
               <div class="follow">
@@ -37,13 +37,13 @@
 
 <script>
 
-import {mapState} from "vuex";
 
 export default {
   name: "NoteLeftSliderBoard",
+  props: ["authorInfo"],
   data() {
     return {
-      isShow: {
+      visible: {
         userInfer: false,
       },
       svg: {
@@ -52,11 +52,6 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      authorInfo(state) {
-        return state.author.authorInfo;
-      }
-    }),
   },
   mounted() {
   },
@@ -72,6 +67,7 @@ export default {
   position: fixed;
   top: 0px;
   left: 0px;
+  z-index: 8;
   display: flex;
   flex-direction: column;
   align-items: center;

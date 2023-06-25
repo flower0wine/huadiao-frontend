@@ -2,7 +2,7 @@
   <div class="note-comment-container" ref="noteCommentContainer">
     <div class="comment-title-box" id="comment-title">
       <span>评论</span>
-      <span class="comment-number">{{ noteInfer.commentNumber }}</span>
+      <span class="comment-number">{{ noteInfo.commentNumber }}</span>
     </div>
     <div class="comment-header-input" ref="currentUserCommentBoard">
       <div>
@@ -10,17 +10,18 @@
       </div>
     </div>
     <div class="comment-list">
-      <root-comment-item v-for="(item, index) in noteInfer.commentList"
+      <root-comment-item v-for="(item, index) in noteInfo.commentList"
                          :key="item.commentId"
                          :rootCommentItem="item"
                          :rootIndex="index"
                          :data-root-id="item.commentId"
                          ref="rootCommentItem"
       />
+      <div class="no-more-comment">没有更多评论了...</div>
     </div>
     <transition name="fade">
       <div class="fixed-comment-board"
-           v-show="isShow.fixedCommentBoard"
+           v-show="visible.fixedCommentBoard"
            ref="fixedCommentBoard"
       >
         <div class="comment-board-box">
@@ -36,6 +37,9 @@
 import {mapState} from "vuex";
 import RootCommentItem from "@/pages/singlenote/components/RootCommentItem";
 import CurrentUserCommentBoard from "@/pages/singlenote/components/CurrentUserCommentBoard";
+import constants from "@/assets/js/constants";
+
+let statusCode = constants.statusCode;
 
 export default {
   name: "NoteCommentBoard",
@@ -44,7 +48,11 @@ export default {
     return {
       // 是否获取过笔记评论
       obtainedNoteComment: false,
-      isShow: {
+      // 评论条数偏移量
+      offset: 0,
+      // 单次获取条数
+      row: 10,
+      visible: {
         fixedCommentBoard: false,
       },
       svg: {
@@ -52,14 +60,16 @@ export default {
       },
       config: {
         replyPlaceholder: "回复 @",
-      }
+      },
+      // 发布中
+      publishing: false,
     }
   },
   computed: {
-    ...mapState(["noteInfer"]),
+    ...mapState(["noteInfo"]),
   },
   mounted() {
-    this.judgeShouldShowFixedCommentBoard();
+    this.scrollEvent();
     this.$bus.$on("judgeClickObject", this.judgeClickObject);
   },
   methods: {
@@ -68,41 +78,89 @@ export default {
       if(this.$refs.rootCommentItem) {
         // 隐藏其他根评论的输入框, 打开该回复按钮的根评论对应的输入框
         for(let ref of this.$refs.rootCommentItem) {
-          ref.isShow.replyBox = ref.$el.contains(pointerEvent.target);
+          ref.visible.replyBox = ref.$el.contains(pointerEvent.target);
         }
 
         // 修改 输入框的 placeholder, 为（回复 @昵称）格式
         let nickname;
         if(Number.isInteger(rootIndex) && rootIndex >= 0) {
-          nickname = this.$store.state.noteInfer.commentList[rootIndex].nickname;
+          nickname = this.$store.state.noteInfo.commentList[rootIndex].nickname;
           if(Number.isInteger(subIndex) && subIndex >= 0) {
-            nickname = this.$store.state.noteInfer.commentList[rootIndex].commentList[subIndex].nickname;
+            nickname = this.$store.state.noteInfo.commentList[rootIndex].commentList[subIndex].nickname;
           }
         }
         this.$refs.rootCommentItem[rootIndex].config.commentInputBoard.defaultPlaceholder = this.config.replyPlaceholder + nickname;
       }
     },
-    // 根据滚动距离来判断是否显示固定的输入框
-    judgeShouldShowFixedCommentBoard() {
+    /**
+     * 滚动触发
+     * 1. 根据滚动距离来判断是否显示固定的输入框
+     * 2. 根据是否滚动到评论区底部来获取评论
+     */
+    scrollEvent() {
       window.addEventListener("scroll", () => {
-        this.isShow.fixedCommentBoard = window.scrollY + 70 >= this.$refs.currentUserCommentBoard.offsetTop;
-        if(!this.obtainedNoteComment && window.scrollY + document.documentElement.clientHeight >= this.$refs.noteCommentContainer.offsetTop) {
+        // 是否有评论
+        let hasComment = this.noteInfo.commentList && (this.noteInfo.commentList.length !== 0);
+        let showCommentInput = window.scrollY + 70 >= this.$refs.currentUserCommentBoard.offsetTop;
+        this.visible.fixedCommentBoard = showCommentInput && hasComment;
+
+        // 判断是否滚动到评论区最下方, 最下方获取评论
+        if(!this.obtainedNoteComment) {
+          // 可视区底部到文档最上部的距离
+          let clientBottom = window.scrollY + document.documentElement.clientHeight;
+          // 笔记区域高度加上笔记区域上部到文档上部的距离
+          let height = this.$refs.noteCommentContainer.clientHeight + this.$refs.noteCommentContainer.offsetTop;
+          if(clientBottom + 160 < height) {
+            return;
+          }
           this.obtainedNoteComment = true;
           // 发送获取笔记评论请求
+          this.sendRequest({
+            path: "note/comment",
+            params: {
+              uid: this.$route.params.authorUid,
+              noteId: this.$route.params.noteId,
+              offset: this.offset,
+              row: this.row
+            },
+            thenCallback: (response) => {
+              let res = response.data;
+              console.log(res);
+              if(res.code === statusCode.succeed) {
+                this.offset += this.row;
+                this.$store.commit("addNoteComment", {comment: res.data});
+                this.obtainedNoteComment = false;
+              } else if(res.code === statusCode.notExist) {
+                // 评论已经全部获取
+              }
+            },
+            errorCallback: (error) => {
+              console.log(error);
+              this.obtainedNoteComment = false;
+            }
+          })
         }
       });
     },
     // 发布根评论
     publishRootComment(commentContent) {
-      this.$store.dispatch("addRootCommentByCurrentUser", {
-        commentContent,
+      if(this.publishing || commentContent == null || commentContent.trim() === "") {
+        return null;
+      }
+      this.publishing = true;
+      let root = true;
+      let comment = this.packageComment(commentContent);
+
+      this.addComment({
+        root,
+        comment,
         succeedCallback: () => {
-          this.huadiaoMiddleTip("回复成功!");
+          this.publishing = false;
         },
         failCallback: () => {
           this.huadiaoMiddleTip("回复失败!");
+          this.publishing = false;
         },
-        uniqueString: this.getUniqueString(this.config.commentIdLength),
       });
     }
   },
@@ -113,7 +171,7 @@ export default {
 
 <style scoped>
 .note-comment-container {
-  padding: 10px 20px 100px;
+  padding: 20px 20px 100px;
 }
 
 .comment-title-box {
@@ -128,7 +186,7 @@ export default {
 
 .comment-header-input {
   width: 60%;
-  margin-top: 20px;
+  margin: 20px 0;
 }
 
 .fixed-comment-board {
@@ -159,5 +217,13 @@ export default {
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.15);
   filter: blur(10px);
+}
+
+.no-more-comment {
+  margin: 30px auto;
+  text-align: center;
+  width: 150px;
+  font-size: 14px;
+  color: #979797;
 }
 </style>

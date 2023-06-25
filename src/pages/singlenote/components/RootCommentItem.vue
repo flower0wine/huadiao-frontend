@@ -2,24 +2,28 @@
   <div class="root-comment-item">
     <div class="root-comment-box">
       <div class="user-avatar-box">
-        <a href="#">
+        <a :href="`/homepage/${rootCommentItem.uid}`">
           <div class="default-user-avatar" v-html="svg.avatar"></div>
-          <div class="user-avatar" ref="userAvatar"></div>
+          <div class="user-avatar" :style="`background-image: ${addBackground(rootCommentItem.userAvatar)}`"></div>
         </a>
       </div>
-      <comment-infer :item="rootCommentItem" :rootIndex="rootIndex"/>
+      <comment-infer :item="rootCommentItem"
+                     :rootIndex="rootIndex"
+                     :rootCommentId="rootCommentItem.commentId"/>
     </div>
     <div class="sub-comment-list">
       <sub-comment-item v-for="(item, index) in rootCommentItem.commentList"
                         :key="item.commentId"
+                        :rootCommentId="rootCommentItem.commentId"
                         :subCommentItem="item"
                         :rootIndex="rootIndex"
                         :subIndex="index"
                         :data-sub-id="item.commentId"
       />
     </div>
-    <div class="reply-box" ref="replyBox" v-if="isShow.replyBox">
-      <current-user-comment-board :publishComment="publishSubComment" :commentInputBoard="config.commentInputBoard"/>
+    <div class="reply-box" ref="replyBox" v-if="visible.replyBox">
+      <current-user-comment-board :publishComment="publishSubComment"
+                                  :commentInputBoard="config.commentInputBoard"/>
     </div>
   </div>
 </template>
@@ -34,7 +38,7 @@ export default {
   props: ["rootCommentItem", "rootIndex"],
   data() {
     return {
-      isShow: {
+      visible: {
         replyBox: false,
       },
       svg: {
@@ -44,19 +48,36 @@ export default {
         commentInputBoard: {
           defaultPlaceholder: null,
         }
-      }
+      },
+      // 发布评论中
+      publishing: false,
     }
   },
   mounted() {
-    this.initial();
   },
   methods: {
-    // 初始化
-    initial() {
-      this.$refs.userAvatar.style.backgroundImage = "url('" + this.rootCommentItem.userAvatar + "')";
-    },
     // 发布子评论
-    publishSubComment() {
+    publishSubComment(commentContent) {
+      if(this.publishing || commentContent == null || commentContent.trim() === "") {
+        return null;
+      }
+      this.publishing = true;
+      let root = false;
+      let comment = this.packageComment(commentContent);
+      comment.commentId = this.rootCommentItem.commentId;
+
+      this.addComment( {
+        comment,
+        root,
+        rootCommentIndex: this.rootIndex,
+        succeedCallback: () => {
+          this.publishing = false;
+        },
+        failCallback: () => {
+          this.huadiaoMiddleTip("回复失败!");
+          this.publishing = false;
+        },
+      });
     },
   },
   beforeDestroy() {

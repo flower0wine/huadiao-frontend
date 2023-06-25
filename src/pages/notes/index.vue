@@ -1,7 +1,7 @@
 <template>
   <div class="huadiao-note-container">
     <huadiao-header/>
-    <left-slider-board/>
+    <left-slider-board :authorInfo="authorInfo"/>
     <note-list-board/>
     <sun-light-theme/>
     <huadiao-middle-tip/>
@@ -27,6 +27,11 @@ export default {
   },
   computed: {
     ...mapState(["isLogin", "user"]),
+    ...mapState({
+      authorInfo() {
+        return this.$store.state.author.authorInfo;
+      }
+    }),
   },
   created() {
     this.getUserNotesByUid();

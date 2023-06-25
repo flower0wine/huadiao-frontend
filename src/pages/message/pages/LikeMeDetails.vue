@@ -17,7 +17,7 @@
         </div>
         <div class="like-date">{{changeDateFormat(item.likeDate)}}</div>
       </div>
-      <div class="follow-user" @click="clickToChangeRelation(index)" ref="changeRelationBtn">{{judgeMeAndOtherRelation(item.followed, item.following)}}</div>
+      <div class="follow-user" @click="clickToChangeRelation(index)" ref="changeRelationBtn">{{judgeRelation(item.followed, item.following)}}</div>
     </div>
   </div>
 </template>

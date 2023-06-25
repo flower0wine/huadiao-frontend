@@ -1,9 +1,9 @@
 <template>
   <div class="huadiao-single-note-container">
-    <huadiao-header :user="user" :isLogin="isLogin" :huadiaoHeaderStyle="huadiaoHeaderStyle">
+    <huadiao-header :huadiaoHeaderStyle="huadiaoHeaderStyle">
       <template v-slot>
         <div class="catalogue-icon"
-             title="打开目录"
+             :title="visible.catalogue ? '关闭目录' : '打开目录'"
              @click="clickCatalogueIcon"
              ref="catalogueIcon"
         >
@@ -13,9 +13,11 @@
         </div>
       </template>
     </huadiao-header>
-    <left-slider-board :author="author"/>
-    <note-content-board :showCatalogue="isShow.catalogue"/>
-    <sun-light-theme/>
+    <template v-if="visible.note">
+      <left-slider-board :authorInfo="authorInfo"/>
+      <note-content-board :showCatalogue="visible.catalogue"/>
+      <sun-light-theme/>
+    </template>
     <huadiao-warning-top-container/>
     <huadiao-middle-tip/>
     <huadiao-popup-window/>
@@ -36,8 +38,9 @@ export default {
   name: "HuadiaoSingleNote",
   data() {
     return {
-      isShow: {
-        catalogue: false,
+      visible: {
+        note: false,
+        catalogue: false
       },
       // huadiaoHeader 样式
       huadiaoHeaderStyle: {
@@ -56,23 +59,52 @@ export default {
     }
   },
   computed: {
-    ...mapState(["isLogin", "user", "noteInfer"]),
-    author() {
-      return {
-        nickname: this.noteInfer.authorInfer.nickname,
-        follow: this.noteInfer.authorInfer.follow,
-        fan: this.noteInfer.authorInfer.fan,
-        userAvatar: this.noteInfer.authorInfer.userAvatar,
-      };
+    ...mapState(["noteInfo"]),
+    authorInfo() {
+      return this.$store.state.noteInfo.authorInfo;
     }
   },
-  mounted() {
+  watch: {
+    "$store.state.noteInfo": {
+      deep: true,
+      handler() {
+        this.visible.note = true;
+      }
+    }
+  },
+  created() {
+    this.searchNote();
   },
   methods: {
+    // 获取笔记
+    searchNote() {
+      let noteId = this.$route.params.noteId;
+      let uid = this.$route.params.authorUid;
+      let reg = /\d+/;
+      if(!reg.test(uid) || !reg.test(noteId)) {
+        return;
+      }
+      this.sendRequest({
+        path: "note/search",
+        params: {
+          noteId,
+          uid,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          res.commentList = [];
+          this.$store.commit("initialNoteInfo", {noteInfo: res});
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      });
+    },
     // 点击目录图标
     clickCatalogueIcon() {
-      this.isShow.catalogue = !this.isShow.catalogue;
-      if (this.isShow.catalogue) {
+      this.visible.catalogue = !this.visible.catalogue;
+      if (this.visible.catalogue) {
         this.$refs.catalogueIcon.classList.add("click-catalogue-icon");
       } else {
         this.$refs.catalogueIcon.classList.remove("click-catalogue-icon");

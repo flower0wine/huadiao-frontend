@@ -153,25 +153,26 @@ export const mixin = {
                     }
                     this.modifySrcObject(srcConfig[c], config[c]);
                 } else {
-                    if (config[c]) {
+                    if (config[c] != null) {
                         srcConfig[c] = config[c]
                     }
                 }
             }
         },
         // 判断我和他人的关系
-        judgeMeAndOtherRelation(relation) {
-            if(relation === "friend") {
-                this.follow = this.fan = true;
-            } else if(relation === "follow") {
-                this.follow = true;
-                this.fan = false;
-            } else if(relation === "fan") {
-                this.follow = false;
-                this.fan = true;
-            } else if(relation === "stranger") {
-                this.follow = this.fan = false;
+        judgeRelation(fan, follow) {
+            if (follow && fan) {
+                return "已互粉";
+            } else if (follow && !fan) {
+                return "已关注";
+            } else {
+                return "关注";
             }
+        },
+        // 判断我和他人的关系
+        judgeMeAndOtherRelation(relation) {
+            this.follow = relation.following;
+            this.fan = relation.followed;
         },
         // 获取指定长度的随机字符串, 可能包含字母, 数字, !, _, :, =
         getUniqueString(length) {
@@ -183,7 +184,7 @@ export const mixin = {
             ];
             let charsIndex;
             let res = "";
-            for (let index = 0; index <= len; index++) {
+            for (let index = 0; index < len; index++) {
                 charsIndex = (Math.random() * chars.length).toFixed(0);
                 res += chars[charsIndex];
             }
@@ -212,14 +213,52 @@ export const mixin = {
         numberGreaterThenTenThousand(number) {
             return number > 10000 ? number.toFixed(1) + "万" : number;
         },
-        // 将时间戳转换为年月日
+        /**
+         * 将时间戳转换为年月日
+         * @param timestamp 时间戳
+         * @returns {string} 返回格式为 (xxxx年xx月xx日 xx:xx)
+         */
         dateFormat(timestamp) {
             let date = new Date(timestamp);
             return `${date.getFullYear()}年${this.numberFormat(date.getMonth() + 1)}月${this.numberFormat(date.getDate())}日 ${this.numberFormat(date.getHours())}:${this.numberFormat(date.getMinutes())}`;
         },
-        // 辅助上一个方法, 将 一位数转换为两位数
+        /**
+         * 将 一位数转换为两位数, 如 1 返回 01, 10 返回 10
+         * @param number 数字型
+         * @returns {string|*} 返回两个字符的字符串
+         */
         numberFormat(number) {
             return number < 10 ? '0' + number : number;
+        },
+        /**
+         * 截断指定长度的字符串
+         * @param string 字符串
+         * @param length 指定截断长度, 数字型
+         * @param charAdjust 是否要开启调整字符串, 传入参数类型为 bool, 即中文占两个英文的大小, 传入 true 将会得到改善,
+         * 如截断长度为 10, 6 个中文字符将截断为 5 个字符, 不会保留 6个
+         * @returns {string} 返回截断的字符串
+         */
+        cutStringByLength(string, length, charAdjust) {
+            let count = length;
+            if (charAdjust === true) {
+                count = 0;
+                let zhReg = /\u4E00-\u9FA5/;
+                let enReg = /[A-Za-z]/;
+                for (let c of string) {
+                    // 一个中文字符占两个英文字符大小, 故 length -= 2
+                    if (zhReg.test(c)) {
+                        length -= 2;
+                    } else if (enReg.test(c)) {
+                        length -= 1;
+                    }
+                    // 计算截取长度
+                    count++;
+                    if(length <= 0) {
+                        break;
+                    }
+                }
+            }
+            return string.substring(0, count);
         }
     },
 }

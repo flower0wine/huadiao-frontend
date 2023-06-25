@@ -3,10 +3,14 @@
     <div class="user-avatar-box">
       <a href="#">
         <div class="default-user-avatar" v-html="svg.avatar"></div>
-        <div class="user-avatar" ref="userAvatar"></div>
+        <div class="user-avatar" :style="`back-ground-image: ${addBackground(subCommentItem.userAvatar)}`"></div>
       </a>
     </div>
-    <comment-infer :item="subCommentItem" :rootIndex="rootIndex" :subIndex="subIndex"/>
+    <comment-infer :item="subCommentItem"
+                   :rootIndex="rootIndex"
+                   :subIndex="subIndex"
+                   :rootCommentId="rootCommentId"
+                   :subCommentId="subCommentItem.commentId"/>
   </div>
 </template>
 
@@ -14,7 +18,7 @@
 import CommentInfer from "@/pages/singlenote/components/CommentInfer";
 export default {
   name: "SubCommentItem",
-  props: ["subCommentItem", "rootIndex", "subIndex"],
+  props: ["rootCommentId", "subCommentItem", "rootIndex", "subIndex"],
   data() {
     return {
       svg: {
@@ -23,13 +27,8 @@ export default {
     }
   },
   mounted() {
-    this.initial();
   },
   methods: {
-    // 初始化
-    initial() {
-      this.$refs.userAvatar.style.backgroundImage = "url('" + this.subCommentItem.userAvatar + "')";
-    },
   },
   beforeDestroy() {
   },

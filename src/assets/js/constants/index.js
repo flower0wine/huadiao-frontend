@@ -7,6 +7,13 @@
 'use strict';
 
 export default {
+    statusCode: {
+        succeed: 1000,
+        errorParam: 2000,
+        blankParam: 2001,
+        notExist: 3000,
+        existed: 3001,
+    },
     url: 'http://localhost:9090/huadiao/',
     wrongLink: "javascript:void(0);",
     // 注册响应处理

@@ -17,7 +17,7 @@
 <script>
 export default {
   name: "HuadiaoBelow",
-  props: ["openMenu", "isLogin"],
+  props: ["openMenu", "login"],
   data() {
     return {
       huadiaoBelowConfig: [{
@@ -38,7 +38,7 @@ export default {
   methods: {
     // 点击添加笔记
     clickToCreateNewNote() {
-      if(this.isLogin) {
+      if(this.login) {
         window.location.href = "/buildNote";
       } else {
         this.huadiaoMiddleTip("登录后体验更多功能!");
