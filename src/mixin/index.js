@@ -6,7 +6,7 @@
 // 使用严格模式
 'use strict';
 import axios from "axios";
-import constants from "@/assets/js/constants";
+import {apis} from "@/assets/js/constants/request-path.js";
 
 export const mixin = {
     data() {
@@ -38,7 +38,7 @@ export const mixin = {
         huadiaoPopupWindow(iconType, operationType, tip, confirmFn, cancelFn) {
             this.$bus.$emit("huadiaoPopupWindow", iconType, operationType, tip, confirmFn, cancelFn);
         },
-        // 发送请求
+        // 发送请求, 由于请求 url 由 http://localhost:9090/huadiao/ 和 path 组成, 故 path 不需要加斜杆
         sendRequest({path, method, params, data, headers, thenCallback, errorCallback}) {
             axios.defaults.withCredentials = true;
             // 可以选择的文本类型
@@ -49,7 +49,7 @@ export const mixin = {
             // 请求头
             let headersProp = headers ? {"Content-Type": ContentType[headers]} : {};
             let srcObj = {
-                url: constants.url + path,
+                url: apis.host + path,
                 method: "get",
                 params: {},
                 data: {},

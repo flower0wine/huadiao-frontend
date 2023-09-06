@@ -14,9 +14,8 @@ export default {
         notExist: 3000,
         existed: 3001,
     },
-    url: 'http://localhost:9090/huadiao/',
     wrongLink: "javascript:void(0);",
-    // 注册响应处理
+    // 注册响应消息
     registerResponse: {
         wrongCode: "验证码错误!",
         sameUsername: "这个用户名太受欢迎了, 已经有人使用, 换一个吧!",
@@ -30,7 +29,7 @@ export default {
         nullPassword: "请填写密码!",
         nullCheckCode: "请填写验证码!"
     },
-    // 账号信息响应处理
+    // 账号信息响应消息
     accountInfoResponse: {
         wrongNullNickname: "昵称不能为空或只包含空格",
         wrongLengthNickname: "昵称长度最大为 20 个字符",
@@ -39,9 +38,15 @@ export default {
         wrongLengthCanvases: "个人简介长度最长为 50 个字符",
         wrongLengthSchool: "学校长度最长为 30 个字符",
     },
-    // 账号设置响应设置
+    // 账号设置响应消息
     accountSettingResponse: {
         accountSettingUpdateSucceed: "accountSettingUpdateSucceed",
         accountSettingUpdateFail: "accountSettingUpdateFail",
     },
+    // 单个笔记页面响应消息
+    singleNoteResponse: {
+        chooseDeleteComment: "确认删除吗?删除根评论其下的子评论也会删除!",
+        deleteCommentSucceed: "评论删除成功",
+        reportNoteCommentSucceed: "举报评论成功"
+    }
 }

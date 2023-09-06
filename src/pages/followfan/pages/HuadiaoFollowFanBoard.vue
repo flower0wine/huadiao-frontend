@@ -12,7 +12,10 @@
                alt>
         </div>
         <router-link :to="{
-          path: `/followfan/follow/${item.groupId}`,
+          path: `/followfan/${viewedUid}/follow`,
+          query: {
+            groupId: item.groupId
+          }
         }"
                      v-for="(item, index) in followGroup"
                      class="group-link"
@@ -20,7 +23,7 @@
                      @mouseenter.native="me && item.allowOperate ? $refs.navigator[index].$el.classList.add('group-link-hover') : ''"
                      @mouseleave.native="me && item.allowOperate ? $refs.navigator[index].$el.classList.remove('group-link-hover') : ''"
                      ref="navigator"
-                     :title="item.groupName"
+                     :title="item.groupId"
                      :key="item.groupId"
                      tag="div"
         >
@@ -52,7 +55,8 @@
                      class="group-link"
                      :title="item.groupName"
                      active-class="group-link-active"
-                     :key="index">
+                     :key="index"
+                     tag="div">
           <span class="group-name">{{ item.groupName }}</span>
           <span class="group-number">{{ item.count }}</span>
         </router-link>
@@ -73,13 +77,16 @@ export default {
   name: "HuadiaoFollowFanBoard",
   computed: {
     ...mapState(["followGroup", "fanGroup"]),
+    viewedUid() {
+      console.log(this.$route.params.viewedUid)
+      return 1;
+    },
     me() {
       return this.$store.state.me;
     },
   },
   data() {
     return {
-      viewedUid: 1,
       visible: {
         groupMore: [],
       },
@@ -91,6 +98,12 @@ export default {
   created() {
     this.getCurrentUserFollowFanInfo();
   },
+  mounted() {
+    console.log(this.$route.params.viewedUid)
+  },
+  updated() {
+    console.log(this.$route.params.viewedUid)
+  },
   methods: {
     // 获取当前用户的关注与粉丝信息
     getCurrentUserFollowFanInfo() {
@@ -100,6 +113,7 @@ export default {
         path: "share",
         thenCallback: (response) => {
           let res = response.data;
+          console.log(res);
           // 仅当当前用户为本人才获取关注分组
           if (this.viewedUid === res.uid) {
             this.getUserFollowGroup();
@@ -116,6 +130,7 @@ export default {
         path: "relation/follow/group",
         thenCallback: (response) => {
           let res = response.data;
+          console.log(res);
           this.$store.commit("initialFollowGroup", {followGroup: res});
           this.initial();
         },
@@ -133,6 +148,7 @@ export default {
         },
         thenCallback: (response) => {
           let res = response.data;
+          console.log(res);
           this.$store.commit("initialFollowFanCount", {stat: res});
         },
         errorCallback: (error) => {
@@ -323,4 +339,5 @@ export default {
   font-size: 20px;
   font-weight: 700;
 }
+
 </style>

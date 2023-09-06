@@ -39,6 +39,19 @@
 <script>
 import {Timer} from "@/assets/js/utils";
 
+export const huadiaoPopupWindowOptions = {
+  iconType: {
+    warning: "warning",
+    completed: "completed",
+    error: "error",
+    info: "info"
+  },
+  operate: {
+    confirmOrCancel: "confirmOrCancel",
+    hasRead: "hasRead",
+  }
+}
+
 export default {
   name: "HuadiaoPopupWindow",
   data() {
@@ -62,7 +75,7 @@ export default {
           warning: "warning",
           completed: "completed",
           error: "error",
-          info: "info-color",
+          info: "info",
         },
         // 选择的操作类型类型
         operation: {

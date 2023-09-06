@@ -244,7 +244,7 @@ export default {
 .huadiao-header {
   position: fixed;
   width: 100%;
-  z-index: 9;
+  z-index: 30;
   top: 0;
   left: 0;
 }

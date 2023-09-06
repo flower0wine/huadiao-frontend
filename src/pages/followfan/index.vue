@@ -15,7 +15,7 @@
 
 <script>
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
-import HuadiaoFollowFanBoard from "@/pages/followfan/components/HuadiaoFollowFanBoard";
+import HuadiaoFollowFanBoard from "@/pages/followfan/pages/HuadiaoFollowFanBoard";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import AddNewGroupBoard from "@/pages/followfan/components/AddNewGroupBoard";
@@ -25,7 +25,6 @@ export default {
   name: "HuadiaoFollowFan",
   data() {
     return {
-
     }
   },
   watch: {

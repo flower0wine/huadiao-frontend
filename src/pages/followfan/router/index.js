@@ -11,28 +11,29 @@ export default new VueRouter({
     mode: "history",
     routes: [
         {
-            path: "/followfan/follow",
-            redirect: "/followfan/follow/-1",
-        },
-        {
-            name: "followBoard",
-            path: "/followfan/follow/:groupId(-?\\d+)?",
-            components: {
-                followFanExhibit: () => import("@/pages/followfan/pages/HuadiaoFollowBoard"),
+            name: "followFanBoard",
+            path: "/followfan/:viewedUid(\\d+)",
+            component: () => import("@/pages/followfan/pages/HuadiaoFollowFanBoard"),
+            children: [{
+                name: "followBoard",
+                path: "follow",
+                components: {
+                    followFanExhibit: () => import("@/pages/followfan/pages/HuadiaoFollowBoard"),
+                },
+                beforeRouteLeave() {
+                    this.$store.commit("clearDeletedFollow");
+                }
             },
-            beforeRouteLeave() {
-                this.$store.commit("clearDeletedFollow");
-            }
+            {
+                name: "fanBoard",
+                path: "fan",
+                components: {
+                    followFanExhibit: () => import("@/pages/followfan/pages/HuadiaoFanBoard"),
+                },
+                beforeRouteLeave() {
+                    this.$store.commit("clearDeletedFan");
+                }
+            }]
         },
-        {
-            name: "fanBoard",
-            path: "/followfan/fan",
-            components: {
-                followFanExhibit: () => import("@/pages/followfan/pages/HuadiaoFanBoard"),
-            },
-            beforeRouteLeave() {
-                this.$store.commit("clearDeletedFan");
-            }
-        }
     ]
 })

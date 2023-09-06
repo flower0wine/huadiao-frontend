@@ -28,9 +28,9 @@ import {mapState} from "vuex";
 
 export default {
   name: "HuadiaoFanBoard",
+  props: ["viewedUid"],
   data() {
     return {
-      viewedUid: 1,
     }
   },
   computed: {

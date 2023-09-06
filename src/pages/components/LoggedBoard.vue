@@ -5,11 +5,11 @@
   >
     <div class="logged-bar-nickname">{{ user.nickname }}</div>
     <div class="logged-bar">
-      <a :href="'/' + user.uid + '/follow/follows'" class="logged-bar-follows">
+      <a :href="`/followfan/${user.uid}/follow`" class="logged-bar-follows">
         <em>{{ user.follow }}</em>
         <span>关注</span>
       </a>
-      <a :href="'/' + user.uid + '/follow/fans'" class="logged-bar-fans">
+      <a :href="`/followfan/${user.uid}/fan`" class="logged-bar-fans">
         <em>{{ user.fan }}</em>
         <span>粉丝</span>
       </a>

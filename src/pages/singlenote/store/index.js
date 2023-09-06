@@ -137,6 +137,19 @@ const mutations = {
         state.noteInfo.commentList[rootCommentIndex].commentList.unshift(comment);
         state.noteInfo.commentNumber++;
     },
+    // 删除根评论
+    deleteRootComment(state, {rootIndex}) {
+        let commentList = state.noteInfo.commentList[rootIndex].commentList;
+        let length = commentList && commentList.length !== 0 ? commentList.length + 1 : 1;
+        console.log(length)
+        state.noteInfo.commentList.splice(rootIndex, 1);
+        state.noteInfo.commentNumber -= length;
+    },
+    // 删除子评论
+    deleteSubComment(state, {rootIndex, subIndex}) {
+        state.noteInfo.commentList[rootIndex].commentList.splice(subIndex, 1);
+        state.noteInfo.commentNumber--;
+    },
     // 笔记点赞
     clickNoteLikeIcon(state, {likeCallback, cancelLikeCallback}) {
         let myLike = state.noteInfo.noteAndMeRelation.myLike;

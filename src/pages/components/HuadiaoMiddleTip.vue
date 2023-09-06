@@ -43,7 +43,7 @@ export default {
       this.modifySrcObject(this.defaultTipStyle, this.tipStyle);
     },
     // 花凋中间弹窗提示
-    addHuadiaoMiddleTip(middleTip) {
+    addHuadiaoMiddleTip(middleTip = "") {
       // 6 个字读 1 秒
       let time = middleTip.length / 12 * 1000;
       time = time > 2000 ? time : 2000;

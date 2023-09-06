@@ -150,6 +150,7 @@
 <script>
 import {Timer} from "@/assets/js/utils";
 import constants from "@/assets/js/constants";
+import {statusCode} from "@/assets/js/constants/status-code.js";
 
 let registerResponse = constants.registerResponse;
 
@@ -178,8 +179,8 @@ export default {
           render: false,
           show: false,
         },
-        // 小眼睛是否可见
         loginEye: false,
+        // 小眼睛是否可见
         registerEye: false,
         // 密码是否可见
         loginPasswordVisible: false,
@@ -261,13 +262,18 @@ export default {
             username: this.login.username,
             password: this.login.password
           },
-          thenCallback: () => {
-            // 刷新网页
-            window.location.reload();
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if(res.code === statusCode.succeed) {
+              // 刷新网页
+              window.location.reload();
+            } else if(res.code === statusCode.notExist) {
+              this.huadiaoMiddleTip("用户名或密码输入错误!");
+            }
           },
           errorCallback: (error) => {
             console.log(error);
-            this.huadiaoMiddleTip("用户名或密码输入错误!");
           }
         });
       }

@@ -31,7 +31,6 @@ export default {
   name: "HuadiaoFollowBoard",
   data() {
     return {
-      viewedUid: 1,
       visible: {
         render: false
       },
@@ -41,7 +40,13 @@ export default {
       accessing: false,
     }
   },
+  created() {
+    console.log(this.$route.params.viewedUid)
+  },
   computed: {
+    viewedUid() {
+      return this.$route.params.viewedUid;
+    },
     ...mapState({
       // 所有的关注, 根据 groupId 来查找
       follow(state) {
@@ -91,7 +96,7 @@ export default {
         this.visible.render = true;
       }
     },
-    "$route.params.groupId": {
+    "$route.query.groupId": {
       deep: true,
       immediate: true,
       handler() {
@@ -121,6 +126,7 @@ export default {
         },
         thenCallback: (response) => {
           let res = response.data;
+          console.log(res);
           this.$store.commit("addFollow", {follow: res});
           this.accessedFollowGroup.add(this.groupId);
           this.accessing = false;
