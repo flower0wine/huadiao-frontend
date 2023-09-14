@@ -16,5 +16,17 @@ export const apis = {
         commentDelete: "note/comment/delete",
         commentReport: "note/comment/report",
     },
-
+    // 个人主页相关 api
+    homepage: {
+        info: "homepage/info",
+    },
+    // 番剧页面相关 api
+    huadiaoHouse: {
+        info: "huadiaohouse/info",
+        cardBorderImage: "huadiaohouse/border",
+        infoModify: "huadiaohouse/info/modify",
+        infoPictureModify: "huadiaohouse/info/picture/modify",
+        addAnime: "huadiaohouse/anime/add",
+        deleteAnime: "huadiaohouse/anime/delete",
+    }
 };

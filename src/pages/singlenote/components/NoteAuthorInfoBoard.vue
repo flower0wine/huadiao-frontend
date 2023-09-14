@@ -18,12 +18,12 @@
         <span v-html="svg.colorLike" class="icon" @click="clickNoteUnlikeIcon" ref="unlikeIcon"></span>
       </div>
       <div class="note-infer-item">
-        <span v-html="svg.star" class="icon" @click="clickNoteStarIcon" ref="starIcon"></span>
+        <span v-html="svg.colorStar" class="icon" @click="clickNoteStarIcon" ref="starIcon"></span>
         <span>{{ noteInfo.starNumber }}</span>
       </div>
       <div class="note-infer-item">
         <a href="#comment-title">
-          <span v-html="svg.comment" class="icon"></span>
+          <span v-html="svg.colorComment" class="icon"></span>
           <span>{{ noteInfo.commentNumber }}</span>
         </a>
       </div>

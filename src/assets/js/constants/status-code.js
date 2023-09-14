@@ -8,8 +8,10 @@
 
 export const statusCode = {
     succeed: 1000,
+    exceedLimit: 1001,
     errorParam: 2000,
     blankParam: 2001,
     notExist: 3000,
     existed: 3001,
+    notAllowed: 3002,
 }

@@ -42,7 +42,7 @@ export default {
         href: '/' + this.user.uid + '/notes',
         content: "我的笔记",
       }, {
-        href: '/huadiaohouse/' + this.user.uid,
+        href: '/animehouse/' + this.user.uid,
         content: "我喜欢的番剧",
       }],
       svg: {

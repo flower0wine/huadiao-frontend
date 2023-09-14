@@ -13,7 +13,8 @@ export default {
                 element.addEventListener("mousewheel",  (e) => {
                     // 文档上移
                     if(e.wheelDeltaY && e.wheelDeltaY < 0) {
-                        if(window.scrollY < element.children[0].clientHeight) {
+                        if(window.scrollY < element.children[0].clientHeight &&
+                            window.scrollY > element.children[0].clientHeight - window.innerHeight) {
                             window.scrollTo({
                                 top: element.children[0].clientHeight,
                                 behavior: "smooth"
@@ -22,7 +23,6 @@ export default {
                     }
                     // 文档下移
                     else if(e.wheelDeltaY && e.wheelDeltaY > 0) {
-                        console.log(window.scrollY, element.children[0].clientHeight - 20, window.scrollY < element.children[0].clientHeight - 20)
                         // 指定区域文档自动滚动到指定位置
                         if(element.children[0].clientHeight - 20 < window.scrollY &&
                             window.scrollY < element.children[0].clientHeight + 200) {

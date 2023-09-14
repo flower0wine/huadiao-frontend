@@ -10,34 +10,24 @@ import Vuex from "vuex";
 import Vue from "vue";
 
 const state = {
-    isLogin: true,
     // 用户信息
     user: {
-        isLogin: null,
-        nickname: "花凋大总管",
-        canvases: "今天是花凋一周年!",
-        school: "东华理工大学",
-        userId: "huadiao_01234567890",
-        bornDate: "2003-03-15",
-        sex: "2",
-        uid: "1",
-        fans: 8,
-        follows: 8,
-        userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
+        login: false,
+        nickname: "",
+        uid: 0,
+        userAvatar: "",
+        follows: 0,
+        fans: 0,
     },
     // 作者
     author: {
-        me: false,
+        me: null,
         authorInfo: {
-            nickname: "花凋大总管",
-            userAvatar: "https://img2.baidu.com/it/u=2887833645,2834576538&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1679677200&t=9691b915847b2697e6f5ffc546cee982",
-            canvases: "今天是花凋一周年!",
-            userId: "huadiao_01234567890",
-            bornDate: "2003-03-15",
-            sex: "2",
-            uid: "1",
-            fan: 8,
-            follow: 8,
+            nickname: "",
+            uid: 0,
+            userAvatar: "",
+            follows: 0,
+            fans: 0,
         },
         noteList: []
     }

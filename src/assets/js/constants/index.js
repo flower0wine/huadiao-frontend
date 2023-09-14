@@ -7,6 +7,7 @@
 'use strict';
 
 export default {
+    imageHost: "http://localhost:9090/images/",
     statusCode: {
         succeed: 1000,
         errorParam: 2000,

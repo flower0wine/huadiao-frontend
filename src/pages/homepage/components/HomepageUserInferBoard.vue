@@ -95,7 +95,7 @@ export default {
     // 面板下部
     otherConfig() {
       return [{
-        href: "/huadiaohouse/" + this.uid,
+        href: "/animehouse/" + this.uid,
         name: this.name + "番剧馆",
         count: 0,
       }, {

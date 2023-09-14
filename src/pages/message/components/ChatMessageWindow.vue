@@ -2,15 +2,13 @@
   <div class="message-window" ref="messageWindow">
     <div class="message-item-box"
          :class="item.me ? 'me' : 'not-me'"
-         v-for="(item, index) in whisper.messageList"
+         v-for="(item, index) in []"
          :key="item.messageId"
          @contextmenu="operationMessageItem($event, index, item.messageId)"
     >
       <div class="publish-time" v-if="publishDate(index)">{{ publishDate(index) }}</div>
       <div class="message-info">
-        <a href="#">
-          <user-avatar-box :user-avatar="whisper.user.userAvatar" scale="30px"/>
-        </a>
+        <user-avatar-box :options="userAvatarOptions"/>
         <div class="message-item">
           {{ item.messageContent }}
         </div>
@@ -56,6 +54,12 @@ export default {
     }
   },
   computed: {
+    userAvatarOptions() {
+      return {
+        userAvatar: this.whisper.user.userAvatar,
+        scale: "30px",
+      }
+    },
     whisper() {
       console.log(this.$route.params.latestUserIndex)
       return this.$store.state.message.whisper[parseInt(this.$route.params.latestUserIndex)];
@@ -66,10 +70,11 @@ export default {
     this.timer.interval(this.setCurrentDate, 60000);
   },
   mounted() {
-    this.$refs.messageWindow.addEventListener("scroll", () => {
+    console.log(this.$refs.messageWindow)
+    /*this.$refs.messageWindow.addEventListener("scroll", () => {
       // let messageWindow = this.$refs.messageWindow;
       // console.log(messageWindow.scrollTop, messageWindow.scrollHeight, messageWindow.clientHeight)
-    });
+    });*/
     // 添加获取当前时间事件
     this.$bus.$on("getCurrentDate", this.getCurrentDate);
     // 隐藏消息操作面板

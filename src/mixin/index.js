@@ -7,6 +7,7 @@
 'use strict';
 import axios from "axios";
 import {apis} from "@/assets/js/constants/request-path.js";
+import constants from "@/assets/js/constants";
 
 export const mixin = {
     data() {
@@ -47,7 +48,12 @@ export const mixin = {
                 json: "application/json",
             };
             // 请求头
-            let headersProp = headers ? {"Content-Type": ContentType[headers]} : {};
+            let headersProp = {};
+            if(typeof headers === "string") {
+                headersProp = headers ? {"Content-Type": ContentType[headers]} : {};
+            } else if(typeof headers === "object") {
+                headersProp = {...headers};
+            }
             let srcObj = {
                 url: apis.host + path,
                 method: "get",
@@ -56,7 +62,8 @@ export const mixin = {
                 headers: headersProp,
             };
             // 修改对象属性
-            this.modifySrcObject(srcObj, {params, method, data});
+            this.modifySrcObject(srcObj, {params, method});
+            srcObj.data = data;
 
             let defaultThenCallback = (response) => {
                 thenCallback && thenCallback(response);
@@ -144,15 +151,18 @@ export const mixin = {
                 return mid + 1;
             }
         },
-        // 修改源对象指定属性为提供的对象的属性
-        modifySrcObject(srcConfig, config) {
+        // 修改源对象指定属性为提供的对象的属性, generate: 是否允许创建新属性
+        modifySrcObject(srcConfig, config, generate = true) {
             for (let c in config) {
+                // 可能为 对象 或者 null(属于对象)
                 if (typeof config[c] === "object") {
                     if (!srcConfig[c]) {
-                        srcConfig[c] = {};
+                        if(!generate) continue;
+                        srcConfig[c] = config[c] === null ? null : {};
                     }
-                    this.modifySrcObject(srcConfig[c], config[c]);
+                    this.modifySrcObject(srcConfig[c], config[c], generate);
                 } else {
+                    if(!srcConfig[c] && !generate) continue;
                     if (config[c] != null) {
                         srcConfig[c] = config[c]
                     }
@@ -259,6 +269,19 @@ export const mixin = {
                 }
             }
             return string.substring(0, count);
-        }
+        },
+        // 将带文件的 input 传入，返回的 url 可以放在 img 标签的 src 或者 任何盒子的 background-image 中
+        getImgPath: function (obj) {
+            let fileObj = obj.files[0];
+            let url;
+            if (window.createObjectURL != undefined) {
+                url = window.createObjectURL(fileObj);
+            } else if (window.URL != undefined) {
+                url = window.URL.createObjectURL(fileObj);
+            } else if (window.webkitURL != undefined) {
+                url = window.webkitURL.createObjectURL(fileObj);
+            }
+            return url;
+        },
     },
 }

@@ -10,17 +10,33 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 const state = {
-    user: {
-        login: false,
-        nickname: "",
-        uid: 0,
-        userAvatar: "",
-        follows: 0,
-        fans: 0,
-    },
+    allInfo: {
+        me: null,
+        uid: null,
+        relation: null,
+        fanCount: null,
+        followCount: null,
+        homepageInfo: {
+            uid: null,
+            pageBackground: null,
+            userAvatar: null,
+            visitCount: null,
+        },
+        userInfo: {
+            bornDate: null,
+            canvases: null,
+            nickname: null,
+            school: null,
+            sex: null,
+        },
+    }
 };
 const actions = {};
-const mutations = {};
+const mutations = {
+    initialAllInfo(state, {allInfo}) {
+        state.allInfo = allInfo;
+    },
+};
 const getters = {};
 
 Vue.use(Vuex);

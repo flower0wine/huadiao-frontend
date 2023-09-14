@@ -156,14 +156,10 @@ export default {
           this.$store.dispatch("cancelNoteStar", {
             selectedNoteStarArray: this.selectedNoteStarArray,
             favoriteId: this.$route.params.favoriteId,
-            succeedCallback: () => {
+            callback: () => {
               this.huadiaoMiddleTip("取消收藏成功!");
               this.selectedNoteStarArray = [];
             },
-            failCallback: () => {
-              this.huadiaoMiddleTip("部分收藏可能已被删除导致删除操作中断!");
-              this.selectedNoteStarArray = [];
-            }
           });
         });
       }
@@ -179,13 +175,10 @@ export default {
               selectedNoteStarArray: this.selectedNoteStarArray,
               srcFavoriteId: this.favoriteId,
               destFavoriteId,
-              succeedCallback: () => {
+              callback: () => {
                 this.huadiaoMiddleTip("复制成功!");
                 this.allNoteStarRemoveStyle();
               },
-              failCallback: () => {
-                this.huadiaoMiddleTip("笔记可能已被删除导致复制中断!");
-              }
             });
           },
           favoriteId: this.favoriteId,
@@ -205,13 +198,10 @@ export default {
               selectedNoteStarArray: this.selectedNoteStarArray,
               srcFavoriteId: this.favoriteId,
               destFavoriteId,
-              succeedCallback: () => {
+              callback: () => {
                 this.huadiaoMiddleTip("移动成功!");
                 this.allNoteStarRemoveStyle();
               },
-              failCallback: () => {
-                this.huadiaoMiddleTip("笔记可能已被删除导致移动中断!");
-              }
             });
           },
           favoriteId: this.favoriteId,

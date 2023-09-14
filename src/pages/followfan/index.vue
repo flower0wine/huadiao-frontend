@@ -1,7 +1,7 @@
 <template>
   <div class="huadiao-follow-fan">
     <huadiao-header/>
-    <huadiao-follow-fan-board/>
+    <router-view></router-view>
     <div class="follow-fan-foreground foreground-animation"
          ref="followFanForeground"
          @mouseenter="$refs.followFanForeground.classList.remove('foreground-animation')"

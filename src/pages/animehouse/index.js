@@ -7,22 +7,28 @@
 'use strict';
 import Vue from 'vue'
 import VueRouter from "vue-router";
-import index from "@/pages/singlefanju/index.vue";
+import index from "@/pages/animehouse/index.vue";
 import "@/assets/css/common.css";
 import "@/assets/css/animation.css";
 import {mixin} from "@/mixin";
+import {animeHouseMixin} from "@/pages/animehouse/mixin";
 import $ from "jquery";
-import router from "@/pages/singlefanju/router";
-import store from "@/pages/singlefanju/store";
+import router from "@/pages/animehouse/router";
+import store from "@/pages/animehouse/store";
+import huadiaoFullPage from "@/assets/js/plugins/huadiao-fullpage";
+import huadiaoVuerefpro from "@/assets/js/plugins/huadiao-vuerefpro";
 
 Vue.config.productionTip = false;  // 生产提示
 
 // 使用路由
 Vue.use(VueRouter);
-
+// 全屏滚动
+Vue.use(huadiaoFullPage);
+Vue.use(huadiaoVuerefpro);
 // 使用 VUE 混入
 // 引入所有页面公共 mixin
 Vue.mixin(mixin);
+Vue.mixin(animeHouseMixin);
 
 new Vue({
     beforeCreate() {

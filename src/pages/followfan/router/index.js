@@ -11,12 +11,16 @@ export default new VueRouter({
     mode: "history",
     routes: [
         {
+            path: "/followfan/:viewedUid(\\d+)/follow",
+            redirect: "/followfan/:viewedUid/follow/-1",
+        },
+        {
             name: "followFanBoard",
             path: "/followfan/:viewedUid(\\d+)",
             component: () => import("@/pages/followfan/pages/HuadiaoFollowFanBoard"),
             children: [{
                 name: "followBoard",
-                path: "follow",
+                path: "follow/:groupId(-?\\d+)",
                 components: {
                     followFanExhibit: () => import("@/pages/followfan/pages/HuadiaoFollowBoard"),
                 },

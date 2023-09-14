@@ -1,68 +1,70 @@
 <template>
-  <div class="huadiao-homepage"
-       v-if="getDataCompleted">
-    <huadiao-homepage-header :me="viewedUser.me"/>
-    <homepage-user-infer-top :homepageInfo="viewedUser.homepageInfo"
-                             :userInfo="viewedUser.userInfo"
-                             :me="viewedUser.me"/>
-    <homepage-user-infer-board :viewedUserinfo="viewedUser"
-                               :uid="viewedUser.homepageInfo.uid"/>
+  <div class="huadiao-homepage">
+    <div v-if="getDataCompleted">
+      <huadiao-homepage-header :me="allInfo.me"/>
+      <homepage-user-infer-top :homepageInfo="allInfo.homepageInfo"
+                               :userInfo="allInfo.userInfo"
+                               :me="allInfo.me"/>
+      <homepage-user-infer-board :viewedUserinfo="allInfo"
+                                 :uid="allInfo.homepageInfo.uid"/>
+    </div>
+    <huadiao-middle-tip/>
+    <huadiao-popup-window/>
+    <huadiao-warning-top-container/>
   </div>
 </template>
 
 <script>
-import HuadiaoHomepageHeader from "@/pages/homepage/components/HuadiaoHomepageHeader";
-import HomepageUserInferTop from "@/pages/homepage/components/HomepageUserInferTop";
-import HomepageUserInferBoard from "@/pages/homepage/components/HomepageUserInferBoard";
 import {mapState} from "vuex";
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
+import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
+import HomepageUserInferTop from "@/pages/homepage/components/HomepageUserInferTop";
+import HuadiaoHomepageHeader from "@/pages/homepage/components/HuadiaoHomepageHeader";
+import HomepageUserInferBoard from "@/pages/homepage/components/HomepageUserInferBoard";
+import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
+import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 
 export default {
   name: "HuadiaoHomepage",
   data() {
     return {
-      currentUid: 1,
-      viewedUid: 2,
-      viewedUser: {
-        me: null,
-        relation: null,
-        fanCount: null,
-        followCount: null,
-        homepageInfo: {
-          uid: null,
-          pageBackground: null,
-          userAvatar: null,
-          visitCount: null,
-        },
-        userInfo: {
-          bornDate: null,
-          canvases: null,
-          nickname: null,
-          school: null,
-          sex: null,
-        },
-      }
+      viewedUid: -1,
     }
   },
-  created() {
-    this.sendRequest({
-      path: "homepage/info",
-      params: {
-        viewedUid: this.viewedUid,
-      },
-      thenCallback: (response) => {
-        let res = response.data;
-        console.log(res);
-        this.getDataCompleted = true;
-        this.viewedUser = res;
-      },
-      errorCallback: (error) => {
-        console.log(error);
-      },
-    });
-  },
-  methods: {},
   computed: {
-    ...mapState(["user"]),
+    ...mapState(["allInfo"]),
+  },
+  created() {
+    this.getUid();
+    this.getHomepageInfo();
+  },
+  methods: {
+    // 获取个人主页 uid
+    getUid() {
+      this.viewedUid = parseInt(window.location.pathname.split(/[/]/)[2]);
+    },
+    getHomepageInfo() {
+      this.sendRequest({
+        path: apis.homepage.info,
+        params: {
+          viewedUid: this.viewedUid,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          if(statusCode.succeed === res.code) {
+            this.getDataCompleted = true;
+            this.$store.commit("initialAllInfo", {allInfo: res.data});
+          } else if(statusCode.notAllowed === res.code) {
+            this.huadiaoPopupWindow(huadiaoPopupWindowOptions.iconType.error, huadiaoPopupWindowOptions.operate.hasRead, "用户不公开个人主页");
+          }
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        },
+      });
+    },
   },
   beforeMount() {
   },
@@ -70,6 +72,9 @@ export default {
     this.clearAllRefsEvents();
   },
   components: {
+    HuadiaoWarningTopContainer,
+    HuadiaoMiddleTip,
+    HuadiaoPopupWindow,
     HomepageUserInferBoard,
     HomepageUserInferTop,
     HuadiaoHomepageHeader

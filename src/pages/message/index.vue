@@ -1,6 +1,6 @@
 <template>
   <div class="huadiao-message">
-    <huadiao-header :user="user" :isLogin="isLogin" :huadiaoHeaderStyle="huadiaoHeaderStyle"/>
+    <huadiao-header :huadiaoHeaderStyle="huadiaoHeaderStyle"/>
     <div class="message-board">
       <message-navigation-board/>
       <div class="message-content-board">
@@ -79,7 +79,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(["isLogin", "user"]),
   },
   mounted() {
     this.clickToHidden();

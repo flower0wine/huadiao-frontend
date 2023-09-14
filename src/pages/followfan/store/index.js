@@ -102,10 +102,7 @@ const actions = {
     },
     // 根据索引删除粉丝
     deleteFan(context, {index}) {
-        let fan = context.state.followFan.fan;
-        if (0 <= index && index <= fan.length) {
-            context.commit("deleteFan", {index});
-        }
+        context.commit("deleteFan", {index});
     },
 };
 const mutations = {

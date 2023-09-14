@@ -17,7 +17,7 @@
                      active-class="latest-user-item-active"
                      :title="item.user.nickname"
         >
-          <user-avatar-box :user-avatar="item.user.userAvatar" scale="40px"/>
+          <user-avatar-box :options="{ userAvatar: item.user.userAvatar, scale: '40px' }"/>
           <div class="user-info">
             <div class="nickname">{{ item.user.nickname }}</div>
             <div class="latest-message"

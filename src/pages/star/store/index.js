@@ -13,17 +13,13 @@ const state = {
     isLogin: true,
     // 用户信息
     user: {
-        isLogin: null,
-        nickname: "花凋大总管",
-        canvases: "今天是花凋一周年!",
-        school: "东华理工大学",
-        userId: "huadiao_01234567890",
-        bornDate: "2003-03-15",
-        sex: "2",
-        uid: "1",
-        fans: 8,
-        follows: 8,
-        userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
+        login: null,
+        nickname: null,
+        userId: null,
+        uid: null,
+        fan: null,
+        follow: null,
+        userAvatar: null
     },
     // 笔记收藏目录
     noteStarCatalogue: [{
@@ -193,28 +189,17 @@ const actions = {
     // 检查操作收藏夹是否合理
     checkFavoriteOperation(context, index) {
         let noteStar = context.state.noteStarCatalogue;
-        if (0 <= index && index < noteStar.length) {
-            if (noteStar[index].allowOperate) {
-                return true;
-            }
-        }
-        return false;
+        return noteStar[index].allowOperate;
     },
     // 取消收藏
-    cancelNoteStar(context, {selectedNoteStarArray, favoriteId, succeedCallback, failCallback}) {
-        let noteStar = context.state.noteStarDivide.get(favoriteId);
+    cancelNoteStar(context, {selectedNoteStarArray, favoriteId, callback}) {
         for (let index = selectedNoteStarArray.length - 1; index >= 0; index--) {
-            if (0 <= selectedNoteStarArray[index] && selectedNoteStarArray[index] <= noteStar.length - 1) {
-                context.commit("cancelNoteStar", {
-                    favoriteId,
-                    index: selectedNoteStarArray[index],
-                });
-            } else {
-                failCallback && failCallback();
-                return;
-            }
+            context.commit("cancelNoteStar", {
+                favoriteId,
+                index: selectedNoteStarArray[index],
+            });
         }
-        succeedCallback && succeedCallback();
+        callback && callback();
     },
     // 按照收藏夹将收藏分开
     accordingFavoriteIdDivide(context) {
@@ -234,15 +219,13 @@ const actions = {
         selectedNoteStarArray,
         srcFavoriteId,
         destFavoriteId,
-        succeedCallback,
-        failCallback
+        callback,
     }) {
         context.dispatch("copyOrMoveNoteStarToOtherFavorite", {
             selectedNoteStarArray,
             srcFavoriteId,
             destFavoriteId,
-            succeedCallback,
-            failCallback,
+            callback,
             fn: ({srcNoteStar, destNoteStar, noteStarIndex, destFavoriteId, sign}) => {
                 context.commit("copyNoteStarToOtherFavorite", {
                     srcNoteStar,
@@ -259,15 +242,13 @@ const actions = {
         selectedNoteStarArray,
         srcFavoriteId,
         destFavoriteId,
-        succeedCallback,
-        failCallback
+        callback,
     }) {
         context.dispatch("copyOrMoveNoteStarToOtherFavorite", {
             selectedNoteStarArray,
             srcFavoriteId,
             destFavoriteId,
-            succeedCallback,
-            failCallback,
+            callback,
             fn: ({srcNoteStar, destNoteStar, noteStarIndex, destFavoriteId, sign}) => {
                 context.commit("moveNoteStarToOtherFavorite", {
                     srcNoteStar,
@@ -284,8 +265,7 @@ const actions = {
         selectedNoteStarArray,
         srcFavoriteId,
         destFavoriteId,
-        succeedCallback,
-        failCallback,
+        callback,
         fn
     }) {
         srcFavoriteId = String(srcFavoriteId);
@@ -296,22 +276,18 @@ const actions = {
         for (let index = selectedNoteStarArray.length - 1; index >= 0; index--) {
             let noteStarIndex = selectedNoteStarArray[index];
             let sign = true;
-            if (0 <= noteStarIndex && noteStarIndex < srcNoteStar.length) {
-                for (let noteStar of destNoteStar) {
-                    // 在目标收藏夹下存在同样的笔记收藏
-                    if (noteStar.noteId === srcNoteStar[noteStarIndex].noteId) {
-                        sign = false;
-                        break;
-                    }
+            for (let noteStar of destNoteStar) {
+                // 在目标收藏夹下存在同样的笔记收藏
+                if (noteStar.noteId === srcNoteStar[noteStarIndex].noteId) {
+                    sign = false;
+                    break;
                 }
-                console.log(noteStarIndex, sign)
-                // 符合条件执行函数
-                fn({srcNoteStar, destNoteStar, noteStarIndex, destFavoriteId, sign});
-            } else {
-                failCallback && failCallback();
             }
+            console.log(noteStarIndex, sign)
+            // 符合条件执行函数
+            fn({srcNoteStar, destNoteStar, noteStarIndex, destFavoriteId, sign});
         }
-        succeedCallback && succeedCallback();
+        callback && callback();
     }
 };
 const mutations = {

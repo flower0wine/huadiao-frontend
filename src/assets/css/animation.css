@@ -29,6 +29,7 @@
     display: none;
 }
 
+/*----*/
 /* 右滑及左滑 */
 .left-slide-enter,
 .left-slide-leave-to {
@@ -40,6 +41,7 @@
     transform: translateX(0);
 }
 
+/*----*/
 /* 上移渐现渐隐 */
 .top-slide-enter {
     transform: translateY(100%);
@@ -57,6 +59,7 @@
     opacity: 0;
 }
 
+/*----*/
 /* 上滑展示 */
 .top-show-enter {
     transform: translateY(100px);
@@ -77,6 +80,7 @@
     transition: all 0s;
 }
 
+/*----*/
 /* 下滑渐隐渐现 */
 .bottom-slide-enter,
 .bottom-slide-leave-to {
@@ -89,7 +93,7 @@
     transform: translateY(0);
     opacity: 1;
 }
-
+/*----*/
 /* 色相反转 */
 @keyframes background {
     0% {

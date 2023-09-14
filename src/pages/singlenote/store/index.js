@@ -10,24 +10,19 @@ import Vuex from "vuex";
 import Vue from "vue";
 
 const state = {
-    isLogin: true,
     // 获取数据的页码
     page: {
         comment: 0,
     },
     // 当前用户信息
     user: {
-        isLogin: null,
+        login: null,
         nickname: null,
-        userAvatar: null,
         userId: null,
         uid: null,
-        fans: null,
-        follows: null,
-        sex: null,
-        canvases: null,
-        bornDate: null,
-        school: null,
+        fan: null,
+        follow: null,
+        userAvatar: null
     },
     noteInfo: {
         authorInfo: {
@@ -97,6 +92,7 @@ const mutations = {
     },
     // 初始化笔记信息
     initialNoteInfo(state, {noteInfo}) {
+        noteInfo.commentList = [];
         state.noteInfo = noteInfo;
     },
     // 添加笔记评论

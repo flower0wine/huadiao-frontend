@@ -71,6 +71,14 @@ svg {
     vertical-align: middle;
 }
 
+.hidden-input {
+    position: absolute;
+    display: none;
+    z-index: -99;
+    top: -999px;
+    left: -999px;
+}
+
 :root {
     --box-shadow-min: 1px 1px 3px 1px #5b5b5b94;
     --box-shadow: 2px 2px 5px 2px #999999a1;

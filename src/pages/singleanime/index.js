@@ -7,13 +7,13 @@
 'use strict';
 import Vue from 'vue'
 import VueRouter from "vue-router";
-import index from "@/pages/huadiaohouse/index.vue";
+import index from "@/pages/singleanime/index.vue";
 import "@/assets/css/common.css";
 import "@/assets/css/animation.css";
 import {mixin} from "@/mixin";
 import $ from "jquery";
-import router from "@/pages/huadiaohouse/router";
-import store from "@/pages/huadiaohouse/store";
+import router from "@/pages/singleanime/router";
+import store from "@/pages/singleanime/store";
 
 Vue.config.productionTip = false;  // 生产提示
 

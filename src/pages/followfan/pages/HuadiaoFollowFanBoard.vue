@@ -12,10 +12,7 @@
                alt>
         </div>
         <router-link :to="{
-          path: `/followfan/${viewedUid}/follow`,
-          query: {
-            groupId: item.groupId
-          }
+          path: `/followfan/${$route.params.viewedUid}/follow/${item.groupId}`,
         }"
                      v-for="(item, index) in followGroup"
                      class="group-link"
@@ -77,16 +74,13 @@ export default {
   name: "HuadiaoFollowFanBoard",
   computed: {
     ...mapState(["followGroup", "fanGroup"]),
-    viewedUid() {
-      console.log(this.$route.params.viewedUid)
-      return 1;
-    },
     me() {
       return this.$store.state.me;
     },
   },
   data() {
     return {
+      viewedUid: parseInt(this.$route.params.viewedUid),
       visible: {
         groupMore: [],
       },
@@ -97,12 +91,6 @@ export default {
   },
   created() {
     this.getCurrentUserFollowFanInfo();
-  },
-  mounted() {
-    console.log(this.$route.params.viewedUid)
-  },
-  updated() {
-    console.log(this.$route.params.viewedUid)
   },
   methods: {
     // 获取当前用户的关注与粉丝信息

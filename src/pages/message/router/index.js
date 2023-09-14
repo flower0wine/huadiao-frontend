@@ -36,11 +36,11 @@ export default new VueRouter({
             name: "likeMeBoard",
             path: "/like",
             component: () => import("@/pages/message/pages/LikeMeBoard"),
-        },
-        {
-            name: "likeMeDetails",
-            path: "/like/:messageIndex(\\d+)",
-            component: () => import("@/pages/message/pages/LikeMeDetails"),
+            children: [{
+                name: "likeMeDetails",
+                path: ":messageIndex(\\d+)",
+                component: () => import("@/pages/message/pages/LikeMeDetails"),
+            },],
         },
         {
             name: "systemMessageBoard",
@@ -51,6 +51,6 @@ export default new VueRouter({
             name: "messageSettingsBoard",
             path: "/settings",
             component: () => import("@/pages/message/pages/MessageSettingsBoard"),
-        },
+        }
     ],
 })

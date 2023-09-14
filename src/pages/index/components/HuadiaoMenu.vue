@@ -33,7 +33,7 @@ export default {
         title: "回顾一下以前的艰辛",
         svg: "/svg/notes.svg",
         description: "我的笔记",
-        url: this.getLinkByUserLogged("/" + this.user.uid + "/notes"),
+        url: this.getLinkByUserLogged(`/notes/${this.user.uid}`),
       }, {
         title: "收藏都在这里",
         svg: "/svg/star.svg",
@@ -43,12 +43,12 @@ export default {
         title: "瞅一瞅关注了谁",
         svg: "/svg/follow.svg",
         description: "我的关注",
-        url: this.getLinkByUserLogged("/" + this.user.uid + "/follow/follow"),
+        url: this.getLinkByUserLogged(`/followfan/${this.user.uid}/follow`),
       }, {
         title: "打造属于我的番剧馆",
         svg: "/svg/fanju.svg",
         description: "我的番剧馆",
-        url: this.getLinkByUserLogged("/huadiaohouse/" + this.user.uid),
+        url: this.getLinkByUserLogged("/animehouse/" + this.user.uid),
       }, {
         title: "有个性的个人主页",
         svg: "/svg/user.svg",

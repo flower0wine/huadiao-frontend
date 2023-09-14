@@ -10,7 +10,6 @@ import Vuex from "vuex";
 import Vue from "vue";
 
 const state = {
-    isLogin: true,
     // 用户信息
     user: {
         isLogin: null,

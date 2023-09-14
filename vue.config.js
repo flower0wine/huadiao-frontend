@@ -81,17 +81,17 @@ module.exports = defineConfig({
             title: '花凋~~过去的味道'
         },
         // 番剧馆
-        huadiaohouse: {
-            entry: "./src/pages/huadiaohouse/index.js",
-            template: './src/pages/huadiaohouse/index.html',
-            filename: "huadiaohouse.html",
+        animehouse: {
+            entry: "./src/pages/animehouse/index.js",
+            template: './src/pages/animehouse/index.html',
+            filename: "animehouse.html",
             title: '花凋~~保存的都是回忆'
         },
         // 单个番剧
-        singlefanju: {
-            entry: "./src/pages/singlefanju/index.js",
-            template: './src/pages/singlefanju/index.html',
-            filename: "singlefanju.html",
+        singleanime: {
+            entry: "./src/pages/singleanime/index.js",
+            template: './src/pages/singleanime/index.html',
+            filename: "singleanime.html",
             title: '花凋~~打造旷世巨作'
         }
     },

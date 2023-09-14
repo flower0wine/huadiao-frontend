@@ -40,9 +40,6 @@ export default {
       accessing: false,
     }
   },
-  created() {
-    console.log(this.$route.params.viewedUid)
-  },
   computed: {
     viewedUid() {
       return this.$route.params.viewedUid;

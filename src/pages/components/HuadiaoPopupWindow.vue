@@ -65,8 +65,8 @@ export default {
       tip: "",
       // 操作类型
       operation: {
-        confirmOrCancel: false,
-        hasRead: false,
+        confirmOrCancel: "confirmOrCancel",
+        hasRead: "hasRead",
       },
       // 配置
       config: {
@@ -79,9 +79,9 @@ export default {
         },
         // 选择的操作类型类型
         operation: {
-          confirmOrCancel: "confirmOrCancel",
-          hasRead: "hasRead",
-          none: "none",
+          confirmOrCancel: false,
+          hasRead: false,
+          none: false,
         },
         // 提示标题
         tipTitle: {
@@ -126,6 +126,7 @@ export default {
       if(typeof iconType === "string") {
         this.iconType = iconType;
         this.operationType = operationType;
+        this.config.operation[operationType] = true;
         this.tip = tip;
         // 回调函数
         this.callback.confirmCallback = confirmCallback;

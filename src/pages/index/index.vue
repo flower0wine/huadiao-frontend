@@ -170,8 +170,6 @@ export default {
     HuadiaoPoem,
   },
   beforeDestroy() {
-    // 清除事件
-    this.$bus.$off();
   },
 }
 </script>

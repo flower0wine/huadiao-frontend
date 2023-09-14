@@ -20,11 +20,11 @@
             <span>发布于 {{ dateFormat(noteInfo.publishTime) }}</span>
           </div>
           <div class="view-number">
-            <span v-html="svg.view" class="infer-icon"></span>
+            <span v-html="svg.colorEye" class="infer-icon"></span>
             <span>浏览量 {{ noteInfo.viewNumber }}</span>
           </div>
           <div class="star-number">
-            <span v-html="svg.star" class="infer-icon"></span>
+            <span v-html="svg.colorStar" class="infer-icon"></span>
             <span>收藏 {{ noteInfo.starNumber }}</span>
           </div>
           <div class="topping" v-if="noteInfo.topping">置顶</div>

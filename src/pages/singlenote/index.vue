@@ -1,7 +1,7 @@
 <template>
   <div class="huadiao-single-note-container">
     <huadiao-header :huadiaoHeaderStyle="huadiaoHeaderStyle">
-      <template v-slot>
+      <template v-slot:right>
         <div class="catalogue-icon"
              :title="visible.catalogue ? '关闭目录' : '打开目录'"
              @click="clickCatalogueIcon"
@@ -33,6 +33,7 @@ import LeftSliderBoard from "@/pages/components/NoteLeftSliderBoard";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import {statusCode} from "@/assets/js/constants/status-code";
 
 export default {
   name: "HuadiaoSingleNote",
@@ -93,8 +94,9 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          res.commentList = [];
-          this.$store.commit("initialNoteInfo", {noteInfo: res});
+          if(res.code === statusCode.succeed) {
+            this.$store.commit("initialNoteInfo", {noteInfo: res.data});
+          }
         },
         errorCallback: (error) => {
           console.log(error);
