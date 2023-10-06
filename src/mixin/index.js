@@ -14,6 +14,8 @@ export const mixin = {
         return {
             // 是否获取了数据
             getDataCompleted: false,
+            userAvatarImagePath: `${constants.imageHost}userAvatar/`,
+            huadiaoHouseImagePath: `${constants.imageHost}huadiaoHouse/`,
         }
     },
     watch: {
@@ -49,9 +51,9 @@ export const mixin = {
             };
             // 请求头
             let headersProp = {};
-            if(typeof headers === "string") {
+            if (typeof headers === "string") {
                 headersProp = headers ? {"Content-Type": ContentType[headers]} : {};
-            } else if(typeof headers === "object") {
+            } else if (typeof headers === "object") {
                 headersProp = {...headers};
             }
             let srcObj = {
@@ -157,12 +159,12 @@ export const mixin = {
                 // 可能为 对象 或者 null(属于对象)
                 if (typeof config[c] === "object") {
                     if (!srcConfig[c]) {
-                        if(!generate) continue;
+                        if (!generate) continue;
                         srcConfig[c] = config[c] === null ? null : {};
                     }
                     this.modifySrcObject(srcConfig[c], config[c], generate);
                 } else {
-                    if(!srcConfig[c] && !generate) continue;
+                    if (!srcConfig[c] && !generate) continue;
                     if (config[c] != null) {
                         srcConfig[c] = config[c]
                     }
@@ -228,7 +230,7 @@ export const mixin = {
          * @param timestamp 时间戳
          * @returns {string} 返回格式为 (xxxx年xx月xx日 xx:xx)
          */
-        dateFormat(timestamp) {
+        huadiaoDateFormat(timestamp) {
             let date = new Date(timestamp);
             return `${date.getFullYear()}年${this.numberFormat(date.getMonth() + 1)}月${this.numberFormat(date.getDate())}日 ${this.numberFormat(date.getHours())}:${this.numberFormat(date.getMinutes())}`;
         },
@@ -250,25 +252,25 @@ export const mixin = {
          */
         cutStringByLength(string, length, charAdjust) {
             let count = length;
+            console.log(11)
             if (charAdjust === true) {
                 count = 0;
-                let zhReg = /\u4E00-\u9FA5/;
-                let enReg = /[A-Za-z]/;
+                let zhReg = /[\u4E00-\u9FA5]/;
                 for (let c of string) {
                     // 一个中文字符占两个英文字符大小, 故 length -= 2
                     if (zhReg.test(c)) {
                         length -= 2;
-                    } else if (enReg.test(c)) {
+                    } else {
                         length -= 1;
                     }
                     // 计算截取长度
                     count++;
-                    if(length <= 0) {
+                    if (length <= 0) {
                         break;
                     }
                 }
             }
-            return string.substring(0, count);
+            return string.substring(0, count) + (count < string.length ? "..." : "");
         },
         // 将带文件的 input 传入，返回的 url 可以放在 img 标签的 src 或者 任何盒子的 background-image 中
         getImgPath: function (obj) {

@@ -26,7 +26,9 @@ class Timer {
         this.timerId = setInterval(fn, time);
     }
     destroy() {
-        clearTimeout(this.timerId);
+        if(this.timerId) {
+            clearTimeout(this.timerId);
+        }
     }
 }
 

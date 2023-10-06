@@ -48,6 +48,7 @@ export default {
 <style scoped>
 .huadiao-account {
   width: 100%;
+  min-width: 1000px;
   min-height: 100vh;
   padding: 60px 150px;
   background: -webkit-linear-gradient(left, #3494E6, #EC6EAD);

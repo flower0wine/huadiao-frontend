@@ -5,26 +5,26 @@
         <div class="transfer-note-favorite-header">
           <div>
             <span>你正在{{isCopy ? "复制" : "移动"}} {{selectedAmount}} 个笔记到</span>
-            <span v-html="svg.close" class="close-icon" @click="isShow = false"></span>
+            <span v-html="svg.close" class="close-icon" @click="closeBoard"></span>
           </div>
           <div>{{clickedFavoriteDirectoryName}}</div>
         </div>
         <div class="favorite-list">
           <div class="favorite-item"
                v-for="(item, index) in noteStarCatalogue"
-               :key="item.favoriteId"
-               :class="[clickedFavoriteDirectoryIndex === index ? 'click-input-checked-box' : '', String(item.favoriteId) === srcFavoriteId ? 'disable' : '']"
-               @click="String(item.favoriteId) !== srcFavoriteId && clickFavoriteItem(index, item.favoriteName)"
+               :key="item.groupId"
+               :class="[clickedFavoriteDirectoryIndex === index ? 'click-input-checked-box' : '', item.groupId === srcFavoriteId ? 'disable' : '']"
+               @click="item.groupId !== srcFavoriteId && clickFavoriteItem(index, item.groupName)"
                ref="favoriteDirectory"
           >
             <div class="input-checked-box">
               <div></div>
             </div>
             <div class="favorite-infer">
-              <div class="favorite-name">{{item.favoriteName}}</div>
-              <div class="favorite-public">{{item.isPublic ? "公开" : "私密"}}</div>
+              <div class="favorite-name">{{item.groupName}}</div>
+              <div class="favorite-public">{{item.open ? "公开" : "私密"}}</div>
             </div>
-            <div class="favorite-number">{{item.number}}</div>
+            <div class="favorite-number">{{item.count}}</div>
           </div>
         </div>
         <div class="transfer-note-favorite-footer">
@@ -62,7 +62,15 @@ export default {
     }
   },
   computed: {
-    ...mapState(["noteStarCatalogue"]),
+    ...mapState({
+      noteStarCatalogue(state) {
+        let catalogue = [];
+        for(let c of state.noteStarCatalogue) {
+          catalogue.push(c);
+        }
+        return catalogue;
+      }
+    }),
   },
   watch: {
     isShow: {
@@ -76,30 +84,42 @@ export default {
   },
   beforeMount() {
     // 打开面板
-    this.$bus.$on("copyOMoveNoteStarToOtherFavorite", ({confirmFn, favoriteId, amount, copy}) => {
+    this.$bus.$on("copyOrMoveStarToOtherGroup", ({confirmFn, groupId, count, copy}) => {
       this.confirmFn = confirmFn;
-      this.srcFavoriteId = favoriteId;
-      this.selectedAmount = amount;
+      this.srcFavoriteId = groupId;
+      this.selectedAmount = count;
       this.isCopy = copy;
       this.isShow = true;
     });
   },
   methods: {
+    reset() {
+      this.confirmFn = null;
+      this.srcFavoriteId = null;
+      this.destFavoriteId = null;
+      this.selectedAmount = null;
+      this.clickedFavoriteDirectoryIndex = null;
+      this.clickedFavoriteDirectoryName = "请选择一个收藏夹";
+    },
     // 点击收藏夹
-    clickFavoriteItem(index, favoriteName) {
+    clickFavoriteItem(index, groupName) {
       this.clickedFavoriteDirectoryIndex = index;
-      this.clickedFavoriteDirectoryName = favoriteName;
-      this.destFavoriteId = this.noteStarCatalogue[index].favoriteId;
+      this.clickedFavoriteDirectoryName = groupName;
+      this.destFavoriteId = this.noteStarCatalogue[index].groupId;
     },
     // 确认保存的收藏夹
     clickToConfirmOperation() {
       if(this.destFavoriteId) {
-        this.confirmFn(this.destFavoriteId);
-        this.isShow = false;
+        this.confirmFn && this.confirmFn(this.destFavoriteId);
+        this.closeBoard();
       } else {
         this.huadiaoMiddleTip("请选择一个收藏夹再点击确认!");
       }
     },
+    closeBoard() {
+      this.isShow = false;
+      this.reset();
+    }
   },
   beforeDestroy() {
   }
@@ -111,7 +131,7 @@ export default {
   position: fixed;
   top: 0px;
   left: 0px;
-  z-index: 20;
+  z-index: 99;
   width: 100%;
   height: 100vh;
   backdrop-filter: blur(2px);

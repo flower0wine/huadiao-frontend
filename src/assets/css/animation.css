@@ -41,6 +41,27 @@
     transform: translateX(0);
 }
 
+.right-slide-enter,
+.right-slide-leave-to {
+    transform: translateX(100%);
+}
+
+.right-slide-enter-to,
+.right-slide-leave {
+    transform: translateX(0);
+}
+
+/*----*/
+/* 下滑及上滑 */
+.bottom-slide-enter,
+.bottom-slide-leave-to {
+    transform: translateY(-100%);
+}
+
+.bottom-slide-enter-to,
+.bottom-slide-leave {
+}
+
 /*----*/
 /* 上移渐现渐隐 */
 .top-slide-enter {

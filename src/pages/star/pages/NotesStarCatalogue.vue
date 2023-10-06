@@ -1,8 +1,9 @@
 <template>
   <div class="note-star-catalogue-container">
-    <div class="note-star-catalogue">
-      <div class="catalogue-header">{{ $store.getters.call }}的收藏</div>
+    <div class="note-star-catalogue" ref="noteStarCatalogue">
+      <div class="catalogue-header">收藏夹列表</div>
       <div class="add-new-favorites"
+           v-if="me"
            @click="addNewFavorite"
            ref="addNewFavorite"
       >
@@ -11,25 +12,24 @@
       </div>
       <div class="note-star-favorite-list">
         <router-link class="note-star-favorite"
-                     v-for="(favorite, index) in noteStarCatalogue"
-                     :to="'/star/note/' + favorite.favoriteId"
+                     :class="groupItem.allowOperate ? 'favorite-link-hover' : ''"
+                     v-for="(groupItem, index) in noteStarCatalogue"
+                     :to="`/star/${viewedUid}/note/${groupItem.groupId}`"
                      active-class="note-star-favorite-active"
-                     :title="favorite.favoriteName"
-                     @mouseenter.native="me && favorite.allowOperate ? $refs.navigator[index].$el.classList.add('favorite-link-hover') : ''"
-                     @mouseleave.native="me && favorite.allowOperate ? $refs.navigator[index].$el.classList.remove('favorite-link-hover') : ''"
+                     :title="groupItem.groupName"
                      ref="navigator"
-                     :key="favorite.favoriteId"
+                     :key="groupItem.groupId"
                      tag="div"
         >
           <div>
             <span v-html="svg.favorite" class="favorite-icon"></span>
-            <span>{{ favorite.favoriteName }}</span>
+            <span>{{ groupItem.groupName }}</span>
           </div>
           <div class="favorite-number">
-            <span>{{ favorite.number }}</span>
+            <span>{{ groupItem.count }}</span>
           </div>
           <div class="favorite-more"
-               v-if="favorite.allowOperate && me"
+               v-if="groupItem.allowOperate && me"
                @mouseenter="isShow.favoriteMore.splice(index, 1, true)"
                @mouseleave="isShow.favoriteMore.splice(index, 1, false)"
                @click="isShow.favoriteMore.splice(index, 1, false)"
@@ -39,10 +39,9 @@
             <transition name="fade">
               <div class="favorite-more-board"
                    v-show="isShow.favoriteMore[index]"
-                   title=""
-              >
-                <div @click="modifyFavoriteInfer(index)">修改信息</div>
-                <div @click="deleteFavorite(index)">删除分组</div>
+                   title="">
+                <div @click="modifyGroupInfo(index)">修改信息</div>
+                <div @click="deleteGroup(index)">删除分组</div>
               </div>
             </transition>
           </div>
@@ -54,11 +53,15 @@
 
 <script>
 import {mapState} from "vuex";
+import {Timer} from "@/assets/js/utils";
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
 
 export default {
   name: "NotesStarCatalogue",
   data() {
     return {
+      timer: new Timer(),
       isShow: {
         favoriteMore: [],
       },
@@ -71,46 +74,100 @@ export default {
   },
   computed: {
     ...mapState(["noteStarCatalogue", "me"]),
+    viewedUid() {
+      return this.$route.params.viewedUid;
+    },
+  },
+  created() {
+    this.initialCatalogue();
+    this.getNoteStarCatalogue();
+  },
+  mounted() {
   },
   methods: {
-    // 初始化
-    initial() {
+    initialCatalogue() {
+      // 再次获取笔记收藏目录
+      this.$bus.$on("flushNoteStarCatalogue", () => {
+        this.getNoteStarCatalogue();
+      });
+    },
+    setCatalogue() {
+      if(!this.me) return;
       // 全部填充为 false
       let array = new Array(this.noteStarCatalogue.length);
       this.isShow.favoriteMore = array.fill(false);
     },
-    // 修改收藏夹信息
-    modifyFavoriteInfer(favoriteIndex) {
-      this.$bus.$emit("modifyFavoriteInfer",
-          this.noteStarCatalogue[favoriteIndex].favoriteName,
-          this.noteStarCatalogue[favoriteIndex].favoriteCanvases,
-          this.noteStarCatalogue[favoriteIndex].isPublic,
-          favoriteIndex,
+    // 获取笔记收藏目录
+    getNoteStarCatalogue() {
+      this.sendRequest({
+        path: apis.star.noteGroupGet,
+        params: {
+          uid: this.$route.params.viewedUid,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          if(res.code === statusCode.succeed) {
+            this.$store.commit("setNoteStarCatalogue", {catalogues: res.data});
+            this.setCatalogue();
+          }
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      })
+    },
+    modifyGroupInfo(index) {
+      this.$bus.$emit("modifyGroup",
+          this.noteStarCatalogue[index].groupName,
+          this.noteStarCatalogue[index].groupDescription,
+          this.noteStarCatalogue[index].groupId,
+          this.noteStarCatalogue[index].open,
+          index,
       );
     },
     // 删除收藏夹
-    deleteFavorite(deleteIndex) {
+    deleteGroup(index) {
       this.huadiaoPopupWindow(
           "warning",
           "confirmOrCancel",
           "确认删除吗？删除之后该收藏夹下所有的收藏都将删除, 不可恢复!",
           () => {
-            this.$store.dispatch("deleteFavorite", {
-              deleteIndex,
-              succeedCallback: () => {
-                this.huadiaoMiddleTip("删除成功!");
-              },
-              failCallback: () => {
-                this.huadiaoMiddleTip("收藏夹不存在或不允许删除!");
-              }
-            });
+            this.requestDeleteGroup(index);
           }
       );
+    },
+    requestDeleteGroup(index) {
+      let group = this.noteStarCatalogue[index];
+      this.sendRequest({
+        path: apis.star.noteGroupDelete,
+        params: {
+          groupId: group.groupId,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          if(res.code === statusCode.succeed) {
+            this.$store.dispatch("deleteFavorite", {
+              deleteIndex: index,
+              mapKey: this.getMapKey(this.viewedUid, group.groupId),
+              succeedCallback: () => {
+                this.huadiaoMiddleTip("删除成功!");
+                this.$bus.$emit("resetNoteStarList");
+                this.$router.replace({path: `/star/${this.viewedUid}/note/-1`});
+              },
+            });
+          }
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      })
     },
     // 添加新的收藏夹
     addNewFavorite() {
       // 打开新建面板
-      this.$bus.$emit("openOrCloseAddFavoriteBoard");
+      this.$bus.$emit("addGroup", this.viewedUid);
     },
   },
   beforeDestroy() {
@@ -121,6 +178,7 @@ export default {
 
 <style scoped>
 .note-star-catalogue-container {
+  flex-shrink: 0;
   width: 250px;
   height: 600px;
   margin-right: 10px;
@@ -133,6 +191,7 @@ export default {
   z-index: 1;
   width: 250px;
   height: 600px;
+  margin-right: 0;
   border-radius: 6px;
   background-color: #FFFFFFB7;
   box-shadow: var(--box-shadow-min);
@@ -194,24 +253,28 @@ export default {
   position: relative;
 }
 
+.favorite-number {
+  display: block;
+}
+
+.favorite-link-hover:hover .favorite-more {
+  display: block;
+}
+
+.favorite-link-hover:hover .favorite-number {
+  display: none;
+}
+
 .favorite-more/deep/svg {
   width: 18px;
   height: 18px;
   transform: translateX(4px);
 }
 
-.favorite-link-hover .favorite-number {
-  display: none;
-}
-
-.favorite-link-hover .favorite-more {
-  display: block;
-}
-
 .favorite-more-board {
   position: absolute;
-  top: 27px;
-  left: -46px;
+  top: 32px;
+  left: -76px;
   width: 120px;
   text-align: center;
   border-radius: 6px;

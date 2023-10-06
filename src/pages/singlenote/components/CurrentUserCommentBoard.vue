@@ -1,10 +1,7 @@
 <template>
   <div class="current-user-comment-box">
     <div class="input-box" ref="inputBox">
-      <div class="user-avatar-box">
-        <div class="default-user-avatar" v-html="svg.avatar"></div>
-        <div class="user-avatar" :style="`background-image: ${$store.state.user.userAvatar}`" ref="userAvatar"></div>
-      </div>
+      <user-avatar-box :options="userAvatarOptions"></user-avatar-box>
       <div class="comment-input">
         <textarea autocomplete="off"
                   minlength="1"
@@ -26,9 +23,12 @@
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
+import UserAvatarBox from "@/pages/components/UserAvatarBox";
+import {mapState} from "vuex";
 
 export default {
   name: "CurrentUserCommentBoard",
+  components: {UserAvatarBox},
   props: ["publishComment", "commentInputBoard"],
   data() {
     return {
@@ -43,6 +43,14 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      userAvatarOptions(state) {
+        return {
+          scale: "44px",
+          userAvatar: state.user.userAvatar,
+        }
+      },
+    }),
     defaultPlaceholder() {
       if(this.commentInputBoard) {
         return this.commentInputBoard.defaultPlaceholder;
@@ -85,29 +93,6 @@ export default {
 
 .focusin-input-box {
   height: 70px;
-}
-
-.user-avatar-box {
-  position: relative;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-}
-
-.default-user-avatar /deep/ svg {
-  width: 44px;
-  height: 44px;
-}
-
-.user-avatar {
-  position: absolute;
-  top: 0px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 
 .comment-input {

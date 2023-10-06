@@ -29,7 +29,16 @@ const state = {
             follows: 0,
             fans: 0,
         },
-        noteList: []
+        noteList: [{
+          noteId: null,
+          noteTitle: null,
+          noteContent: null,
+          publishTime: null,
+          viewCount: null,
+          starCount: null,
+          likeCount: null,
+          commentCount: null,
+        }]
     }
 };
 const actions = {};

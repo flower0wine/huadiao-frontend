@@ -38,6 +38,7 @@ export default {
       userAvatarOptions: {
         href: `/homepage/${this.rootCommentItem.uid}`,
         userAvatar: this.rootCommentItem.userAvatar,
+        transitionTime: "500ms",
         scale: "44px",
         hover: true,
       },

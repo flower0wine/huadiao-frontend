@@ -1,6 +1,6 @@
 <template>
   <div class="note-star-board">
-    <div class="note-star-board-header">
+    <div class="note-star-board-header" v-if="me">
       <transition name="right-slide">
         <div class="note-star-patch"
              v-if="!clickPatch"
@@ -17,10 +17,10 @@
         >
           <div class="chose-note-star">已选择 {{ choseNoteStar }} 个笔记</div>
           <div class="tool"
-               @click="allChoose"
+               @click="clickToChooseAll"
                ref="chooseAll"
           >
-            <input type="checkbox" id="choose-all" ref="chooseAllInput">
+            <input type="checkbox" id="choose-all" ref="chooseAllInput" :checked="chooseAll">
             <span>全选</span>
           </div>
           <div class="tool"
@@ -30,11 +30,11 @@
             <span v-html="svg.cancelStar"></span>
             <span>取消收藏</span>
           </div>
-          <div class="tool" @click="clickToCopyFavorite">
+          <div class="tool" @click="clickToCopyGroup">
             <span v-html="svg.copyTo"></span>
             <span>复制到</span>
           </div>
-          <div class="tool" @click="clickToMoveFavorite">
+          <div class="tool" @click="clickToMoveGroup">
             <span v-html="svg.moveTo"></span>
             <span>移动到</span>
           </div>
@@ -48,15 +48,17 @@
     </div>
     <div class="note-star-container">
       <div class="note-star-list">
-        <note-star-item v-for="(item, index) in afterHandleNoteStar"
-                        :key="item.noteId"
+        <note-star-item v-for="(item, index) in noteStarList"
+                        :key="`${item.uid}/${item.noteId}/${item.groupId}`"
                         :noteStar="item"
-                        :uid="getAuthorUid()"
                         :index="index"
+                        :addStarToArray="addStarToArray"
+                        :removeStarFromArray="removeStarFromArray"
                         :selectedNoteStarArray="selectedNoteStarArray"
                         :clickPatch="clickPatch"
                         ref="noteStarItem"
         />
+        <div class="no-note-star" v-if="!noteStarList || noteStarList.length === 0">收藏夹现在非常干净</div>
       </div>
     </div>
   </div>
@@ -65,6 +67,8 @@
 <script>
 import NoteStarItem from "@/pages/star/components/NoteStarItem";
 import {mapState} from "vuex";
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
 
 export default {
   name: "NotesStarBoard",
@@ -72,6 +76,7 @@ export default {
     return {
       clickPatch: false,
       uid: null,
+      chooseAll: null,
       choseNoteStar: 0,
       svg: {
         batch: `<svg t="1679106025781" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5186" width="200" height="200"><path d="M745.01688889 201.31081482A77.6722963 77.6722963 0 0 1 822.68918518 278.98311111v673.15990164a77.6722963 77.6722963 0 0 1-77.67229629 77.6722963h-673.15990164A77.6722963 77.6722963 0 0 1-5.81530905 952.14301275v-673.15990164A77.6722963 77.6722963 0 0 1 71.85698725 201.31081482zM719.12612386 304.87387614H97.74775349v621.37837037h621.37837037V304.87387614z m-92.63715911 141.10467201a51.78153127 51.78153127 0 0 1 10.61521423 67.67846044l-3.83183409 5.28171614-236.79693984 285.05732741a51.78153127 51.78153127 0 0 1-74.87609364 5.07459084l-4.34964858-4.60855706-131.36974461-154.15361658a51.78153127 51.78153127 0 0 1 74.35827912-71.82098371l4.50499319 4.66033778 91.39440116 107.29133154 197.4429772-237.67722666a51.78153127 51.78153127 0 0 1 72.90839586-6.73159821zM951.93588622-5.81530905a77.6722963 77.6722963 0 0 1 77.36160711 70.21575586l0.31068919 7.45654044v646.9066655a51.78153127 51.78153127 0 0 1-103.20059142 6.0584391l-0.36246991-6.0584391V97.74775349H304.87387614a51.78153127 51.78153127 0 0 1-51.41906015-45.72309216L253.09234608 45.96622222a51.78153127 51.78153127 0 0 1 45.72309094-51.41906014L304.87387614-5.81530905h647.06201008z" p-id="5187"></path></svg>`,
@@ -81,60 +86,122 @@ export default {
       },
       // 已选择的笔记收藏
       selectedNoteStarArray: [],
-      favoriteId: null,
+      groupId: null,
+      noteStarList: null,
     }
   },
   computed: {
-    ...mapState(["noteStar"]),
-    afterHandleNoteStar() {
-      return this.$store.state.noteStarDivide.get(this.favoriteId);
-    }
+    ...mapState(["noteStar", "viewedUid", "me"]),
+    mapKey() {
+      return this.getMapKey(this.viewedUid, this.groupId);
+    },
   },
   watch: {
     "selectedNoteStarArray.length": {
+      deep: true,
       handler(newValue) {
-        this.choseNoteStar = newValue;
-        this.$refs.chooseAll.children[0].checked = newValue === this.afterHandleNoteStar.length && this.afterHandleNoteStar.length !== 0;
+        this.chooseAll = newValue === this.noteStarList.length;
       }
     },
-    "$route.params.favoriteId": {
+    "$route.params.groupId": {
       immediate: true,
+      deep: true,
       handler(newValue) {
-        this.selectedNoteStarArray = [];
-        this.favoriteId = newValue;
-        this.clickPatch = false;
+        this.groupId = +newValue;
+        this.getNoteStarByGroupId().then(this.setNoteStarList).catch(() => {});
+
+        this.resetPitch();
       }
     }
   },
+  created() {
+    this.initial();
+  },
   methods: {
-    // 获取作者 uid
-    getAuthorUid() {
-      if (!this.uid) {
-        // let uid = window.location.href.split(/\//);
-        this.uid = "http://localhost:9090/1/note/1".split(/\//)[3];
-      }
-      return this.uid;
+    initial() {
+      this.$bus.$on("resetNoteStarList", this.setNoteStarList);
+    },
+    resetPitch() {
+      this.clickPatch = false;
+      this.chooseAll = false;
+    },
+    setNoteStarList() {
+      this.noteStarList = this.$store.state.noteStar.get(this.mapKey)?.noteStar;
+    },
+    // 点击选择
+    addStarToArray(index) {
+      this.insertOrderArray(this.selectedNoteStarArray, index);
+      this.choseNoteStar++;
+    },
+    // 移除选择
+    removeStarFromArray(index) {
+      this.deleteNumberFromArray(this.selectedNoteStarArray, index);
+      this.choseNoteStar--;
+    },
+    // 根据 groupId 获取笔记收藏
+    getNoteStarByGroupId() {
+      return new Promise((resolve, reject) => {
+        if (!this.groupId) {
+          reject();
+          return;
+        }
+        let mapKey = this.mapKey;
+        let noteStarGroup = this.noteStar.get(mapKey);
+        // 第一次获取未初始化, map.get() 得到的是 undefined, 若已经全部获取则返回
+        if (noteStarGroup && !noteStarGroup.hasNext) {
+          resolve();
+          return;
+        }
+        // 如果是第一次获取则为 undefined, 则 offset 为 0
+        let offset = this.noteStar.get(mapKey)?.offset ?? 0;
+
+        this.sendRequest({
+          path: apis.star.noteGet,
+          params: {
+            uid: this.viewedUid,
+            groupId: this.groupId,
+            offset,
+            row: 10,
+          },
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if (res.code === statusCode.succeed) {
+              this.$store.commit("addNoteStar", {mapKey, noteStar: res.data, hasNext: true});
+              resolve();
+            } else if (res.code === statusCode.notExist) {
+              this.$store.commit("addNoteStar", {mapKey, noteStar: [], hasNext: false});
+              resolve();
+            }
+          },
+          errorCallback: (error) => {
+            console.log(error);
+            reject();
+          }
+        });
+      });
     },
     // 全选
-    allChoose(e) {
-      if(this.afterHandleNoteStar.length === 0) {
+    clickToChooseAll(e) {
+      if (this.noteStarList.length === 0) {
         this.huadiaoMiddleTip("没有可以选择的笔记收藏!");
       } else {
-        // 改变 input 选项, 如果点击目标不是 input, 因为 input:checkbox 有默认点击事件
-        if(e.target !== this.$refs.chooseAllInput) {
-          this.$refs.chooseAll.children[0].checked = !this.$refs.chooseAll.children[0].checked;
+        if (e.target === this.$refs.chooseAllInput) {
+          this.chooseAll = this.$refs.chooseAllInput.checked;
+        } else {
+          this.chooseAll = !this.chooseAll;
         }
-        if(this.$refs.chooseAll.children[0].checked) {
+        if (this.chooseAll) {
           let arr = [];
           // 全部添加样式
           this.$refs.noteStarItem.forEach((item, index) => {
-            if(String(item.noteStar.favoriteId) === this.favoriteId) {
-              item.addClickNoteStarStyle();
-              arr.push(index);
-            }
+            item.addClickNoteStarStyle();
+            arr.push(index);
           });
+          this.choseNoteStar = this.$refs.noteStarItem.length;
           this.selectedNoteStarArray = arr;
         } else {
+          this.choseNoteStar = 0;
           this.allNoteStarRemoveStyle();
         }
       }
@@ -149,66 +216,178 @@ export default {
     },
     // 取消收藏
     cancelNoteStar() {
-      if(this.selectedNoteStarArray.length === 0) {
+      if (this.selectedNoteStarArray.length === 0) {
         this.huadiaoMiddleTip("请选择要取消收藏的笔记收藏!");
       } else {
-        this.huadiaoPopupWindow("warning", "confirmOrCancel", "确认取消收藏吗？确认后将无法恢复!", () => {
-          this.$store.dispatch("cancelNoteStar", {
-            selectedNoteStarArray: this.selectedNoteStarArray,
-            favoriteId: this.$route.params.favoriteId,
-            callback: () => {
-              this.huadiaoMiddleTip("取消收藏成功!");
-              this.selectedNoteStarArray = [];
-            },
+        // 取消收藏成功, 重新获取收藏目录
+        this.getCatalogueInfo((resolve) => {
+          this.huadiaoPopupWindow("warning", "confirmOrCancel", "确认取消收藏吗？确认后将无法恢复!", () => {
+            // 确认删除, 发送请求, 成功则执行相应回调
+            this.requestCancelNoteStar().then(() => {
+              this.$store.dispatch("cancelNoteStar", {
+                selectedNoteStarArray: this.selectedNoteStarArray,
+                mapKey: this.mapKey,
+              }).then(() => {
+                resolve();
+                this.huadiaoMiddleTip("取消收藏成功!");
+                this.selectedNoteStarArray = [];
+              });
+            })
           });
         });
       }
     },
+    // 请求取消收藏
+    requestCancelNoteStar() {
+      let uid = [];
+      let noteId = [];
+      for (let noteStarListKey of this.noteStarList) {
+        uid.push(noteStarListKey.uid);
+        noteId.push(noteStarListKey.noteId);
+      }
+      return new Promise((resolve) => {
+        this.sendRequest({
+          path: apis.star.noteDelete,
+          params: {
+            groupId: this.groupId,
+            uid: uid.join(","),
+            noteId: noteId.join(","),
+          },
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if (res.code === statusCode.succeed) {
+              resolve();
+            }
+          },
+          errorCallback: (error) => {
+            console.log(error);
+          }
+        });
+      });
+    },
     // 复制笔记到其他收藏夹
-    clickToCopyFavorite() {
-      if(this.selectedNoteStarArray.length === 0) {
+    clickToCopyGroup() {
+      if (this.selectedNoteStarArray.length === 0) {
         this.huadiaoMiddleTip("请选择要复制的笔记收藏!");
       } else {
-        this.$bus.$emit("copyOMoveNoteStarToOtherFavorite", {
-          confirmFn: (destFavoriteId) => {
-            this.$store.dispatch("copyNoteStarToOtherFavorite", {
-              selectedNoteStarArray: this.selectedNoteStarArray,
-              srcFavoriteId: this.favoriteId,
-              destFavoriteId,
-              callback: () => {
-                this.huadiaoMiddleTip("复制成功!");
+        this.getCatalogueInfo((resolve) => {
+          this.$bus.$emit("copyOrMoveStarToOtherGroup", {
+            confirmFn: (destGroupId) => {
+              // 发送请求到服务器, 复制
+              this.requestCopyToOtherGroup(destGroupId).then(() => {
                 this.allNoteStarRemoveStyle();
-              },
-            });
-          },
-          favoriteId: this.favoriteId,
-          amount: this.selectedNoteStarArray.length,
-          copy: true,
+                this.$store.commit("deleteNoteStar", {mapKey: this.getMapKey(this.viewedUid, destGroupId)});
+                resolve();
+              });
+            },
+            groupId: this.groupId,
+            count: this.selectedNoteStarArray.length,
+            copy: true,
+          });
         });
       }
     },
+    // 请求复制到其他收藏夹
+    requestCopyToOtherGroup(destGroupId) {
+      let uid = [];
+      let noteId = [];
+      for (let index = 0, length = this.selectedNoteStarArray.length; index < length; index++) {
+        uid.push(this.noteStarList[this.selectedNoteStarArray[index]].uid);
+        noteId.push(this.noteStarList[this.selectedNoteStarArray[index]].noteId);
+      }
+
+      return new Promise((resolve) => {
+        this.sendRequest({
+          path: apis.star.noteCopy,
+          method: "post",
+          params: {
+            uid: uid.join(","),
+            noteId: noteId.join(","),
+            srcGroupId: this.groupId,
+            destGroupId
+          },
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if (res.code === statusCode.succeed) {
+              resolve(res);
+            }
+          },
+          errorCallback: (error) => {
+            console.log(error);
+          },
+        })
+      })
+    },
     // 移动收藏到其他收藏夹
-    clickToMoveFavorite() {
-      if(this.selectedNoteStarArray.length === 0) {
+    clickToMoveGroup() {
+      if (this.selectedNoteStarArray.length === 0) {
         this.huadiaoMiddleTip("请选择要移动的笔记收藏!");
       } else {
-        this.$bus.$emit("copyOMoveNoteStarToOtherFavorite", {
-          confirmFn: (destFavoriteId) => {
-            this.$store.dispatch("moveNoteStarToOtherFavorite", {
-              selectedNoteStarArray: this.selectedNoteStarArray,
-              srcFavoriteId: this.favoriteId,
-              destFavoriteId,
-              callback: () => {
-                this.huadiaoMiddleTip("移动成功!");
-                this.allNoteStarRemoveStyle();
-              },
-            });
-          },
-          favoriteId: this.favoriteId,
-          amount: this.selectedNoteStarArray.length,
-          copy: false,
-        });
+        this.getCatalogueInfo((resolve) => {
+          this.$bus.$emit("copyOrMoveStarToOtherGroup", {
+            confirmFn: (destGroupId) => {
+              this.requestMoveNoteStar(destGroupId).then(() => {
+                this.$store.commit("moveNoteStarToOtherGroup", {
+                  selectedNoteStarArray: this.selectedNoteStarArray,
+                  srcMapKey: this.mapKey,
+                  callback: () => {
+                    this.allNoteStarRemoveStyle();
+                    this.$store.commit("deleteNoteStar", {mapKey: this.getMapKey(this.viewedUid, destGroupId)});
+                    resolve();
+                  },
+                });
+              });
+            },
+            groupId: this.groupId,
+            count: this.selectedNoteStarArray.length,
+            copy: false,
+          });
+        })
       }
+    },
+    // 请求移动收藏
+    requestMoveNoteStar(destGroupId) {
+      let uid = [];
+      let noteId = [];
+      for (let index = 0, length = this.selectedNoteStarArray.length; index < length; index++) {
+        uid.push(this.noteStarList[this.selectedNoteStarArray[index]].uid);
+        noteId.push(this.noteStarList[this.selectedNoteStarArray[index]].noteId);
+      }
+
+      return new Promise((resolve) => {
+        this.sendRequest({
+          path: apis.star.noteMove,
+          method: "post",
+          params: {
+            uid: uid.join(","),
+            noteId: noteId.join(","),
+            srcGroupId: this.groupId,
+            destGroupId,
+          },
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if (res.code === statusCode.succeed) {
+              resolve();
+            }
+          },
+          errorCallback: (error) => {
+            console.log(error);
+          }
+        })
+      });
+    },
+    // 处理完获取目录信息
+    getCatalogueInfo(fn) {
+      new Promise((resolve, reject) => {
+        fn(resolve, reject);
+      }).then(() => {
+        this.resetPitch();
+        this.setNoteStarList();
+        this.$bus.$emit("flushNoteStarCatalogue");
+      });
     },
   },
   beforeDestroy() {
@@ -221,7 +400,9 @@ export default {
 
 <style scoped>
 .note-star-board {
-  width: 1000px;
+  flex-shrink: 0;
+  width: 70vw;
+  min-width: 800px;
   min-height: 600px;
   border-radius: 6px;
   box-shadow: var(--box-shadow-min);
@@ -304,5 +485,11 @@ export default {
 
 .right-slide-leave-active {
   display: none;
+}
+
+.no-note-star {
+  color: #9d7edb;
+  text-align: center;
+  margin-top: 50px;
 }
 </style>

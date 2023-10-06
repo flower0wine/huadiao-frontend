@@ -11,6 +11,7 @@ import index from "@/pages/star/index.vue";
 import "@/assets/css/common.css";
 import "@/assets/css/animation.css";
 import {mixin} from "@/mixin";
+import starMixin from "@/pages/star/mixin";
 import domParser from "@/assets/js/plugins/huadiao-domparser";
 import router from "@/pages/star/router";
 import store from "@/pages/star/store";
@@ -23,6 +24,7 @@ Vue.use(VueRouter);
 // 使用 VUE 混入
 // 引入所有页面公共 mixin
 Vue.mixin(mixin);
+Vue.mixin(starMixin);
 
 new Vue({
     beforeCreate() {

@@ -19,10 +19,9 @@
     <ul class="right-entry">
       <li v-for="(rightEntry, index) in huadiaoIndexHeaderConfig.rightEntry"
           :key="index">
-        <a :href="rightEntry.url" class="right-icon"
-           :style="'color: ' + boardConfig.entryColor + '; fill: ' + boardConfig.entryColor">
-          <span v-html="rightEntry.svg"></span>
-          <span>{{ rightEntry.description }}</span>
+        <a :href="rightEntry.url" class="right-icon">
+          <span v-html="rightEntry.svg" :style="`fill: ${boardConfig.entryColor}`"></span>
+          <span :style="`color: ${boardConfig.entryColor}`">{{ rightEntry.description }}</span>
         </a>
       </li>
       <!--头像-->
@@ -44,7 +43,7 @@
                  alt=""
             >
             <div v-if="login && user.userAvatar"
-                 :style="`border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}; background-image: ${addBackground(user.userAvatar)}`"
+                 :style="`border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}; background-image: url('${userAvatarImagePath}${user.userAvatar}')`"
                  class="user-avatar-box logged-avatar"
                  ref="avatar"
             ></div>
@@ -248,6 +247,7 @@ export default {
   z-index: 30;
   top: 0;
   left: 0;
+  transition: all 500ms;
 }
 
 .huadiao-header {

@@ -39,7 +39,7 @@ export default {
     // 点击添加笔记
     clickToCreateNewNote() {
       if(this.login) {
-        window.location.href = "/buildNote";
+        window.location.href = "/buildnote";
       } else {
         this.huadiaoMiddleTip("登录后体验更多功能!");
       }

@@ -1,21 +1,23 @@
 <template>
-  <div class="note-history-list">
+  <div class="anime-history-list">
     <transition-group name="right-slide">
-      <note-history-item v-for="(item, index) in noteHistory"
-                         :key="`${item.uid}/${item.noteId}`"
-                         :noteHistory="item"/>
+      <anime-history-item v-for="(item, index) in animeHistory"
+                          :key="`${item.uid}/${item.animeId}`"
+                          :animeItem="item"/>
     </transition-group>
-    <div class="no-note" ref="noNote">去发现更多有意思的人吧!</div>
+    <div class="no-anime" ref="noAnime">你到了世界的尽头...</div>
   </div>
 </template>
 
 <script>
-import NoteHistoryItem from "@/pages/history/components/NoteHistoryItem";
 import {mapState} from "vuex";
+import AnimeHistoryItem from "@/pages/history/components/AnimeHistoryItem";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
+
 export default {
-  name: "NoteHistoryList",
+  name: "AnimeHistoryList",
+  components: {AnimeHistoryItem},
   data() {
     return {
       offset: 0,
@@ -25,7 +27,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["noteHistory"]),
+    ...mapState(["animeHistory"]),
   },
   created() {
     this.initial();
@@ -35,21 +37,21 @@ export default {
       this.observer = new IntersectionObserver((entries) => {
         let observerInfo = entries[0];
         if(observerInfo.isIntersecting) {
-          this.getNoteHistory();
+          this.getAnimeHistory();
         }
       }, {
         threshold: 0.1
       });
       this.$nextTick(() => {
-        this.observer.observe(this.$refs.noNote);
+        this.observer.observe(this.$refs.noAnime);
       });
     },
-    // 获取笔记历史记录
-    getNoteHistory() {
+    // 获取番剧馆历史记录
+    getAnimeHistory() {
       if(this.requesting) return;
       this.requesting = true;
       this.sendRequest({
-        path: apis.history.note,
+        path: apis.history.anime,
         params: {
           row: this.row,
           offset: this.offset,
@@ -59,12 +61,12 @@ export default {
           console.log(res);
           if(res.code === statusCode.succeed) {
             let length = res.data.length;
-            this.$store.commit("addNoteHistory", {noteHistory: res.data});
+            this.$store.commit("addAnimeHistory", {animeHistory: res.data});
             this.offset += length;
           }
           else if(res.code === statusCode.notExist) {
             this.$nextTick(() => {
-              this.observer.unobserve(this.$refs.noNote);
+              this.observer.unobserve(this.$refs.noAnime);
             });
           }
           this.requesting = false;
@@ -77,23 +79,21 @@ export default {
     },
   },
   beforeDestroy() {
-  },
-  components: {NoteHistoryItem},
+  }
 }
 </script>
 
 <style scoped>
-.note-history-list {
+.anime-history-list {
   width: 1200px;
   margin: 0 auto 100px;
   transition: var(--transition-500ms);
 }
 
-.no-note {
-  margin-top: 40px;
-  font-size: 14px;
+.no-anime {
   text-align: center;
-  letter-spacing: 1px;
-  color: #a9a9a9;
+  font-size: 14px;
+  margin-top: 40px;
+  color: #adadad;
 }
 </style>

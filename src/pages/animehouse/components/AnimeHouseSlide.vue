@@ -7,7 +7,8 @@
         <div class="slide-content" :style="nativeUrlReject(item.cover)">{{item.word}}</div>
       </swiper-slide>
       <swiper-slide v-if="slides.length === 0">
-        <div class="slide-content">快把你喜欢的番剧记录下来吧！打造属于你的番剧馆！</div>
+        <div class="slide-content" v-if="me">快把你喜欢的番剧记录下来吧！打造属于你的番剧馆！</div>
+        <div class="slide-content" v-else>番剧馆空空如也</div>
       </swiper-slide>
       <div class="swiper-pagination" slot="pagination"></div>
     </swiper>
@@ -57,7 +58,7 @@ export default {
     ...mapState({
       slides(state) {
         return state.huadiaoHouseInfo.animeList;
-      }
+      },
     }),
   },
   created() {

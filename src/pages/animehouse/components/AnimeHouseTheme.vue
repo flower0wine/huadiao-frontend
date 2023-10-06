@@ -26,7 +26,7 @@
                           :realTimeCallback="borderImageRealTimeCallback"
                           key="borderImage"/>
     </transition-group>
-    <input type="color" name="colorBoard" id="colorBoard" @change="colorBoardChange" v-model="colorInputValue" ref="colorInput">
+    <input type="color" name="colorBoard" id="colorBoard" @input="colorBoardChange" v-model="colorInputValue" ref="colorInput">
   </div>
 </template>
 

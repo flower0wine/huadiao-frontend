@@ -17,15 +17,15 @@
         <div class="note-infer">
           <div class="public-time">
             <span v-html="svg.public" class="infer-icon"></span>
-            <span>发布于 {{ dateFormat(noteInfo.publishTime) }}</span>
+            <span>发布于 {{ huadiaoDateFormat(noteInfo.publishTime) }}</span>
           </div>
           <div class="view-number">
             <span v-html="svg.colorEye" class="infer-icon"></span>
-            <span>浏览量 {{ noteInfo.viewNumber }}</span>
+            <span>浏览量 {{ noteInfo.viewCount }}</span>
           </div>
           <div class="star-number">
             <span v-html="svg.colorStar" class="infer-icon"></span>
-            <span>收藏 {{ noteInfo.starNumber }}</span>
+            <span>收藏 {{ noteInfo.starCount }}</span>
           </div>
           <div class="topping" v-if="noteInfo.topping">置顶</div>
           <div class="concentration" v-if="noteInfo.concentration">精选</div>

@@ -50,10 +50,10 @@ const state = {
         topping: false,
         // 精选？
         concentration: false,
-        viewNumber: null,
-        likeNumber: null,
-        starNumber: null,
-        commentNumber: null,
+        viewCount: null,
+        likeCount: null,
+        starCount: null,
+        commentCount: null,
         // 原创？
         original: false,
         noteTitle: null,
@@ -108,11 +108,11 @@ const mutations = {
         if (Number.isInteger(subIndex)) {
             let myLike = state.noteInfo.commentList[rootIndex].commentList[subIndex].myLike;
             state.noteInfo.commentList[rootIndex].commentList[subIndex].myLike = !myLike;
-            state.noteInfo.commentList[rootIndex].commentList[subIndex].likeNumber += incr;
+            state.noteInfo.commentList[rootIndex].commentList[subIndex].likeCount += incr;
         } else {
             let myLike = state.noteInfo.commentList[rootIndex].myLike;
             state.noteInfo.commentList[rootIndex].myLike = !myLike;
-            state.noteInfo.commentList[rootIndex].likeNumber += incr;
+            state.noteInfo.commentList[rootIndex].likeCount += incr;
         }
     },
     // 给评论不喜欢
@@ -126,12 +126,12 @@ const mutations = {
     // 添加根评论
     addRootCommentByCurrentUser(state, {comment}) {
         state.noteInfo.commentList.unshift(comment);
-        state.noteInfo.commentNumber++;
+        state.noteInfo.commentCount++;
     },
     // 添加子评论
     addSubCommentByCurrentUser(state, {comment, rootCommentIndex}) {
         state.noteInfo.commentList[rootCommentIndex].commentList.unshift(comment);
-        state.noteInfo.commentNumber++;
+        state.noteInfo.commentCount++;
     },
     // 删除根评论
     deleteRootComment(state, {rootIndex}) {
@@ -139,22 +139,22 @@ const mutations = {
         let length = commentList && commentList.length !== 0 ? commentList.length + 1 : 1;
         console.log(length)
         state.noteInfo.commentList.splice(rootIndex, 1);
-        state.noteInfo.commentNumber -= length;
+        state.noteInfo.commentCount -= length;
     },
     // 删除子评论
     deleteSubComment(state, {rootIndex, subIndex}) {
         state.noteInfo.commentList[rootIndex].commentList.splice(subIndex, 1);
-        state.noteInfo.commentNumber--;
+        state.noteInfo.commentCount--;
     },
     // 笔记点赞
     clickNoteLikeIcon(state, {likeCallback, cancelLikeCallback}) {
         let myLike = state.noteInfo.noteAndMeRelation.myLike;
         state.noteInfo.noteAndMeRelation.myLike = !myLike;
         if (!myLike) {
-            state.noteInfo.likeNumber += 1;
+            state.noteInfo.likeCount += 1;
             likeCallback && likeCallback();
         } else {
-            state.noteInfo.likeNumber -= 1;
+            state.noteInfo.likeCount -= 1;
             cancelLikeCallback && cancelLikeCallback();
         }
     },
@@ -173,10 +173,10 @@ const mutations = {
         let myStar = state.noteInfo.noteAndMeRelation.myStar;
         state.noteInfo.noteAndMeRelation.myStar = !myStar;
         if (!myStar) {
-            state.noteInfo.starNumber += 1;
+            state.noteInfo.starCount += 1;
             starCallback && starCallback();
         } else {
-            state.noteInfo.starNumber -= 1;
+            state.noteInfo.starCount -= 1;
             cancelStarCallback && cancelStarCallback();
         }
     },

@@ -23,6 +23,7 @@ export default {
       userAvatarOptions: {
         href: `/homepage/${this.subCommentItem.uid}`,
         userAvatar: this.subCommentItem.userAvatar,
+        transitionTime: "500ms",
         scale: "30px",
         hover: true,
       },

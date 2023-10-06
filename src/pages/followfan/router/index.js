@@ -12,7 +12,7 @@ export default new VueRouter({
     routes: [
         {
             path: "/followfan/:viewedUid(\\d+)/follow",
-            redirect: "/followfan/:viewedUid/follow/-1",
+            redirect: "/followfan/:viewedUid(\\d+)/follow/-1",
         },
         {
             name: "followFanBoard",

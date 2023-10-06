@@ -10,7 +10,7 @@
              :class="cardBorder ? `has-border-image` : ``"></div>
         <div class="anime-info">
           <div class="anime-title">{{item.title}}</div>
-          <div class="anime-add-time">{{dateFormat(item.addTime)}}</div>
+          <div class="anime-add-time">{{ huadiaoDateFormat(item.addTime) }}</div>
           <div class="delete-anime" @click="deleteAnime(index)" v-if="me">
             <span v-html="svg.deleteTrashcan"></span>
             <span>删除该番剧</span>

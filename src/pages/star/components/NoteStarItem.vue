@@ -1,19 +1,19 @@
 <template>
   <div class="note-star-item">
-    <a :href="'/' + uid + '/note/' + noteStar.noteId"
+    <a :href="`/singlenote/${noteStar.uid}/${noteStar.noteId}`"
        :title="noteStar.noteTitle"
        class="note-star-link"
     >
       <div class="note-title">{{ noteTitle }}</div>
-      <div class="note-abstract">{{ noteStar.noteAbstract }}</div>
+      <div class="note-abstract" v-html="noteStar.noteContent"></div>
       <div class="note-star-link-bottom">
-        <a :href="'/homepage'"
+        <a :href="`/homepage/${noteStar.uid}`"
            class="homepage-link"
-           :title="'前往' + noteStar.authorNickname + '的主页'"
+           :title="`前往${noteStar.nickname}的主页`"
         >
           <div class="user-avatar-box">
             <span v-html="svg.noAvatar"></span>
-            <div class="user-avatar" ref="userAvatar"></div>
+            <div class="user-avatar" :style="`background-image: url('${userAvatarImagePath}${noteStar.userAvatar}');`"></div>
           </div>
         </a>
         <div>{{ starDate }}</div>
@@ -32,7 +32,7 @@
 <script>
 export default {
   name: "NoteStarItem",
-  props: ["noteStar", "uid", "index", "selectedNoteStarArray", "clickPatch"],
+  props: ["noteStar", "index", "clickPatch", "addStarToArray", "removeStarFromArray"],
   data() {
     return {
       svg: {
@@ -45,8 +45,8 @@ export default {
   computed: {
     // 收藏日期
     starDate() {
-      let date = this.noteStar.starDate.split(/[-:\s]/);
-      return date[0] + "年" + date[1] + "月" + date[2] + "日";
+      let date = new Date(this.noteStar.starTime);
+      return date.getFullYear() + "年" + (date.getMonth() + 1) + "月" + date.getDate() + "日";
     },
     noteTitle() {
       let noteTitle = this.noteStar.noteTitle;
@@ -59,26 +59,25 @@ export default {
   methods: {
     // 初始化
     initial() {
-      this.$refs.userAvatar.style.backgroundImage = "url('" + this.noteStar.authorAvatar + "')";
       this.classList = this.$refs.chooseMark.classList;
     },
     // 点击来选择笔记收藏
     clickToChooseNoteStar() {
       if(this.classList.contains("click-choose-mark")) {
+        this.removeStarFromArray(this.index);
         this.removeClickNoteStarStyle();
       } else {
+        this.addStarToArray(this.index);
         this.addClickNoteStarStyle();
       }
     },
     // 添加点击样式
     addClickNoteStarStyle() {
       this.classList.add("click-choose-mark");
-      this.insertOrderArray(this.selectedNoteStarArray, this.index);
     },
     // 移除点击样式
     removeClickNoteStarStyle() {
       this.classList.remove("click-choose-mark");
-      this.deleteNumberFromArray(this.selectedNoteStarArray, this.index);
     },
   },
   beforeDestroy() {
@@ -91,7 +90,7 @@ export default {
   position: relative;
   float: left;
   width: 50%;
-  height: 130px;
+  height: 140px;
   transition: var(--transition-500ms);
 }
 
@@ -154,6 +153,9 @@ export default {
   font-size: 16px;
   padding: 6px 10px;
   color: #777676;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 
 .note-star-link {
@@ -166,6 +168,7 @@ export default {
   justify-content: end;
   align-items: center;
   margin-top: auto;
+  padding-right: 20px;
   color: #777676;
   font-size: 16px;
 }

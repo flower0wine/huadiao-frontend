@@ -12,11 +12,15 @@ export default new VueRouter({
     mode: "history",
     routes: [
         {
-            path: "/star/note",
-            redirect: "/star/note/-1"
+            path: "/star/:viewedUid(\\d+)/note",
+            redirect: "/star/:viewedUid(\\d+)/note/-1"
         },
         {
-            path: "/star/note/:favoriteId(-?\\d+)",
+            path: "/star/:viewedUid(\\d+)/anime",
+            redirect: "/star/:viewedUid(\\d+)/anime/-1"
+        },
+        {
+            path: "/star/:viewedUid(\\d+)/note/:groupId(-?\\d+)",
             components: {
                 // 目录
                 catalogue: () => import("@/pages/star/pages/NotesStarCatalogue"),
@@ -25,7 +29,7 @@ export default new VueRouter({
             },
         },
         {
-            path: "/star/fanju",
+            path: "/star/:viewedUid(\\d+)/anime/:groupId(-?\\d+)",
             components: {
                 // 目录
                 catalogue: () => import("@/pages/star/pages/FanjuStarCatalogue"),

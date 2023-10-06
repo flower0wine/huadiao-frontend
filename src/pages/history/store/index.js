@@ -10,79 +10,58 @@ import Vuex from "vuex";
 import Vue from "vue";
 
 const state = {
-    isLogin: true,
     // 用户信息
     user: {
-        isLogin: null,
-        nickname: "花凋大总管",
-        canvases: "今天是花凋一周年!",
-        school: "东华理工大学",
-        userId: "huadiao_01234567890",
-        bornDate: "2003-03-15",
-        sex: "2",
-        uid: "1",
-        fans: 8,
-        follows: 8,
-        userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
+        login: null,
+        nickname: null,
+        userId: null,
+        uid: null,
+        fans: null,
+        follows: null,
+        userAvatar: null,
     },
     // 笔记历史
-    noteHistory: [{
-        authorNickname: "孙庆洋",
-        authorUid: "30",
-        authorUserAvatar: "https://img1.baidu.com/it/u=413643897,2296924942&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500",
-        noteAbstract: "孙庆洋大SB",
-        noteId: "5",
-        noteTitle: "孙庆洋SB",
-        viewedDate: "2023-3-21 13:05:57.0",
-    }, {
-        authorNickname: "孙庆洋",
-        authorUid: "30",
-        authorUserAvatar: "https://img1.baidu.com/it/u=413643897,2296924942&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500",
-        noteAbstract: "孙庆洋大SB",
-        noteId: "52",
-        noteTitle: "孙庆洋SB",
-        viewedDate: "2022-10-17 13:05:57.0",
-    },{
-        authorNickname: "孙庆洋",
-        authorUid: "30",
-        authorUserAvatar: "https://img1.baidu.com/it/u=413643897,2296924942&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500",
-        noteAbstract: "孙庆洋大SB",
-        noteId: "51",
-        noteTitle: "孙庆洋SB",
-        viewedDate: "2022-10-17 13:05:57.0",
-    },{
-        authorNickname: "孙庆洋",
-        authorUid: "30",
-        authorUserAvatar: "https://img1.baidu.com/it/u=413643897,2296924942&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500",
-        noteAbstract: "孙庆洋大SB",
-        noteId: "53",
-        noteTitle: "孙庆洋SB",
-        viewedDate: "2022-10-17 13:05:57.0",
-    },{
-        authorNickname: "孙庆洋",
-        authorUid: "30",
-        authorUserAvatar: "https://img1.baidu.com/it/u=413643897,2296924942&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500",
-        noteAbstract: "孙庆洋大SB",
-        noteId: "15",
-        noteTitle: "孙庆洋SB",
-        viewedDate: "2022-10-17 13:05:57.0",
-    },{
-        authorNickname: "孙庆洋",
-        authorUid: "30",
-        authorUserAvatar: "https://img1.baidu.com/it/u=413643897,2296924942&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500",
-        noteAbstract: "孙庆洋大SB",
-        noteId: "35",
-        noteTitle: "孙庆洋SB",
-        viewedDate: "2022-10-17 13:05:57.0",
-    }]
+    noteHistory: [],
+    // 番剧馆历史
+    animeHistory: [],
 };
 const actions = {
 };
 const mutations = {
-    // 清空历史记录
-    clearAllHistory(state, {succeedCallback}) {
+    initialUser(state, {user}) {
+        state.user = user;
+    },
+    addNoteHistory(state, {noteHistory}) {
+        state.noteHistory.push(...noteHistory);
+    },
+    addAnimeHistory(state, {animeHistory}) {
+        state.animeHistory.push(...animeHistory);
+    },
+    deleteNoteHistory(state, {noteId, uid}) {
+        let noteHistoryList = state.noteHistory;
+        for(let index = 0; index < noteHistoryList.length; index++) {
+            if(noteHistoryList[index].uid === uid && noteHistoryList[index].noteId === noteId) {
+                noteHistoryList.splice(index, 1);
+            }
+        }
+    },
+    deleteAnimeHistory(state, {uid}) {
+        let animeHistoryList = state.animeHistory;
+        for(let index = 0; index < animeHistoryList.length; index++) {
+            if(animeHistoryList[index].uid === uid) {
+                animeHistoryList.splice(index, 1);
+            }
+        }
+    },
+    // 清空笔记历史记录
+    clearNoteHistory(state, {succeedCallback}) {
         state.noteHistory = [];
-        succeedCallback && succeedCallback();
+        succeedCallback();
+    },
+    // 清空番剧馆历史记录
+    clearAnimeHistory(state, {succeedCallback}) {
+        state.animeHistory = [];
+        succeedCallback();
     },
 };
 const getters = {};

@@ -1,14 +1,15 @@
 <template>
   <transition name="fade">
     <div class="add-new-favorite-board-container"
-         v-if="isShow"
+         v-if="visible.render"
+         v-show="visible.show"
     >
       <div class="add-new-favorite-board">
         <div class="new-favorite-board-header">
-          <div>新建收藏夹</div>
+          <div>{{modify ? '修改' : '新建'}}收藏夹</div>
           <div class="close-add-favorite-board-btn">
             <img src="/svg/starClose.svg"
-                 @click="openOrCloseAddFavoriteBoard"
+                 @click="closeBoard"
                  ref="closeFavoriteBoardBtn"
                  alt="">
           </div>
@@ -16,141 +17,130 @@
         <div class="favorite-name">
           <div>收藏夹名称</div>
           <input type="text" id="favorite-name"
-                 v-model="favoriteName"
+                 v-model="groupName"
                  placeholder="收藏夹名称"
                  autocomplete="off"
                  maxlength="16"
           >
-          <div class="favorite-name-word-number">{{ wordNumber.favoriteName }}/16</div>
+          <div class="favorite-name-word-number">{{ wordNumber.groupName }}/16</div>
         </div>
         <div class="favorite-canvases">
           <div>简介</div>
           <textarea id="favorite-canvases"
-                    v-model="favoriteCanvases"
+                    v-model="groupDescription"
                     placeholder="可以对你的收藏夹说明一下"
                     maxlength="100"
           ></textarea>
-          <div class="favorite-canvases-word-number">{{ wordNumber.favoriteCanvases }}/100</div>
+          <div class="favorite-canvases-word-number">{{ wordNumber.groupDescription }}/100</div>
         </div>
         <label class="public-favorite" for="public-favorite">
-          <input type="checkbox" id="public-favorite" ref="publicFavorite" :checked="modify ? isPublic : true">
+          <input type="checkbox" id="public-favorite" ref="publicFavorite" :checked="open">
           <span>公开收藏夹</span>
         </label>
-        <div class="build-favorite">
-          <div @click="modify ? modifyFavoriteInfer() : buildNewFavorite()">{{ modify ? '修改' : '建立' }}</div>
-        </div>
+        <modify-button v-if="modify"
+                       :group-name="groupName"
+                       :group-id="groupId"
+                       :group-description="groupDescription"
+                       :modify-index="modifyIndex"
+                       :viewedUid="viewedUid"
+                       :access="checkFavoriteInfer"></modify-button>
+        <new-button v-else
+                    :group-name="groupName"
+                    :group-description="groupDescription"
+                    :open="open"
+                    :viewedUid="viewedUid"
+                    :access="checkFavoriteInfer"></new-button>
       </div>
     </div>
   </transition>
 </template>
 
 <script>
+import ModifyButton from "@/pages/star/components/ModifyBotton";
+import NewButton from "@/pages/star/components/NewButton";
+
 export default {
   name: "AddNewFavoriteBoard",
+  components: {NewButton, ModifyButton},
   data() {
     return {
-      isShow: false,
       modify: false,
+      visible: {
+        render: false,
+        show: false,
+      },
       modifyIndex: null,
-      favoriteName: "",
-      favoriteCanvases: "",
-      isPublic: true,
+      groupName: "",
+      groupDescription: "",
+      groupId: null,
+      open: true,
+      viewedUid: null,
       wordNumber: {
-        favoriteName: 0,
-        favoriteCanvases: 0,
+        groupName: 0,
+        groupDescription: 0,
       }
     }
   },
   watch: {
-    favoriteName: {
+    groupName: {
       handler(newValue) {
-        this.wordNumber.favoriteName = newValue.length;
+        this.wordNumber.groupName = newValue.length;
       },
     },
-    favoriteCanvases: {
+    groupDescription: {
       handler(newValue) {
-        this.wordNumber.favoriteCanvases = newValue.length;
+        this.wordNumber.groupDescription = newValue?.length ?? 0;
       },
     }
   },
   beforeMount() {
-    this.$bus.$on("openOrCloseAddFavoriteBoard", this.openOrCloseAddFavoriteBoard);
-    this.$bus.$on("modifyFavoriteInfer", (favoriteName, favoriteCanvases, isPublic, modifyIndex) => {
+    this.$bus.$on("addGroup", (viewedUid) => {
+      this.flushBoard();
+      this.viewedUid = viewedUid;
+      this.visible.show = this.visible.render = true;
+    });
+    this.$bus.$on("modifyGroup", (groupName, groupDescription, groupId, isPublic, modifyIndex) => {
       this.modify = true;
-      this.favoriteName = favoriteName;
-      this.favoriteCanvases = favoriteCanvases;
-      this.isPublic = isPublic;
+      this.groupName = groupName;
+      this.groupDescription = groupDescription;
+      this.groupId = groupId;
+      this.open = isPublic;
       this.modifyIndex = modifyIndex;
-      this.isShow = true;
+      this.visible.render = this.visible.show = true;
+    });
+    this.$bus.$on("closeBoard", () => {
+      this.visible.show = false;
+      this.flushBoard();
     });
   },
   methods: {
-    // 打开或关闭
-    openOrCloseAddFavoriteBoard() {
-      this.isShow = !this.isShow;
-      if (!this.isShow) {
-        this.flushBoard();
-      }
+    closeBoard() {
+      this.visible.show = false;
+      this.flushBoard();
     },
     // 刷新面板
     flushBoard() {
-      this.favoriteName = "";
-      this.favoriteCanvases = "";
-      this.isPublic = true;
-    },
-    // 修改收藏夹信息
-    modifyFavoriteInfer() {
-      if(this.checkFavoriteInfer()) {
-        this.$store.dispatch("modifyFavoriteInfer", {
-          favoriteName: this.favoriteName,
-          favoriteCanvases: this.favoriteCanvases,
-          isPublic: this.$refs.publicFavorite.checked,
-          modifyIndex: this.modifyIndex,
-          succeedCallback: () => {
-            this.isShow = false;
-            this.flushBoard();
-            this.huadiaoMiddleTip("修改成功!");
-          },
-          failCallback: () => {
-            this.huadiaoMiddleTip("收藏夹不存在或不允许操作!");
-          },
-        });
-      }
+      this.groupName = "";
+      this.groupDescription = "";
+      this.groupId = null;
+      this.open = true;
     },
     // 检查收藏夹名称, 简介是否合理
     checkFavoriteInfer() {
-      if (typeof this.favoriteName === "string" && typeof this.favoriteCanvases === "string") {
-        if (0 < this.favoriteName.length && this.favoriteName.length <= 16 && this.favoriteCanvases.length <= 100) {
-          this.huadiaoMiddleTip("收藏夹添加成功!");
-          return true;
-        } else if (this.favoriteName.length === 0) {
-          this.huadiaoMiddleTip("收藏夹名称不能为空!");
-        } else if (this.favoriteCanvases.length > 16) {
-          this.huadiaoMiddleTip("收藏夹名称长度最大为 16 个字符!");
-        } else if (this.favoriteCanvases.length > 100) {
-          this.huadiaoMiddleTip("收藏夹简介长度最大为 100 个字符!");
-        }
-      } else {
-        this.huadiaoMiddleTip("请检查输入是否有误!");
+      this.groupName = this.groupName ?? "";
+      this.groupDescription = this.groupDescription ?? "";
+      if (0 < this.groupName.length && this.groupName.length <= 16 && this.groupDescription.length <= 50) {
+        return true;
+      } else if (this.groupName.length === 0) {
+        this.huadiaoMiddleTip("收藏夹名称不能为空!");
+      } else if (this.groupDescription.length > 16) {
+        this.huadiaoMiddleTip("收藏夹名称长度最大为 16 个字符!");
+      } else if (this.groupDescription.length > 50) {
+        this.huadiaoMiddleTip("收藏夹简介长度最大为 50 个字符!");
       }
       return false;
     },
-    // 建立新的收藏夹
-    buildNewFavorite() {
-      if (this.checkFavoriteInfer()) {
-        this.isShow = false;
-        this.flushBoard();
-        this.$store.commit("buildNewFavorite", {
-          favoriteName: this.favoriteName,
-          favoriteCanvases: this.favoriteCanvases,
-          isPublic: this.$refs.publicFavorite.checked,
-        });
-      }
-    },
   },
-  beforeDestroy() {
-    this.clearAllRefsEvents();
-  }
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="huadiao-follow-fan-board">
+  <div class="huadiao-follow-fan-board" v-if="visible.followFanBoard">
     <div class="follow-fan-group">
       <div class="follow-group">
         <div class="group-header">
@@ -11,16 +11,13 @@
                ref="addNewGroup"
                alt>
         </div>
-        <router-link :to="{
-          path: `/followfan/${$route.params.viewedUid}/follow/${item.groupId}`,
-        }"
+        <router-link :to="`/followfan/${viewedUid}/follow/${item.groupId}`"
                      v-for="(item, index) in followGroup"
                      class="group-link"
+                     :class="me && item.allowOperate ? 'group-link-hover' : ''"
                      active-class="group-link-active"
-                     @mouseenter.native="me && item.allowOperate ? $refs.navigator[index].$el.classList.add('group-link-hover') : ''"
-                     @mouseleave.native="me && item.allowOperate ? $refs.navigator[index].$el.classList.remove('group-link-hover') : ''"
                      ref="navigator"
-                     :title="item.groupId"
+                     :title="item.groupName"
                      :key="item.groupId"
                      tag="div"
         >
@@ -69,42 +66,63 @@
 
 <script>
 import {mapState} from "vuex";
+import {statusCode} from "@/assets/js/constants/status-code";
+import {apis} from "@/assets/js/constants/request-path";
 
 export default {
   name: "HuadiaoFollowFanBoard",
-  computed: {
-    ...mapState(["followGroup", "fanGroup"]),
-    me() {
-      return this.$store.state.me;
-    },
-  },
   data() {
     return {
-      viewedUid: parseInt(this.$route.params.viewedUid),
+      viewedUid: null,
       visible: {
+        followFanBoard: false,
         groupMore: [],
       },
       loadingCircleStyle: {
         circleColor: "#a6a6a6",
-      }
+      },
+      followFanArray: [],
     }
   },
+  computed: {
+    ...mapState(["followGroup", "fanGroup", "me"]),
+  },
   created() {
-    this.getCurrentUserFollowFanInfo();
+    this.initial();
   },
   methods: {
+    // 初始化
+    initial() {
+      let myUid = this.$store.state.user.uid;
+      this.viewedUid = +this.$route.params.viewedUid;
+      this.$store.commit("initialMe", {me: myUid === this.viewedUid});
+      this.visible.followFanBoard = true;
+      this.getCurrentUserFollowFanInfo();
+      this.$bus.$on("getFollowGroup", this.getUserFollowGroup);
+      this.$bus.$on("flushFollowFanGroup", this.getCurrentUserFollowFanInfo);
+    },
+    setGroupMore() {
+      let array = new Array(this.followGroup.length);
+      this.visible.groupMore = array.fill(false);
+    },
     // 获取当前用户的关注与粉丝信息
     getCurrentUserFollowFanInfo() {
-      this.getFollowFanCount();
-      // 先判断当前用户是否为本人访问
+      this.getFollowFanCount().then(() => {
+        if (this.me) {
+          this.getUserFollowGroup();
+        }
+      });
+    },
+    // 获取用户关注分组
+    getUserFollowGroup() {
       this.sendRequest({
-        path: "share",
+        path: apis.followFan.followGroupGet,
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          // 仅当当前用户为本人才获取关注分组
-          if (this.viewedUid === res.uid) {
-            this.getUserFollowGroup();
+          if (res.code === statusCode.succeed) {
+            this.$store.commit("initialFollowGroup", {followGroup: res.data});
+            this.setGroupMore();
           }
         },
         errorCallback: (error) => {
@@ -112,43 +130,27 @@ export default {
         }
       });
     },
-    // 获取用户关注分组
-    getUserFollowGroup() {
-      this.sendRequest({
-        path: "relation/follow/group",
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          this.$store.commit("initialFollowGroup", {followGroup: res});
-          this.initial();
-        },
-        errorCallback: (error) => {
-          console.log(error);
-        }
-      });
-    },
-    // 获取用户关注和粉丝统计信息
+    // 获取用户关注和粉丝总数数量
     getFollowFanCount() {
-      this.sendRequest({
-        path: "relation/stat",
-        params: {
-          viewedUid: this.viewedUid,
-        },
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          this.$store.commit("initialFollowFanCount", {stat: res});
-        },
-        errorCallback: (error) => {
-          console.log(error);
-        }
-      })
-    },
-    // 初始化
-    initial() {
-      // 全部填充为 false, 与关注分组操作面板显示有关
-      let array = new Array(this.followGroup.length);
-      this.visible.groupMore = array.fill(false);
+      return new Promise((resolve) => {
+        this.sendRequest({
+          path: apis.followFan.followFanCount,
+          params: {
+            uid: this.viewedUid,
+          },
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if (res.code === statusCode.succeed) {
+              resolve();
+              this.$store.commit("initialFollowFanCount", {stat: res.data});
+            }
+          },
+          errorCallback: (error) => {
+            console.log(error);
+          }
+        });
+      });
     },
     // 打开新建面板
     openAddNewGroupBoard() {
@@ -160,35 +162,40 @@ export default {
     },
     // 删除分组
     deleteGroup(deleteIndex, groupId) {
-      this.sendRequest({
-        path: "relation/deleteFollowGroup",
-        params: {
-          groupId,
-        },
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          this.huadiaoPopupWindow(
-              "warning",
-              "confirmOrCancel",
-              "确认删除吗？删除后该收藏夹下的所有收藏都将删除!",
-              () => {
-                this.$store.dispatch("deleteFollowGroup", {
-                  deleteIndex,
-                  succeedCallback: () => {
-                    this.huadiaoMiddleTip("删除成功!");
-                  },
-                  failCallback: () => {
-                    this.huadiaoMiddleTip("分组不存在或不允许删除")
-                  },
-                });
+      this.huadiaoPopupWindow(
+          "warning",
+          "confirmOrCancel",
+          "确认删除吗？删除后该收藏夹下的所有收藏都将删除!",
+          () => {
+            this.requestDeleteGroup(groupId).then(() => {
+              this.$store.dispatch("deleteFollowGroup", {
+                deleteIndex,
               });
-        },
-        errorCallback: (error) => {
-          console.log(error);
-        }
-      })
+              this.$router.replace(`/followfan/${this.viewedUid}/follow/-1`)
+            })
+          });
     },
+    // 请求删除
+    requestDeleteGroup(groupId) {
+      return new Promise((resolve) => {
+        this.sendRequest({
+          path: apis.followFan.followGroupDelete,
+          params: {
+            groupId,
+          },
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if(res.code === statusCode.succeed) {
+              resolve();
+            }
+          },
+          errorCallback: (error) => {
+            console.log(error);
+          }
+        });
+      });
+    }
   },
   beforeDestroy() {
     this.clearAllRefsEvents();
@@ -301,11 +308,19 @@ export default {
 }
 
 /* 鼠标进入导航 */
-.group-link-hover .group-number {
+.group-number {
+  display: block;
+}
+
+.group-link-hover:hover .group-number {
   display: none;
 }
 
-.group-link-hover .group-more {
+.group-more {
+  display: none;
+}
+
+.group-link-hover:hover .group-more {
   display: block;
 }
 

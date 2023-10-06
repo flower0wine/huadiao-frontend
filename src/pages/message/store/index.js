@@ -363,6 +363,9 @@ const state = {
 };
 const actions = {};
 const mutations = {
+    initialUser(state, {user}) {
+        state.user = user;
+    },
     // 通过收到的赞改变关注关系
     clickToChangeRelation(state, {messageIndex, likerIndex}) {
         state.message.likeMeMessage[messageIndex].likerList[likerIndex].following = !state.message.likeMeMessage[messageIndex].likerList[likerIndex].following;

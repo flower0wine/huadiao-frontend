@@ -10,23 +10,23 @@
         <div class="note-infer">
           <div>
             <span v-html="svg.time"></span>
-            <span>{{dateFormat(noteItem.publishTime)}}</span>
+            <span>{{ huadiaoDateFormat(noteItem.publishTime) }}</span>
           </div>
           <div>
             <span v-html="svg.eye"></span>
-            <span>{{noteItem.viewNumber}}</span>
+            <span>{{noteItem.viewCount}}</span>
           </div>
           <div>
             <span v-html="svg.star"></span>
-            <span>{{noteItem.starNumber}}</span>
+            <span>{{noteItem.starCount}}</span>
           </div>
           <div>
             <span v-html="svg.comment"></span>
-            <span>{{noteItem.markNumber}}</span>
+            <span>{{noteItem.commentCount}}</span>
           </div>
           <div>
             <span v-html="svg.love"></span>
-            <span>{{noteItem.likeNumber}}</span>
+            <span>{{noteItem.likeCount}}</span>
           </div>
         </div>
       </a>

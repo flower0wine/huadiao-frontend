@@ -1,12 +1,11 @@
 <template>
-  <div class="huadiao-homepage">
-    <div v-if="getDataCompleted">
-      <huadiao-homepage-header :me="allInfo.me"/>
-      <homepage-user-infer-top :homepageInfo="allInfo.homepageInfo"
-                               :userInfo="allInfo.userInfo"
-                               :me="allInfo.me"/>
-      <homepage-user-infer-board :viewedUserinfo="allInfo"
-                                 :uid="allInfo.homepageInfo.uid"/>
+  <div class="huadiao-homepage-container" :style="`background-image: url('${homepageBackground}');`">
+    <div class="homepage-mark">
+      <div v-if="getDataCompleted">
+        <huadiao-homepage-header/>
+        <homepage-user-infer-top/>
+        <homepage-user-infer-board/>
+      </div>
     </div>
     <huadiao-middle-tip/>
     <huadiao-popup-window/>
@@ -15,7 +14,6 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
@@ -24,25 +22,37 @@ import HuadiaoHomepageHeader from "@/pages/homepage/components/HuadiaoHomepageHe
 import HomepageUserInferBoard from "@/pages/homepage/components/HomepageUserInferBoard";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
+import {mapState} from "vuex";
 
 export default {
   name: "HuadiaoHomepage",
   data() {
     return {
-      viewedUid: -1,
     }
   },
-  computed: {
-    ...mapState(["allInfo"]),
-  },
-  created() {
+  beforeMount() {
     this.getUid();
     this.getHomepageInfo();
+  },
+  computed: {
+    ...mapState({
+      homepageBackground(state) {
+        let homepageBackground = state.allInfo.homepageInfo.pageBackground;
+        if(!homepageBackground) {
+          return `${this.homepageBackgroundImagePath}homepageDefaultBackground.jpg`;
+        }
+        if(homepageBackground.startsWith("blob:http://localhost")) {
+          return homepageBackground;
+        }
+        return `${this.homepageBackgroundImagePath}${homepageBackground}`;
+      },
+    }),
   },
   methods: {
     // 获取个人主页 uid
     getUid() {
-      this.viewedUid = parseInt(window.location.pathname.split(/[/]/)[2]);
+      let viewedUid = parseInt(window.location.pathname.split(/[/]/)[2]);
+      this.$store.commit("initialViewedUid", {viewedUid});
     },
     getHomepageInfo() {
       this.sendRequest({
@@ -66,8 +76,6 @@ export default {
       });
     },
   },
-  beforeMount() {
-  },
   beforeDestroy() {
     this.clearAllRefsEvents();
   },
@@ -83,16 +91,17 @@ export default {
 </script>
 
 <style>
-body {
+.huadiao-homepage-container {
   width: 100%;
-  height: 100%;
-  --homepage-background: url('~@/../public/img/homepage/homepageDefaultBackground.jpg');
-  background: var(--homepage-background) no-repeat fixed center;
+  min-width: 1200px;
+  height: 100vh;
+  min-height: 600px;
+  background: no-repeat fixed center;
 }
 
-.huadiao-homepage {
+.homepage-mark {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #00000030;
 }
 </style>

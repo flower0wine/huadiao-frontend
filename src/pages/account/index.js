@@ -14,12 +14,14 @@ import {mixin} from "@/mixin";
 import $ from "jquery";
 import router from "@/pages/account/router";
 import store from "@/pages/account/store";
-
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.config.productionTip = false;  // 生产提示
 
 // 使用路由
 Vue.use(VueRouter);
+Vue.use(ElementUI);
 
 // 使用 VUE 混入
 // 引入所有页面公共 mixin

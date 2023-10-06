@@ -1,7 +1,7 @@
 <template>
   <div class="huadiao-house-container"
-       @wheel="mousewheelEvent" v-if="getDataCompleted">
-    <div v-huadiao-full-page class="scroller">
+       @wheel="mousewheelEvent">
+    <div v-huadiao-full-page class="scroller" v-if="getDataCompleted">
       <anime-house-slide/>
       <huadiao-house-anime v-if="visible.animeHouse.render"/>
       <div class="huadiao-house-header" :style="huadiaoHouseStyle">
@@ -30,7 +30,7 @@ import AnimeHouseSlide from "@/pages/animehouse/components/AnimeHouseSlide";
 import HuadiaoHouseAnime from "@/pages/animehouse/components/HuadiaoHouseAnime";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
-import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 
@@ -99,6 +99,9 @@ export default {
             this.$store.commit("initialHuadiaoHouseInfo", {huadiaoHouseInfo: res.data});
             this.getDataCompleted = true;
             this.initial();
+          }
+          else if(res.code === statusCode.notAllowed) {
+            this.huadiaoPopupWindow(huadiaoPopupWindowOptions.iconType.error, huadiaoPopupWindowOptions.operate.hasRead, "用户不公开番剧馆");
           }
         },
         errorCallback: (error) => {

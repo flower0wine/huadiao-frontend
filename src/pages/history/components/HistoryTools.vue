@@ -52,6 +52,9 @@
 </template>
 
 <script>
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
+
 export default {
   name: "HistoryTools",
   data() {
@@ -89,11 +92,53 @@ export default {
     // 清空历史记录
     clearAllHistory() {
       this.huadiaoPopupWindow("warning", "confirmOrCancel", "清空后就什么都没有了哦!", () => {
-        this.$store.commit("clearAllHistory", {
-          succeedCallback: () => {
-            this.huadiaoMiddleTip("笔记历史记录清除成功!");
+        let name = this.$route.params.name;
+        if(name === "note") {
+          this.clearNoteHistory();
+        }
+        else if(name === "fanju") {
+          this.clearAnimeHistory();
+        }
+      });
+    },
+    // 清空笔记历史记录
+    clearNoteHistory() {
+      this.sendRequest({
+        path: apis.history.noteDelete,
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          if(res.code === statusCode.succeed) {
+            this.$store.commit("clearNoteHistory", {
+              succeedCallback: () => {
+                this.huadiaoMiddleTip("删除成功");
+              },
+            });
           }
-        })
+        },
+        errorCallback: (error) => {
+          console.log(error);
+        }
+      });
+    },
+    // 清空番剧馆历史记录
+    clearAnimeHistory() {
+      this.sendRequest({
+        path: apis.history.animeDelete,
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          if(res.code === statusCode.succeed) {
+            this.$store.commit("clearAnimeHistory", {
+              succeedCallback: () => {
+                this.huadiaoMiddleTip("删除成功");
+              },
+            });
+          }
+        },
+        errorCallback: (error) => {
+          console.log(error)
+        },
       })
     },
   },
@@ -205,6 +250,12 @@ export default {
   width: 240px;
   height: 100%;
   margin-left: 35px;
+  color: #737373;
+  background-color: transparent;
+}
+
+.search-input::-webkit-input-placeholder {
+  color: #c2c2c2;
 }
 
 .history-search-icon /deep/ svg {

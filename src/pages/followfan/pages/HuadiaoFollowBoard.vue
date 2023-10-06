@@ -2,18 +2,49 @@
   <div class="huadiao-follow-board">
     <div class="follow-fan-board-header">
       <div class="active-group-name">{{ groupName }}</div>
-      <div class="group-tools">123</div>
+      <div class="patch-board">
+        <transition name="right-slide" mode="out-in">
+          <div class="patch-enter"
+               v-if="!visible.patch"
+               @click="clickPatch"
+               key="patchEnter"
+          >
+            <span v-html="svg.patch"></span>
+            <span>批量处理</span>
+          </div>
+          <div class="group-tools"
+               v-if="visible.patch"
+               key="groupTools"
+          >
+            <div class="selected-count">已选择 {{ selectFollowArray.length }} 个关注</div>
+            <div class="copy-tool tool" @click="copyFollowToOtherGroup">
+              <span v-html="svg.copyTo"></span>
+              <span>复制到</span>
+            </div>
+            <div class="move-tool tool" v-if="visible.patchMove" @click="moveFollowToOtherGroup">
+              <span v-html="svg.moveTo"></span>
+              <span>移动到</span>
+            </div>
+            <div class="cancel tool" @click="visible.patch = false">取消</div>
+          </div>
+        </transition>
+      </div>
     </div>
-    <huadiao-follow-fan-item v-for="item in follow"
+    <huadiao-follow-fan-item v-for="(item, index) in follow"
                              :key="item.uid"
                              :item="item"
-                             :uid="item.uid"
+                             :index="index"
+                             :addFollow="addFollowToSelectArray"
+                             :removeFollow="removeFollowToSelectArray"
+                             :patch="visible.patch"
+                             :groupId="groupId"
+                             :mapKey="getMapKey(viewedUid, groupId)"
                              type="follow"
     >
       <template v-slot:relation="props">
         <div :class="props.className"
              @click="props.changeFollowStatus(item.uid)"
-        >{{ props.follow ? (item.friend ? "已互粉" : "已关注") : "关注" }}
+        >{{ props.follow ? item.friend ? "已互粉" : "已关注" : "关注" }}
         </div>
       </template>
       <template v-slot:toolMenu>
@@ -24,66 +55,46 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
 import HuadiaoFollowFanItem from "@/pages/followfan/components/HuadiaoFollowFanItem";
+import {statusCode} from "@/assets/js/constants/status-code";
+import {apis} from "@/assets/js/constants/request-path";
+import {svg} from "@/assets/js/constants/svgs";
 
 export default {
   name: "HuadiaoFollowBoard",
   data() {
     return {
+      svg,
       visible: {
-        render: false
+        patch: false,
+        patchMove: false,
       },
-      // 已访问过的关注分组, 为的是不重复获取相同的关注分组
-      accessedFollowGroup: new Set(),
       // 获取信息中, 节流 (主要是)
       accessing: false,
+      groupId: null,
+      follow: [],
+      // 批处理已选择的, 内容为索引
+      selectFollowArray: [],
+      // 改变了关注状态的关注索引
+      followArray: [],
+      offset: 0,
+      row: 10,
+      hasNext: true,
     }
   },
   computed: {
     viewedUid() {
       return this.$route.params.viewedUid;
     },
-    ...mapState({
-      // 所有的关注, 根据 groupId 来查找
-      follow(state) {
-        let follow = [];
-        let followers = state.follow;
-        let groupId = parseInt(this.groupId);
-        // groupId 为 null 或为 -1 默认为查看全部关注
-        if (!groupId || groupId === -1) {
-          for (let index = 0; index < followers.length; index++) {
-            follow.push({index, ...followers[index]});
-          }
+    groupName() {
+      let followGroup = this.$store.state.followGroup;
+      for (let i = 0; i < followGroup.length; i++) {
+        if (followGroup[i].groupId === this.groupId) {
+          return followGroup[i].groupName;
         }
-        // 否则找出与当前选择分组对应的用户
-        else {
-          for (let index = 0; index < followers.length; index++) {
-            if (groupId === followers[index].groupId) {
-              follow.push({index, ...followers[index]});
-            }
-          }
-        }
-        return follow;
-      },
-      groupName(state) {
-        let groupId = parseInt(this.groupId);
-        if (!groupId) {
-          // 如果是直接输入 url, 就默认找全部关注 (全部关注的 groupId = -1)
-          groupId = -1;
-        }
-        // 挑出与当前选择分组对应的关注分组名称
-        for (let folGroup of state.followGroup) {
-          if (groupId === folGroup.groupId) {
-            return folGroup.groupName;
-          }
-        }
-        return "";
-      },
-    }),
-    groupId() {
-      return this.$route.params.groupId;
-    },
+      }
+      return "";
+    }
   },
   watch: {
     "$store.state.followGroup": {
@@ -93,47 +104,203 @@ export default {
         this.visible.render = true;
       }
     },
-    "$route.query.groupId": {
-      deep: true,
+    "$route.params.groupId": {
       immediate: true,
-      handler() {
-        // 每次更换 groupId 都获取关注分组, 实在做不出来了, 放一放
-        this.getFollowInfo();
-      },
-    },
+      deep: true,
+      handler(newValue) {
+        if (!newValue) return;
+        this.groupId = +newValue;
+        this.resetFollow();
+        this.resetPatch();
+        this.getFollowInfo(true);
+
+        this.visible.patchMove = this.groupId !== -1;
+
+        if (this.followArray.length > 0) {
+          let array = this.followArray;
+          for (let index = array.length - 1; index >= 0; index--) {
+            this.follow.splice(array[index], 1);
+          }
+          this.followArray = [];
+        }
+      }
+    }
+  },
+  created() {
+    this.initial();
   },
   methods: {
+    initial() {
+      this.$bus.$on("changeFollowStatus", (index) => {
+        if (this.followArray.includes(index)) {
+          this.deleteNumberFromArray(this.followArray, index);
+        } else {
+          this.insertOrderArray(this.followArray, index);
+        }
+      });
+    },
+    setFollow() {
+      this.follow = this.$store.state.follow.get(this.getMapKey(this.viewedUid, this.groupId))?.follow;
+    },
+    // 打开批处理面板
+    clickPatch() {
+      this.visible.patch = true;
+    },
+    addFollowToSelectArray(index) {
+      this.insertOrderArray(this.selectFollowArray, index);
+    },
+    removeFollowToSelectArray(index) {
+      this.deleteNumberFromArray(this.selectFollowArray, index);
+    },
+    // 重置关注
+    resetFollow() {
+      this.follow = [];
+      this.offset = 0;
+      this.hasNext = true;
+    },
+    // 重置批处理
+    resetPatch() {
+      this.visible.patch = false;
+      this.selectFollowArray = [];
+    },
     // 获取关注信息
-    getFollowInfo() {
-      // 是否访问过该关注分组
-      if(this.accessedFollowGroup.has(this.groupId)) {
+    getFollowInfo(changeGroup = false) {
+      return new Promise((resolve, reject) => {
+        // 是否正在访问
+        if (this.accessing || !this.hasNext) {
+          resolve();
+          return;
+        }
+        // 正在访问
+        this.accessing = true;
+        if (changeGroup) {
+          this.offset = 0;
+          this.follow = [];
+        }
+
+        this.sendRequest({
+          path: apis.followFan.followGet,
+          params: {
+            uid: this.viewedUid,
+            groupId: this.groupId,
+            offset: this.offset,
+            row: this.row,
+          },
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if (res.code === statusCode.succeed) {
+              this.follow.push(...res.data.follow);
+              this.offset += res.data.offset;
+              resolve();
+            } else if (res.code === statusCode.notExist) {
+              this.hasNext = false;
+              resolve();
+            }
+            this.accessing = false;
+          },
+          errorCallback: (error) => {
+            console.log(error);
+            this.accessing = false;
+            reject();
+          }
+        });
+      });
+    },
+    checkSelectFollowArray() {
+      if (this.selectFollowArray.length === 0) {
+        this.huadiaoMiddleTip("未选择任何关注");
+        return false;
+      }
+      return true;
+    },
+    // 复制
+    copyFollowToOtherGroup() {
+      if (!this.checkSelectFollowArray()) {
         return;
       }
-      // 是否正在访问
-      if(this.accessing) {
+      this.$bus.$emit("copyFollow", {
+        copy: true,
+        groupId: this.groupId,
+        confirmCallback: this.requestCopyFollow,
+        selectFollowArray: this.selectFollowArray,
+      });
+    },
+    // 移动
+    moveFollowToOtherGroup() {
+      if (!this.checkSelectFollowArray()) {
         return;
       }
-      // 正在访问
-      this.accessing = true;
+      this.$bus.$emit("moveFollow", {
+        copy: false,
+        groupId: this.groupId,
+        confirmCallback: this.requestMoveFollow,
+        selectFollowArray: this.selectFollowArray,
+      });
+    },
+    getFollowGroup() {
+      this.$bus.$emit("flushFollowFanGroup");
+    },
+    getSelectFollowerUid() {
+      let uidArray = [];
+      this.selectFollowArray.forEach((item) => {
+        uidArray.push(this.follow[item].uid);
+      });
+      return uidArray;
+    },
+    // 请求复制
+    requestCopyFollow(groupId) {
       this.sendRequest({
-        path: `relation/follow`,
+        path: apis.followFan.followCopy,
+        method: "post",
         params: {
-          viewedUid: this.viewedUid,
-          groupId: this.groupId,
+          uid: this.getSelectFollowerUid().join(","),
+          srcGroupId: this.groupId,
+          destGroupId: groupId,
         },
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          this.$store.commit("addFollow", {follow: res});
-          this.accessedFollowGroup.add(this.groupId);
-          this.accessing = false;
-        },
-        errorCallback: (error) => {
-          console.log(error);
-          this.accessing = false;
+          if (res.code === statusCode.succeed) {
+            this.getFollowGroup();
+            this.selectFollowArray = [];
+            this.visible.patch = false;
+          }
         }
       });
     },
+    // 请求移动
+    requestMoveFollow(groupId) {
+      this.sendRequest({
+        path: apis.followFan.followMove,
+        method: "post",
+        params: {
+          uid: this.getSelectFollowerUid().join(","),
+          srcGroupId: this.groupId,
+          destGroupId: groupId,
+        },
+        thenCallback: (response) => {
+          let res = response.data;
+          console.log(res);
+          if (res.code === statusCode.succeed) {
+            this.getFollowGroup();
+            this.removeFollow().then(() => {
+              this.visible.patch = false;
+              this.selectFollowArray = [];
+            });
+          }
+        }
+      });
+    },
+    removeFollow() {
+      return new Promise((resolve) => {
+        let array = this.selectFollowArray;
+        for (let index = array.length - 1; index >= 0; index--) {
+          this.follow.splice(array[index], 1);
+        }
+        resolve();
+      });
+    }
   },
   beforeDestroy() {
   },
@@ -144,5 +311,59 @@ export default {
 </script>
 
 <style scoped>
+.patch-board {
+  overflow: hidden;
+}
+
+.group-tools {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  transition: all 300ms;
+}
+
+.selected-count {
+  font-size: 14px;
+  color: #7e7e7e;
+  margin-right: 10px;
+}
+
+.tool,
+.patch-enter {
+  width: 110px;
+  height: 36px;
+  text-align: center;
+  line-height: 36px;
+  margin-right: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #7e7e7e;
+  cursor: pointer;
+  transition: all 300ms;
+}
+
+.tool:hover,
+.patch-enter:hover {
+  color: #c44141;
+  background-color: rgba(148, 147, 147, 0.2);
+}
+
+.tool:hover /deep/ svg,
+.patch-enter:hover /deep/ svg {
+  fill: #c44141;
+}
+
+.tool /deep/ svg,
+.patch-enter /deep/ svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  vertical-align: -6px;
+  fill: #7e7e7e;
+}
+
+.cancel {
+  width: 70px;
+}
 
 </style>

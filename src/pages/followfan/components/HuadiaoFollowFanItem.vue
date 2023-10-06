@@ -1,18 +1,25 @@
 <template>
-  <div class="huadiao-follow-fan-item">
+  <div class="huadiao-follow-fan-item"
+       ref="followFanItem">
+    <div class="choose-input-box"
+         v-show="patch">
+      <div class="choose-input"
+           v-html="svg.multiplyInput"
+           @click="clickMultiplyInput"></div>
+    </div>
     <a class="user-avatar-box"
-       :title="'前往' + item.nickname + '的个人主页'"
-       :href="login ? '/homepage/' + uid : wrongLink"
+       :title="'前往' + nickname + '的个人主页'"
+       :href="`/homepage/${item.uid}`"
     >
       <img src="/svg/noLoginAvatar.svg" alt="">
       <div class="user-avatar"
-           :style="`background-image: ${addBackground(item.userAvatar)}`"
+           :style="`background-image: url('${userAvatarImagePath}${item.userAvatar}')`"
       ></div>
     </a>
     <div class="user-infer">
       <div class="nickname"
-           :title="item.nickname"
-      >{{ item.nickname }}
+           :title="nickname"
+      >{{ nickname }}
       </div>
       <div class="canvases"
            :title="item.canvases"
@@ -27,16 +34,17 @@
               :follow="follow"
         ></slot>
         <img src="/svg/more.svg"
-             @mouseenter="visible.toolMenu = true"
-             @mouseleave="visible.toolMenu = false"
+             @mouseenter="visible.toolMenu.render = visible.toolMenu.show = true"
+             @mouseleave="visible.toolMenu.show = false"
              ref="more"
              alt="">
       </div>
       <transition name="fade">
         <div class="tool-menu"
-             v-show="visible.toolMenu"
-             @mouseenter="visible.toolMenu = true"
-             @mouseleave="visible.toolMenu = false"
+             v-if="visible.toolMenu.render"
+             v-show="visible.toolMenu.show"
+             @mouseenter="visible.toolMenu.show = true"
+             @mouseleave="visible.toolMenu.show = false"
              ref="toolMenu"
         >
           <div>发消息</div>
@@ -48,40 +56,69 @@
 </template>
 
 <script>
-import constants from "@/assets/js/constants";
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
+import {svg} from "@/assets/js/constants/svgs";
 
 export default {
   name: "HuadiaoFollowFanItem",
-  props: ["item", "uid", "type"],
+  props: ["item", "type", "index", "addFollow", "removeFollow", "patch", "mapKey", "groupId"],
   data() {
     return {
+      svg,
       // 是否关注
       follow: this.type === "follow" ? true : (this.type === "fan" && this.item.friend),
+      itemClass: "chose-follow-item",
       visible: {
-        toolMenu: false,
+        toolMenu: {
+          render: false,
+          show: false,
+        },
       },
-      wrongLink: constants.wrongLink,
     }
   },
   computed: {
-    login() {
-      return this.$store.state.user.login;
-    },
     me() {
       return this.$store.state.me;
+    },
+    nickname() {
+      return this.item.nickname ?? this.item.userId;
+    },
+    canvases() {
+      return this.item.canvases > 20 ? this.item.canvases.substring(0, 20) :
+          this.item.canvases;
+    }
+  },
+  watch: {
+    patch: {
+      handler(val) {
+        if (!val) {
+          let classList = this.$refs.followFanItem.classList;
+          classList.remove(this.itemClass);
+        }
+      }
     }
   },
   methods: {
-    // 改变关注状态
+    clickMultiplyInput() {
+      let classList = this.$refs.followFanItem.classList;
+      let clazz = this.itemClass;
+      if (classList.contains(clazz)) {
+        classList.remove(clazz);
+        this.removeFollow(this.index);
+      } else {
+        classList.add(clazz);
+        this.addFollow(this.index);
+      }
+    },
     changeFollowStatus(uid) {
       // 根据不同的关注状态选择不同的后端接口
       let path;
-      if(this.follow) {
-        path = "relation/modify";
+      if (this.follow) {
+        path = apis.followFan.deleteFollow;
       } else {
-        path = "relation/newFriend";
+        path = apis.followFan.newFollow;
       }
-      // 如果是全部关注, 转换为默认关注
       this.sendRequest({
         path,
         params: {
@@ -90,26 +127,24 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          // 刷新关注数量
-          this.$store.dispatch("flushUserFollow", {follow: this.follow, followUid: this.uid});
+          if (res.code === statusCode.succeed) {
+            this.changeFollowStatusOfFollow();
+            this.$bus.$emit("flushFollowFanGroup");
+          }
           this.follow = !this.follow;
         },
         errorCallback: (error) => {
           console.log(error);
-          console.log('hhhh')
-          let tip;
-          if(this.follow) {
-            tip = "取消关注失败";
-          } else {
-            tip = "关注失败";
-          }
-          this.huadiaoMiddleTip(tip);
         },
       });
     },
+    changeFollowStatusOfFollow() {
+      if(this.type === "follow") {
+        this.$bus.$emit("changeFollowStatus", this.index);
+      }
+    },
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   }
 }
 </script>
@@ -121,6 +156,39 @@ export default {
 
 .huadiao-follow-fan-item {
   display: flex;
+  transition: background-color 300ms;
+}
+
+.chose-follow-item .choose-input-box /deep/ svg {
+  fill: #d96c6c;
+}
+
+.chose-follow-item .choose-input-box /deep/ svg path:nth-child(1) {
+  display: inline-block;
+}
+
+.choose-input-box {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  width: 50px;
+  height: 80px;
+}
+
+.choose-input {
+  width: 38px;
+  height: 38px;
+}
+
+.choose-input-box /deep/ svg {
+  width: 38px;
+  height: 38px;
+  fill: #a4a4a4;
+  cursor: pointer;
+}
+
+.choose-input-box /deep/ svg path:nth-child(1) {
+  display: none;
 }
 
 .user-avatar-box {
@@ -216,7 +284,7 @@ export default {
 }
 
 /* 新添加的 html 元素没有 css 样式, 故使用 /deep/ */
-.tool-menu/deep/div {
+.tool-menu /deep/ div {
   height: 26px;
   text-align: center;
   line-height: 26px;
@@ -224,7 +292,7 @@ export default {
   cursor: pointer;
 }
 
-.tool-menu/deep/div:hover {
+.tool-menu /deep/ div:hover {
   background-color: rgba(216, 216, 216, 0.253);
 }
 

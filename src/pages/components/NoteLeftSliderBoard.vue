@@ -1,21 +1,21 @@
 <template>
   <div class="left-slider-board"
-       @mouseenter="visible.userInfer = true"
-       @mouseleave="visible.userInfer = false"
+       @mouseenter="visible.userInfer.show = visible.userInfer.render = true"
+       @mouseleave="visible.userInfer.show = false"
   >
     <user-avatar-box :options="userAvatarOptions"/>
     <transition name="fade">
-      <template v-if="visible.userInfer">
-        <div class="user-info">
-          <div class="author-nickname">{{ cutStringByLength(authorInfo.nickname, 14) }}...</div>
+      <template v-if="visible.userInfer.render">
+        <div class="user-info" v-show="visible.userInfer.show">
+          <div class="author-nickname">{{ cutStringByLength(authorInfo.nickname || authorInfo.userId, 14, true) }}</div>
           <div class="author-follow-fan">
-            <a href="/followfan/follow">
+            <a :href="`/followfan/${authorInfo.uid}/follow`">
               <div class="follow">
                 <div>{{ authorInfo.follow }}</div>
                 <div>关注</div>
               </div>
             </a>
-            <a href="/followfan/fan">
+            <a :href="`/followfan/${authorInfo.uid}/fan`">
               <div class="fan">
                 <div>{{ authorInfo.fan }}</div>
                 <div>粉丝</div>
@@ -40,7 +40,10 @@ export default {
     return {
       svg,
       visible: {
-        userInfer: false,
+        userInfer: {
+          render: false,
+          show: false
+        },
       },
       userAvatarOptions: {
         href: `/homepage/${this.authorInfo.uid}`,

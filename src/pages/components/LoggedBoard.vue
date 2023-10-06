@@ -36,13 +36,13 @@ export default {
   data() {
     return {
       loggedBoardConfig: [{
-        href: '/homepage/' + this.user.uid,
+        href: `/homepage/${this.user.uid}`,
         content: "个人主页",
       }, {
-        href: '/' + this.user.uid + '/notes',
+        href: `/notes/${this.user.uid}`,
         content: "我的笔记",
       }, {
-        href: '/animehouse/' + this.user.uid,
+        href: `/animehouse/${this.user.uid}`,
         content: "我喜欢的番剧",
       }],
       svg: {

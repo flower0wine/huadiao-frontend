@@ -1,11 +1,15 @@
 <template>
-  <div class="huadiao-follow-fan">
+  <div class="huadiao-follow-fan" :style="background">
     <huadiao-header/>
-    <router-view></router-view>
+    <template v-if="visible">
+      <router-view></router-view>
+    </template>
     <div class="follow-fan-foreground foreground-animation"
          ref="followFanForeground"
+         :style="foreground"
          @mouseenter="$refs.followFanForeground.classList.remove('foreground-animation')"
          @mouseleave="$refs.followFanForeground.classList.add('foreground-animation')"></div>
+    <transfer-follow-group/>
     <huadiao-middle-tip/>
     <huadiao-warning-top-container/>
     <huadiao-popup-window/>
@@ -15,42 +19,53 @@
 
 <script>
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
-import HuadiaoFollowFanBoard from "@/pages/followfan/pages/HuadiaoFollowFanBoard";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import AddNewGroupBoard from "@/pages/followfan/components/AddNewGroupBoard";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import TransferFollowGroup from "@/pages/followfan/components/TransferFollowGroup";
 
 export default {
   name: "HuadiaoFollowFan",
   data() {
     return {
+      visible: false
     }
   },
   watch: {
+    "$store.state.user": {
+      deep: true,
+      handler(val) {
+        this.visible = true;
+      }
+    }
+  },
+  computed: {
+    foreground() {
+      return `background-image: url('${this.followFanImagePath}followFanForeground.png')`;
+    },
+    background() {
+      return `background-image: url('${this.followFanImagePath}followFanBackground.png');`;
+    }
   },
   mounted() {
   },
-  methods: {
-
-  },
+  methods: {},
   beforeDestroy() {
   },
   components: {
+    TransferFollowGroup,
     HuadiaoPopupWindow,
     AddNewGroupBoard,
     HuadiaoWarningTopContainer,
     HuadiaoMiddleTip,
-    HuadiaoFollowFanBoard,
     HuadiaoHeader
   },
 }
 </script>
 
-<style >
+<style>
 body {
-  background: url("~@/../public/img/followfan/followFanBackground.png") no-repeat center center fixed;
-  background-size: cover;
 }
 
 .huadiao-follow-fan {
@@ -59,6 +74,7 @@ body {
   padding: 60px 0 100px 0;
   color: #646464;
   font-family: "宋体", serif;
+  background: no-repeat center/cover;
 }
 
 .follow-fan-foreground {
@@ -68,8 +84,7 @@ body {
   z-index: 2;
   width: 300px;
   height: 100vh;
-  background: url("~@/../public/img/followfan/followFanForeground.png") no-repeat center center;
-  background-size: cover;
+  background: no-repeat center/cover;
   transform: translateX(-98%);
   transition: var(--transition-1000ms);
 }

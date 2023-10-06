@@ -1,7 +1,7 @@
 <template>
   <div class="homepage-user-infer-board">
     <div class="follow-or-chat"
-         v-if="!viewedUserinfo.me"
+         v-if="!me"
     >
       <div class="chat-container">
         <img src="/svg/chat.svg"
@@ -31,12 +31,12 @@
           </div>
         </a>
         <div class="user-active-item">
-          <span class="active-number">{{ numberGreaterThenTenThousand(viewedUserinfo.likeCount) }}</span>
+          <span class="active-number">{{ numberGreaterThenTenThousand(viewedUserInfo.noteLikeCount) }}</span>
           <span class="active-name">获赞数</span>
         </div>
       </div>
-      <a href="/settings/information"
-         v-if="viewedUserinfo.me"
+      <a href="/account/info"
+         v-if="me"
       >
         <div class="modify-user-infer">
           <span>修改用户信息</span>
@@ -61,10 +61,10 @@
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
+import {mapState} from "vuex";
 
 export default {
   name: "HomepageUserInferBoard",
-  props: ["viewedUserinfo", "uid"],
   data() {
     return {
       // 称呼
@@ -76,32 +76,37 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      viewedUserInfo(state) {
+        return state.allInfo;
+      }
+    }),
     // 面板头部
     userActiveConfig() {
       return [{
         name: "关注",
-        number: this.numberGreaterThenTenThousand(this.viewedUserinfo.followCount),
-        href: `/followfan/${this.uid}/follow`
+        number: this.numberGreaterThenTenThousand(this.viewedUserInfo.followCount),
+        href: `/followfan/${this.viewedUid}/follow`
       }, {
         name: "粉丝",
-        number: this.numberGreaterThenTenThousand(this.viewedUserinfo.fanCount),
-        href: `/followfan/${this.uid}/fan`
+        number: this.numberGreaterThenTenThousand(this.viewedUserInfo.fanCount),
+        href: `/followfan/${this.viewedUid}/fan`
       }, {
         name: "收藏",
-        number: this.numberGreaterThenTenThousand(this.viewedUserinfo.starCount),
-        href: "/star/" + this.uid
+        number: this.numberGreaterThenTenThousand(this.viewedUserInfo.noteStarCount),
+        href: "/star/" + this.viewedUid
       }];
     },
     // 面板下部
     otherConfig() {
       return [{
-        href: "/animehouse/" + this.uid,
+        href: "/animehouse/" + this.viewedUid,
         name: this.name + "番剧馆",
-        count: 0,
+        count: this.viewedUserInfo.animeCount,
       }, {
         name: this.name + "笔记",
-        href: `/notes/${this.uid}`,
-        count: 0,
+        href: `/notes/${this.viewedUid}`,
+        count: this.viewedUserInfo.noteCount,
       }];
     },
     // 关注状态
@@ -110,7 +115,7 @@ export default {
     },
   },
   created() {
-    this.name = this.accordingSexToSetName(this.viewedUserinfo.me, this.viewedUserinfo.userInfo.sex);
+    this.name = this.accordingSexToSetName(this.me, this.viewedUserInfo.userInfo.sex);
   },
   mounted() {
     this.initialFollowStatus();
@@ -122,7 +127,7 @@ export default {
       this.sendRequest({
         path: `relation/${followStatus}`,
         params: {
-          uid: this.uid,
+          uid: this.viewedUid,
         },
         thenCallback: (response) => {
           let res = response.data;
@@ -142,8 +147,8 @@ export default {
     // 初始化关注状态
     initialFollowStatus() {
       // 如果不是本人
-      if (!this.viewedUserinfo.me) {
-        this.judgeMeAndOtherRelation(this.viewedUserinfo.relation);
+      if (!this.me) {
+        this.judgeMeAndOtherRelation(this.viewedUserInfo.relation);
         let className = this.follow ? "following" : "unfollow";
         this.$refs.followContainer.classList.add(className);
       }

@@ -2,7 +2,7 @@
   <div class="note-comment-container" ref="noteCommentContainer">
     <div class="comment-title-box" id="comment-title" ref="commentTitle">
       <span>评论</span>
-      <span class="comment-number">{{ noteInfo.commentNumber }}</span>
+      <span class="comment-number">{{ noteInfo.commentCount }}</span>
     </div>
     <div class="comment-header-input" ref="currentUserCommentBoard">
       <div>

@@ -2,7 +2,7 @@
   <div class="author-infer-box">
     <div class="author-infer">
       <user-avatar-box :options="userAvatarOptions"/>
-      <div class="author-nickname">{{ noteInfo.authorInfo.nickname }}</div>
+      <div class="author-nickname">{{ noteInfo.authorInfo.nickname || noteInfo.authorInfo.userId }}</div>
       <div class="follow-or-cancel"
            v-if="!me"
            @click="clickToFollowOrCancelFollow"
@@ -12,19 +12,19 @@
     <div class="note-infer">
       <div class="note-infer-item">
         <span v-html="svg.colorLike" class="icon" @click="clickNoteLikeIcon" ref="likeIcon"></span>
-        <span>{{ noteInfo.likeNumber }}</span>
+        <span>{{ noteInfo.likeCount }}</span>
       </div>
       <div class="note-infer-item">
         <span v-html="svg.colorLike" class="icon" @click="clickNoteUnlikeIcon" ref="unlikeIcon"></span>
       </div>
       <div class="note-infer-item">
         <span v-html="svg.colorStar" class="icon" @click="clickNoteStarIcon" ref="starIcon"></span>
-        <span>{{ noteInfo.starNumber }}</span>
+        <span>{{ noteInfo.starCount }}</span>
       </div>
       <div class="note-infer-item">
         <a href="#comment-title">
           <span v-html="svg.colorComment" class="icon"></span>
-          <span>{{ noteInfo.commentNumber }}</span>
+          <span>{{ noteInfo.commentCount }}</span>
         </a>
       </div>
     </div>

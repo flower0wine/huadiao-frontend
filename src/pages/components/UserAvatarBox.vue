@@ -5,26 +5,30 @@
     <template v-if="defaultOptions.href">
       <a :href="defaultOptions.href">
         <div class="default-user-avatar" v-html="svg.avatar"></div>
-        <div class="user-avatar" :style="`background-image: ${addBackground(defaultOptions.userAvatar)}; ${borderColorStyle}`"></div>
+        <div class="user-avatar"
+             v-if="hasAvatar"
+             :style="`${userAvatar}; ${borderColorStyle}`"></div>
       </a>
     </template>
     <template v-else>
       <div class="default-user-avatar" v-html="svg.avatar"></div>
       <div class="user-avatar"
-           v-if="defaultOptions.userAvatar"
-           :style="`background-image: ${addBackground(defaultOptions.userAvatar)}; ${borderColorStyle}`"></div>
+           v-if="hasAvatar"
+           :style="`${userAvatar}; ${borderColorStyle}`"></div>
     </template>
   </div>
 </template>
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
+import constants from "@/assets/js/constants";
 
 export default {
   name: "UserAvatarBox",
-  props: ["options"],
+  props: ["options", "userAvatarUrl"],
   data() {
     return {
+      defaultUserAvatar: "",
       defaultOptions: {
         userAvatar: "",
         scale: "",
@@ -43,9 +47,24 @@ export default {
       handler(newValue) {
         this.modifySrcObject(this.defaultOptions, newValue);
       }
+    },
+    userAvatarUrl: {
+      immediate: true,
+      handler(newValue) {
+        this.defaultUserAvatar = newValue;
+      }
     }
   },
+  mounted() {
+  },
   computed: {
+    hasAvatar() {
+      return this.userAvatarUrl || this.defaultOptions.userAvatar;
+    },
+    userAvatar() {
+      let userAvatar = this.defaultUserAvatar || this.defaultOptions.userAvatar;
+      return this.parseUserAvatar(userAvatar);
+    },
     userAvatarStyle() {
       let defaultOptions = this.defaultOptions;
       return `--scale: ${defaultOptions.scale}; --transitionTime: ${defaultOptions.transitionTime};
@@ -59,7 +78,14 @@ export default {
   beforeMount() {
     this.modifySrcObject(this.defaultOptions, this.options);
   },
-  methods: {},
+  methods: {
+    parseUserAvatar(userAvatar) {
+      if(!userAvatar.startsWith("blob:http://localhost") && !userAvatar.startsWith("http")) {
+        userAvatar = `${this.userAvatarImagePath}${userAvatar}`;
+      }
+      return `background-image: url('${userAvatar}')`;
+    }
+  },
   beforeDestroy() {
   }
 }

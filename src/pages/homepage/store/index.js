@@ -10,15 +10,20 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 const state = {
+    viewedUid: -1,
     allInfo: {
         me: null,
         uid: null,
         relation: null,
         fanCount: null,
         followCount: null,
+        noteStarCount: null,
+        noteLikeCount: null,
+        noteCount: null,
+        animeCount: null,
         homepageInfo: {
             uid: null,
-            pageBackground: null,
+            pageBackground: "",
             userAvatar: null,
             visitCount: null,
         },
@@ -36,6 +41,15 @@ const mutations = {
     initialAllInfo(state, {allInfo}) {
         state.allInfo = allInfo;
     },
+    initialViewedUid(state, {viewedUid}) {
+        state.viewedUid = viewedUid;
+    },
+    modifyHomepageBackground(state, {background}) {
+        state.allInfo.homepageInfo.pageBackground = background;
+    },
+    modifyUserAvatar(state, {userAvatar}) {
+        state.allInfo.homepageInfo.userAvatar = userAvatar;
+    }
 };
 const getters = {};
 

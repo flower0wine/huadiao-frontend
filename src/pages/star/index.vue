@@ -1,25 +1,31 @@
 <template>
   <div class="huadiao-star">
-    <huadiao-header :isLogin="isLogin" :user="user"/>
-    <star-img-animation/>
-    <router-link class="note-star-btn" to="/star/note" title="打开笔记收藏" tag="div">
-      <img src="/svg/access.svg" alt="">
-    </router-link>
-    <router-link class="fanju-star-btn" to="/star/fanju" title="打开番剧收藏" tag="div">
-      <img src="/svg/access.svg" alt="">
-    </router-link>
-    <div class="star-container">
-      <!--目录-->
-      <transition name="right-dash" mode="out-in">
-        <router-view name="catalogue"></router-view>
-      </transition>
-      <!--内容-->
-      <transition name="left-dash" mode="out-in">
-        <router-view name="starBoard"></router-view>
-      </transition>
-    </div>
-    <add-new-favorite-board/>
-    <transfer-note-favorite/>
+    <huadiao-header/>
+    <template v-if="visible">
+      <star-img-animation/>
+      <router-link class="note-star-btn" :to="`/star/${viewedUid}/note/-1`" title="打开笔记收藏" tag="div">
+        <img src="/svg/access.svg" alt="">
+      </router-link>
+      <router-link class="fanju-star-btn" :to="`/star/${viewedUid}/anime/-1`" title="打开番剧收藏" tag="div">
+        <img src="/svg/access.svg" alt="">
+      </router-link>
+      <div class="star-container">
+        <!--目录-->
+        <transition name="right-dash" mode="out-in">
+          <keep-alive>
+            <router-view name="catalogue"></router-view>
+          </keep-alive>
+        </transition>
+        <!--内容-->
+        <transition name="left-dash" mode="out-in">
+          <keep-alive>
+            <router-view name="starBoard"></router-view>
+          </keep-alive>
+        </transition>
+      </div>
+      <add-new-favorite-board/>
+      <transfer-note-favorite/>
+    </template>
     <huadiao-popup-window/>
     <huadiao-warning-top-container/>
     <huadiao-middle-tip/>
@@ -28,26 +34,46 @@
 
 <script>
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
-import {mapState} from "vuex";
 import StarImgAnimation from "@/pages/star/components/StarImgAnimation";
 import AddNewFavoriteBoard from "@/pages/star/components/AddNewFavoriteBoard";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import TransferNoteFavorite from "@/pages/star/components/TransferNoteFavorite";
+import {mapState} from "vuex";
+
 export default {
   name: "HuadiaoStar",
   data() {
-    return {}
+    return {
+      visible: false,
+    }
   },
   computed: {
-    ...mapState(["isLogin", "user"]),
+    ...mapState(["viewedUid"]),
   },
-  beforeMount() {
-    this.$store.dispatch("accordingFavoriteIdDivide");
+  watch: {
+    "$store.state.user": {
+      deep: true,
+      handler(newValue) {
+        this.setMe(newValue.uid);
+        this.visible = true;
+      }
+    }
+  },
+  created() {
+    this.getViewedUid();
+  },
+  mounted() {
   },
   methods: {
-
+    setMe(uid) {
+      this.$store.commit("initialMe", {me: this.viewedUid === uid});
+    },
+    getViewedUid() {
+      let viewedUid = +window.location.href.split(/\//)[4];
+      this.$store.commit("initialViewedUid", {viewedUid});
+    }
   },
   beforeDestroy() {
   },
@@ -66,6 +92,7 @@ export default {
 <style>
 .huadiao-star {
   position: relative;
+  min-width: 1100px;
   min-height: 100vh;
   background: url("~/public/img/star/starBackground.png") no-repeat center center fixed;
   background-size: cover;

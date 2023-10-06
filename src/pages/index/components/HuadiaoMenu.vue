@@ -28,7 +28,7 @@ export default {
         title: "该替键盘清灰了",
         svg: "/svg/newAdd.svg",
         description: "新建笔记",
-        url: this.getLinkByUserLogged("/buildNote"),
+        url: this.getLinkByUserLogged("/buildnote"),
       }, {
         title: "回顾一下以前的艰辛",
         svg: "/svg/notes.svg",
@@ -38,7 +38,7 @@ export default {
         title: "收藏都在这里",
         svg: "/svg/star.svg",
         description: "我的收藏",
-        url: this.getLinkByUserLogged("/star/" + this.user.uid),
+        url: this.getLinkByUserLogged(`/star/${this.user.uid}/note`),
       }, {
         title: "瞅一瞅关注了谁",
         svg: "/svg/follow.svg",
@@ -58,7 +58,7 @@ export default {
         title: "核心隐私地带",
         svg: "/svg/setting.svg",
         description: "我的设置",
-        url: this.getLinkByUserLogged("/settings")
+        url: this.getLinkByUserLogged("/account/settings")
       }],
       huadiaoMenuStyle: {
         background: "-webkit-linear-gradient(top, #9005a97a, #fb424279)",

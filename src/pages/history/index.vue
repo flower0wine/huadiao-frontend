@@ -1,6 +1,6 @@
 <template>
   <div class="huadiao-build-note">
-    <huadiao-header :user="user" :isLogin="isLogin"/>
+    <huadiao-header :huadiao-header-style="huadiaoHeaderStyle"/>
     <div class="history-header">
       <img src="/img/history/historyBackground.png" alt="">
     </div>
@@ -24,7 +24,9 @@
     </div>
     <history-tools ref="historyTools"/>
     <transition name="fade" mode="out-in">
-      <router-view></router-view>
+      <keep-alive>
+        <router-view></router-view>
+      </keep-alive>
     </transition>
     <huadiao-warning-top-container/>
     <huadiao-middle-tip/>
@@ -33,31 +35,62 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
 import HistoryTools from "@/pages/history/components/HistoryTools";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import {Timer} from "@/assets/js/utils";
 
 export default {
   name: "HuadiaoHistory",
   data() {
     return {
-
+      huadiaoHeaderStyle: {
+        backgroundColor: null,
+      },
+      timer: new Timer(),
     }
   },
-  computed: {
-    ...mapState(["isLogin", "user"]),
-  },
+  computed: {},
   mounted() {
-    this.clickToHidden();
+    this.initial();
   },
   methods: {
+    initial() {
+      this.clickToHidden();
+      this.scrollEvent();
+    },
+    scrollEvent() {
+      window.addEventListener("wheel", (e) => {
+        // 文档下移
+        let pageDown = e.wheelDeltaY > 0;
+        this.changeHuadiaoHeaderStyle();
+      });
+    },
+    // 改变头部样式
+    changeHuadiaoHeaderStyle() {
+      this.timer.destroy();
+      this.timer.timeout(() => {
+        if (window.scrollY <= 10) {
+          this.$bus.$emit("modifyHuadiaoHeaderStyle", {
+            backgroundColor: "transparent",
+            entryColor: "#fff",
+            shadow: false,
+          });
+        } else {
+          this.$bus.$emit("modifyHuadiaoHeaderStyle", {
+            backgroundColor: "#ffffff",
+            entryColor: "#e17474",
+            shadow: true,
+          });
+        }
+      }, 100);
+    },
     // 点击隐藏
     clickToHidden() {
       window.addEventListener("click", (e) => {
-        if(!this.$refs.historyTools.$refs.historyTitleContainer.contains(e.target)) {
+        if (!this.$refs.historyTools.$refs.historyTitleContainer.contains(e.target)) {
           this.$refs.historyTools.isShow.choiceHistoryBoard = false;
         }
       });

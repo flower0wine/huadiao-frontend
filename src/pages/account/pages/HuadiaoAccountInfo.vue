@@ -13,6 +13,7 @@
                    autocomplete="off"
                    minlength="8"
                    maxlength="20"
+                   placeholder="填写你喜欢的昵称"
                    v-model="tempUser.nickname">
           </div>
           <div class="account-user-id account-infer-item">
@@ -27,25 +28,26 @@
                       maxlength="200"
                       cols="60"
                       rows="10"
+                      placeholder="把自己介绍一下吧!!"
                       v-model="tempUser.canvases"></textarea>
           </div>
           <div class="account-sex account-infer-item">
             <label>性别</label>
             <div class="sex-buttons">
-          <span class="man-button button"
-                :class="tempUser.sex === '1' ? 'choice-button-sex' : ''"
-                @click="tempUser.sex = '1'"
-                ref="man"
-          >
-            <span>男</span>
-          </span>
-              <span class="women-button button"
-                    :class="tempUser.sex === '2' ? 'choice-button-sex' : ''"
-                    @click="tempUser.sex = '2'"
-                    ref="women"
-              >
+            <span class="man-button button"
+                  :class="tempUser.sex === '1' ? 'choice-button-sex' : ''"
+                  @click="tempUser.sex = '1'"
+                  ref="man"
+            >
+              <span>男</span>
+            </span>
+            <span class="women-button button"
+                  :class="tempUser.sex === '2' ? 'choice-button-sex' : ''"
+                  @click="tempUser.sex = '2'"
+                  ref="women"
+            >
             <span>女</span>
-          </span>
+            </span>
               <span class="no-known-button button"
                     :class="tempUser.sex === '0' ? 'choice-button-sex' : ''"
                     @click="tempUser.sex = '0'"
@@ -87,17 +89,22 @@
           </div>
           <div class="account-born-date account-infer-item">
             <label for="bornDate">出生日期</label>
-            <input type="text"
-                   v-model="tempUser.bornDate"
-                   id="bornDate"
-                   @click="$refs.datepicker.open()"
-                   readonly>
+            <el-date-picker
+                v-model="tempUser.bornDate"
+                align="right"
+                type="date"
+                placeholder="选择你的出生日期"
+                popper-class="date-picker-panel"
+                prefix-icon="date-picker-prefix-icon"
+                :picker-options="pickerOptions">
+            </el-date-picker>
           </div>
           <div class="account-school account-infer-item">
             <label for="school">学校</label>
             <input type="text"
                    id="school"
                    autocomplete="off"
+                   placeholder="就读学校"
                    v-model="tempUser.school">
           </div>
           <div class="warning-tip account-infer-item">
@@ -112,56 +119,60 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
 import CircleLoading from "@/pages/components/CircleLoading";
 import RequestFail from "@/pages/components/RequestFail";
-import constants from "@/assets/js/constants";
-
-let accountInfoResponse = constants.accountInfoResponse;
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
 
 export default {
   name: "HuadiaoAccountInfo",
   components: {RequestFail, CircleLoading},
   data() {
     return {
-      selected: new Date(),
+      curSex: null,
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+      },
       isShow: {
         loading: true,
         loadingFail: false,
       },
       tempUser: {
-        isLogin: null,
-        nickname: null,
-        canvases: null,
-        school: null,
         userId: null,
+        nickname: null,
+        canvases: "这个人十分神秘...",
         bornDate: null,
-        sex: null,
-        uid: null,
-      },
+        school: null,
+        sex: "0",
+      }
     }
-  },
-  computed: {
-    ...mapState(["isLogin"]),
   },
   created() {
     this.getUserInfo();
-  },
-  mounted() {
   },
   methods: {
     // 获取用户信息并保存到 vuex 中
     getUserInfo() {
       this.isShow.loadingFail = false;
       this.sendRequest({
-        path: "userInfo",
-        method: "get",
+        path: apis.account.info,
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          this.$store.commit("initialUserInfo", {userInfo: res});
-          this.tempUser = {...res, ...this.$store.state.user};
-          this.isShow.loading = false;
+          if(res.code === statusCode.succeed) {
+            let userInfo = res.data;
+            for(let key in userInfo) {
+              if(userInfo[key]) {
+                this.tempUser[key] = userInfo[key];
+              }
+            }
+            if(!userInfo.nickname) {
+              this.tempUser.nickname = userInfo.userId;
+            }
+            this.isShow.loading = false;
+          }
         },
         errorCallback: (error) => {
           console.log(error);
@@ -174,29 +185,24 @@ export default {
       // 检查昵称
       let nickname = this.tempUser.nickname ? this.tempUser.nickname.trim() : '';
       if(nickname === '') {
-        this.huadiaoMiddleTip(accountInfoResponse.wrongNullNickname);
+        this.huadiaoMiddleTip("昵称不能为空或只包含空格");
         return;
       } else if(!(0 < nickname.length && nickname.length <= 20)) {
-        this.huadiaoMiddleTip(accountInfoResponse.wrongLengthNickname);
+        this.huadiaoMiddleTip("昵称长度最大为 20 个字符");
         return;
       }
       // 检查出生日期
-      let bornDate = this.tempUser.bornDate ? this.tempUser.bornDate.trim() : '';
-      let bornDateReg = /^\d{4}([-/])\d{1,2}\1\d{1,2}$/;
-      if(bornDate !== '' && !bornDateReg.test(bornDate)) {
-        this.huadiaoMiddleTip(accountInfoResponse.wrongBornDate);
-        return;
-      }
+      let bornDate = this.tempUser.bornDate.getTime();
       // 检查个人简介
       let canvases = this.tempUser.canvases ? this.tempUser.canvases.trim() : '';
       if(canvases.length > 50) {
-        this.huadiaoMiddleTip(accountInfoResponse.wrongLengthCanvases);
+        this.huadiaoMiddleTip("个人简介长度最长为 50 个字符");
         return;
       }
       // 检查学校
       let school = this.tempUser.school ? this.tempUser.school.trim() : '';
       if(school.length > 30) {
-        this.huadiaoMiddleTip(accountInfoResponse.wrongLengthSchool);
+        this.huadiaoMiddleTip("学校长度最长为 30 个字符");
         return;
       }
 
@@ -212,10 +218,10 @@ export default {
         },
         thenCallback: (response) => {
           let res = response.data;
-          if(res && accountInfoResponse[res]) {
-            this.huadiaoMiddleTip(accountInfoResponse[res]);
-          } else {
+          if(res.code === statusCode.succeed) {
             this.huadiaoMiddleTip("修改用户信息成功");
+          } else {
+            this.huadiaoMiddleTip("修改信息失败");
           }
         },
         errorCallback: (error) => {
@@ -271,7 +277,8 @@ export default {
 }
 
 .account-infer input,
-.account-infer textarea {
+.account-infer textarea,
+/deep/ .el-input__inner {
   padding: 5px 10px;
   font-size: 16px;
   border-radius: 6px;
@@ -282,10 +289,33 @@ export default {
 }
 
 .account-infer input:hover,
-.account-infer textarea:hover {
+.account-infer textarea:hover,
+/deep/ .el-input__inner:hover {
   transform: translateY(-3px);
   box-shadow: var(--box-shadow-min);
   background-color: rgba(253, 253, 253, 0.15);
+}
+
+/deep/ .el-input__inner {
+  width: 140px;
+  height: unset;
+  line-height: initial;
+}
+
+/deep/ .el-input__inner::-webkit-input-placeholder,
+#nickname::-webkit-input-placeholder,
+#canvases::-webkit-input-placeholder,
+#school::-webkit-input-placeholder {
+  font-size: 14px;
+  color: #a8a8a8;
+}
+
+#nickname {
+  width: 300px;
+}
+
+#school {
+  width: 350px;
 }
 
 .account-infer textarea {
@@ -363,6 +393,14 @@ export default {
   margin-top: 70px;
 }
 
+.date-picker-panel {
+  background-color: transparent;
+}
+
+.date-picker-prefix-icon {
+  display: none;
+}
+
 .warning-tip {
   color: #676767;
   font-size: 12px;
@@ -386,4 +424,5 @@ export default {
   box-shadow: var(--box-shadow-min);
   background-color: rgba(194, 3, 3, 0.62);
 }
+
 </style>

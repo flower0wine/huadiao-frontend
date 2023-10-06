@@ -24,6 +24,10 @@
 </template>
 
 <script>
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
+import {mapState} from "vuex";
+
 export default {
   name: "AddNewGroupBoard",
   data() {
@@ -43,6 +47,9 @@ export default {
       // 待修改组名的索引
       modifyIndex: null,
     }
+  },
+  computed: {
+    ...mapState(["viewedUid"]),
   },
   watch: {
     tempGroupName: {
@@ -77,7 +84,7 @@ export default {
         return;
       }
       this.sendRequest({
-        path: "relation/modifyFollowGroupName",
+        path: apis.followFan.followGroupModify,
         params: {
           groupName: this.tempGroupName,
           groupId: this.groupId,
@@ -98,20 +105,46 @@ export default {
         errorCallback: (error) => {
           console.log(error);
         }
-      })
+      });
     },
     // 添加新组
     addNewGroup() {
-      if (this.groupName.length !== 0 && this.groupName.length <= 16) {
-        this.$store.commit("addNewFollowGroup", {groupName: this.groupName});
-        // 关闭面板
-        this.visible.show = false;
-        this.groupName = "";
-      } else if (this.groupName.length === 0) {
+      if (this.tempGroupName.length !== 0 && this.tempGroupName.length <= 16) {
+        this.requestAddNewGroup().then((groupId) => {
+          this.$store.commit("addNewFollowGroup", {groupId, groupName: this.tempGroupName});
+          // 关闭面板
+          this.visible.show = false;
+          this.tempGroupName = "";
+          this.$nextTick(() => {
+            this.$router.replace(`/followfan/${this.viewedUid}/follow/${groupId}`);
+          });
+        });
+      } else if (this.tempGroupName.length === 0) {
         this.huadiaoMiddleTip("组名不能为空哦!");
-      } else if (this.groupName.length > 16) {
+      } else if (this.tempGroupName.length > 16) {
         this.huadiaoMiddleTip("组名长度最大为 16 个字符!");
       }
+    },
+    requestAddNewGroup() {
+      return new Promise((resolve, reject) => {
+        this.sendRequest({
+          path: apis.followFan.followGroupAdd,
+          params: {
+            groupName: this.tempGroupName,
+          },
+          thenCallback: (response) => {
+            let res = response.data;
+            console.log(res);
+            if(res.code === statusCode.succeed) {
+              resolve(res.data.followGroupId);
+            }
+          },
+          errorCallback: (error) => {
+            console.log(error);
+            reject();
+          }
+        })
+      });
     },
     // 关闭面板
     closeBoard() {

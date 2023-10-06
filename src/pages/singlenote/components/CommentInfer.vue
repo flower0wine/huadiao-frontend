@@ -1,6 +1,6 @@
 <template>
   <div class="comment-infer" @mouseleave="hiddenMoreBoard">
-    <div class="user-nickname">{{item.nickname}}</div>
+    <div class="user-nickname">{{item.nickname ? item.nickname : item.userId}}</div>
     <div class="comment-content" v-html="item.commentContent"></div>
     <div class="comment-details">
       <div class="comment-send-date">{{sendDate}}</div>
@@ -73,7 +73,7 @@ export default {
   },
   computed: {
     sendDate() {
-      return this.dateFormat(this.item.commentDate);
+      return this.huadiaoDateFormat(this.item.commentDate);
     },
     ...mapState({
       /*三种情况可删除评论
