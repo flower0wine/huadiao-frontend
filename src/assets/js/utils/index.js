@@ -7,6 +7,8 @@
 'use strict';
 
 // 只开启单个定时器时使用
+const {statusCode} = require("@/assets/js/constants/status-code");
+
 class Timer {
     timerId;
     constructor() {
@@ -32,6 +34,34 @@ class Timer {
     }
 }
 
+/**
+ * 响应处理类
+ */
+class ResponseHandler {
+    response;
+
+    constructor(response) {
+        this.response = response;
+    }
+
+    // 响应成功回调
+    succeed(callback) {
+        if(this.response.code === statusCode.succeed) {
+            callback && callback(this.response.data);
+        }
+        return this;
+    }
+
+    // 没有获取到结果回调
+    notExist(callback) {
+        if(this.response.code === statusCode.notExist) {
+            callback && callback(this.response.data);
+        }
+        return this;
+    }
+}
+
 module.exports = {
-    Timer
+    Timer,
+    ResponseHandler,
 }

@@ -1,15 +1,15 @@
 <template>
   <div class="message-settings-board">
-    <div v-for="(item, index) in config.messageSettings"
+    <div v-for="(config, index) in config.messageSettings"
          class="settings"
          :key="index">
-      <div class="setting-item" v-for="(messageSetting, messageIndex) in item" :key="messageIndex">
+      <div class="setting-item" v-for="(setting, index) in config" :key="index">
         <div class="setting-header">
-          <span class="setting-title">{{ messageSetting.description }}</span>
-          <span class="setting-tip">{{ messageSetting.tip }}</span>
+          <span class="setting-title">{{ setting.description }}</span>
+          <span class="setting-tip">{{ setting.tip }}</span>
         </div>
         <div class="setting-btn">
-          <setting-slider :settingName="messageSetting.name"
+          <setting-slider :settingName="setting.name"
                           :settings="messageSettings"
                           :clickSettingSlider="clickSettingItem"/>
         </div>
@@ -20,6 +20,8 @@
 
 <script>
 import SettingSlider from "@/pages/components/SettingSlider";
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
 
 export default {
   name: "MessageSettingsBoard",
@@ -52,11 +54,46 @@ export default {
       return this.$store.state.message.messageSettings;
     },
   },
+  created() {
+    this.getMessageSettings();
+  },
   methods: {
+    getMessageSettings() {
+      this.sendRequest({
+        path: apis.setting.messageGet,
+      }).then((response) => {
+        let res = response.data;
+        console.log(res);
+        if (res.code === statusCode.succeed) {
+          this.$store.commit("initialMessageSetting", {messageSettings: res.data});
+        }
+      }).catch((error) => {
+        console.log(error);
+      })
+    },
     // 点击滑块
     clickSettingItem(settingName) {
-      this.messageSettings[settingName + "Status"] = !this.messageSettings[settingName + "Status"];
-    }
+      let setting = settingName + "Status";
+      this.requestChaneMessageSettings(setting);
+    },
+    // 请求改变设置
+    requestChaneMessageSettings(setting) {
+      this.sendRequest({
+        path: apis.setting.modify,
+        method: "post",
+        data: {
+          [setting]: setting,
+        }
+      }).then((response) => {
+        let res = response.data;
+        console.log(res);
+        if (res.code === statusCode.succeed) {
+          this.messageSettings[setting] = !this.messageSettings[setting];
+        }
+      }).catch((error) => {
+        console.log(error);
+      })
+    },
   },
   beforeDestroy() {
   }

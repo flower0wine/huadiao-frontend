@@ -9,6 +9,7 @@
 export const apis = {
     // 主机地址
     host: 'http://localhost:9090/huadiao/',
+    whisperHost: 'ws://localhost:9090/huadiao/message/whisper/talk',
     // 笔记相关 api
     note: {
         comment: "note/comment",
@@ -34,6 +35,11 @@ export const apis = {
     // 账号信息页面相关 api
     account: {
         info: "userInfo",
+    },
+    setting: {
+        modify: "setting/modify",
+        accountGet: "setting/account/get",
+        messageGet: "setting/message/get",
     },
     // 历史记录页面相关 api
     history: {
@@ -70,5 +76,22 @@ export const apis = {
         followGroupDelete: "relation/follow/group/delete",
         followCopy: "relation/follow/copy",
         followMove: "relation/follow/move",
+    },
+    // 消息 api
+    message: {
+        systemGet: "message/system/get",
+        likeGet: "message/like/get",
+        likeNoteDelete: "message/like/note/delete",
+        likeCommentDelete: "message/like/comment/delete",
+        likeNoteUserGet: "message/like/note",
+        likeCommentUserGet: "message/like/comment",
+        replyGet: "message/reply/get",
+        replyDelete: "message/reply/delete",
+        latestUserGet: "message/whisper/user",
+        latestSingleUserGet: "message/whisper/user/single",
+        latestUserDelete: "message/whisper/user/delete",
+        whisperAdd: "message/whisper/add",
+        whisperDelete: "message/whisper/delete",
+        whisperGet: "message/whisper/get",
     }
 };

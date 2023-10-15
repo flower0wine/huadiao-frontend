@@ -48,7 +48,7 @@
         </div>
       </template>
       <template v-slot:toolMenu>
-        <div>设置分组</div>
+        <div @click="changeFollowGroup(index)">设置分组</div>
       </template>
     </huadiao-follow-fan-item>
   </div>
@@ -289,6 +289,9 @@ export default {
               this.selectFollowArray = [];
             });
           }
+        },
+        errorCallback: (error) => {
+          console.log(error);
         }
       });
     },
@@ -300,7 +303,18 @@ export default {
         }
         resolve();
       });
-    }
+    },
+    // 单独设置关注分组
+    changeFollowGroup(index) {
+      this.selectFollowArray = [];
+      this.selectFollowArray.push(index);
+      this.$bus.$emit("moveFollow", {
+        copy: false,
+        groupId: this.groupId,
+        selectFollowArray: this.selectFollowArray,
+        confirmCallback: this.requestMoveFollow,
+      });
+    },
   },
   beforeDestroy() {
   },

@@ -1,20 +1,22 @@
 <template>
   <div class="huadiao-message">
     <huadiao-header :huadiaoHeaderStyle="huadiaoHeaderStyle"/>
-    <div class="message-board">
+    <div class="message-board" v-if="visible">
       <message-navigation-board/>
       <div class="message-content-board">
         <div class="content-title">
-          <template v-if="backNavigation[$route.name]">
-            <router-link :to="{name: backNavigation[$route.name].name}">{{ backNavigation[$route.name].content }}
+          <template v-if="backNavigation[name]">
+            <router-link :to="{name: backNavigation[name].name}">{{ backNavigation[name].content }}
             </router-link>
             <span> > </span>
           </template>
-          <span>{{ navigator[$route.name] }}</span>
+          <span>{{ navigator[name] }}</span>
         </div>
         <div class="router-view">
           <transition name="top-show" mode="out-in">
-            <router-view></router-view>
+            <keep-alive>
+              <router-view></router-view>
+            </keep-alive>
           </transition>
         </div>
       </div>
@@ -26,38 +28,19 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import MessageNavigationBoard from "@/pages/message/components/MessageNavigationBoard";
+import {huadiaoHeaderStyle} from "@/assets/js/constants/huadiao_header_style/message";
 
 export default {
   name: "HuadiaoMessage",
   data() {
     return {
-      huadiaoHeaderStyle: {
-        blur: true,
-        shadow: true,
-        backgroundColor: "#FFFFFFB3",
-        // 右侧入口颜色
-        entryColor: "rgb(97 97 97)",
-        // 输入框颜色
-        inputTheme: {
-          searchIconColor: "#fff",
-          textColor: "rgb(120 120 120)",
-          inputBackgroundColor: "rgba(199, 199, 199, 0.64)",
-          searchBackgroundColor: "rgba(201, 201, 201, 0.54)",
-        },
-        // 登录面板
-        loggedBoardStyle: {
-          borderColor: "#C9C9C9C1",
-          textColor: "#ffffff",
-          accessColor: "#fff",
-          background: "-webkit-linear-gradient(left bottom, rgb(0, 0, 0, 0.73), rgb(72, 122, 208, 0.71), #fff)",
-        }
-      },
+      visible: false,
+      huadiaoHeaderStyle,
       // 导航
       navigator: {
         replyMeBoard: "回复我的",
@@ -78,7 +61,19 @@ export default {
       }
     }
   },
+  watch: {
+    "$store.state.user": {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        this.visible = true;
+      },
+    },
+  },
   computed: {
+    name() {
+      return this.$route.name;
+    },
   },
   mounted() {
     this.clickToHidden();
@@ -93,7 +88,6 @@ export default {
     }
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   },
   components: {
     MessageNavigationBoard,
@@ -163,7 +157,7 @@ body {
   background-color: rgba(255, 255, 255, 0.712);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .router-view::-webkit-scrollbar {

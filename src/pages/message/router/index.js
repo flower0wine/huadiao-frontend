@@ -28,19 +28,19 @@ export default new VueRouter({
                 name: "messageChatBoard",
                 path: ":uid(\\d+)",
                 components: {
-                    whisperChatBoard: () => import("@/pages/message/components/WhisperChatBoard"),
+                    whisperChatBoard: () => import("@/pages/message/pages/WhisperChatBoard"),
                 }
-            }]
+            }, ]
         },
         {
             name: "likeMeBoard",
             path: "/like",
             component: () => import("@/pages/message/pages/LikeMeBoard"),
-            children: [{
-                name: "likeMeDetails",
-                path: ":messageIndex(\\d+)",
-                component: () => import("@/pages/message/pages/LikeMeDetails"),
-            },],
+        },
+        {
+            name: "likeMeDetails",
+            path: "/like/:messageIndex(\\d+)",
+            component: () => import("@/pages/message/pages/LikeMeDetails"),
         },
         {
             name: "systemMessageBoard",

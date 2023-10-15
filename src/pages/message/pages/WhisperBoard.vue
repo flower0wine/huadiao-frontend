@@ -1,21 +1,26 @@
 <template>
   <div class="whisper-board">
-    <whisper-person-board/>
-    <keep-alive>
-      <!--keep-alive 使用组件缓存, :key 使得切换路径时加载一个新的组件-->
-      <router-view name="whisperChatBoard" :key="$route.fullPath"></router-view>
-    </keep-alive>
+    <whisper-person-board :loadOver="loadOver"/>
+    <router-view name="whisperChatBoard"
+                 v-if="visible"></router-view>
   </div>
 </template>
 
 <script>
-import WhisperPersonBoard from "@/pages/message/components/WhisperPersonBoard";
+import WhisperPersonBoard from "@/pages/message/pages/WhisperPersonBoard";
+
 export default {
   name: "WhisperBoard",
   data() {
-    return {}
+    return {
+      visible: false,
+    }
   },
-  methods: {},
+  methods: {
+    loadOver() {
+      this.visible = true;
+    },
+  },
   beforeDestroy() {
   },
   components: {

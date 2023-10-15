@@ -13,7 +13,7 @@ import Vue from "vue";
 
 const state = {
     me: false,
-    viewedUid: 1,
+    viewedUid: null,
     // 用户信息
     user: {
         login: false,
@@ -37,11 +37,6 @@ const state = {
         groupName: "全部粉丝",
         count: 0,
     }],
-    follow: new Map(),
-    fan: [],
-    // 已经被删除的用户
-    deletedFollow: [],
-    deletedFan: [],
 };
 const actions = {
     // 删除关注分组
@@ -53,15 +48,14 @@ const actions = {
         context.commit("modifyGroupName", {modifyIndex, groupName});
         succeedCallback && succeedCallback();
     },
-    // 根据索引删除粉丝
-    deleteFan(context, {index}) {
-        context.commit("deleteFan", {index});
-    },
 };
 const mutations = {
     // 初始化 user
     initialUser(state, {user}) {
         state.user = user;
+    },
+    initialViewedUid(state, {viewedUid}) {
+        state.viewedUid = viewedUid;
     },
     initialMe(state, {me}) {
         state.me = me;
@@ -75,38 +69,6 @@ const mutations = {
     initialFollowGroup(state, {followGroup}) {
         state.followGroup.splice(1);
         state.followGroup.push(...followGroup);
-    },
-    // 删除关注
-    removeFollow(state, {array, mapKey, callback}) {
-        let follow = state.follow.get(mapKey).follow;
-        for (let index = array.length - 1; index >= 0; index--) {
-            follow.splice(array[index], 1);
-        }
-        callback && callback();
-    },
-    // 添加用户关注
-    addFollow(state, {follow, mapKey, hasNext, offset}) {
-        let map = state.follow;
-        if (state.follow.has(mapKey)) {
-            let item = map.get(mapKey);
-            item.follow.push(...follow);
-            item.offset += offset;
-            item.hasNext = hasNext;
-        } else {
-            map.set(mapKey, {
-                hasNext,
-                follow: [...follow],
-                offset: offset,
-            });
-        }
-    },
-    // 添加用户粉丝
-    addFan(state, {fan}) {
-        state.fan.push(...fan);
-    },
-    // 删除粉丝
-    deleteFan(state, {index}) {
-        state.fan.splice(index, 1);
     },
     // 修改组名
     modifyGroupName(state, {modifyIndex, groupName}) {

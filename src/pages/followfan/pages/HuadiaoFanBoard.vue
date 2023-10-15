@@ -25,6 +25,7 @@ import HuadiaoFollowFanItem from "@/pages/followfan/components/HuadiaoFollowFanI
 import {mapState} from "vuex";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
+import {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
 
 export default {
   name: "HuadiaoFanBoard",
@@ -37,7 +38,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(["fan"]),
     viewedUid() {
       return this.$route.params.viewedUid;
     },
@@ -89,27 +89,28 @@ export default {
         }
       });
     },
+    // 请求删除粉丝
+    requestDeleteFan(index) {
+      this.sendRequest({
+        path: apis.followFan.deleteFan,
+        params: {
+          uid: this.fan[index].uid,
+        },
+      }).then((response) => {
+        let res = response.data;
+        console.log(res);
+        if(res.code === statusCode.succeed) {
+          this.fan.splice(index, 1);
+        }
+      }).catch((error) => {
+        console.log(error);
+        this.huadiaoMiddleTip("移除粉丝失败");
+      });
+    },
     // 删除粉丝
     deleteFan(index) {
-      this.huadiaoPopupWindow({
-        tip: "确认删除粉丝吗?",
-        confirmCallback: () => {
-          this.sendRequest({
-            path: apis.followFan.deleteFan,
-            thenCallback: (response) => {
-              let res = response.data;
-              console.log(res);
-              if(res.code === statusCode.succeed) {
-                this.$store.dispatch("deleteFan", {index});
-              }
-            },
-            errorCallback: (error) => {
-              console.log(error);
-              this.huadiaoMiddleTip("移除粉丝失败");
-            }
-          })
-        },
-      });
+      this.huadiaoPopupWindow(huadiaoPopupWindowOptions.iconType.warning, huadiaoPopupWindowOptions.operate.confirmOrCancel,"确认删除粉丝吗?")
+          .then(this.requestDeleteFan.bind(this, index));
     },
   },
   beforeDestroy() {

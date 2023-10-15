@@ -1,6 +1,7 @@
 <template>
   <div class="huadiao-header"
        ref="huadiaoHeader"
+       v-show="getDataCompleted"
        :style="huadiaoHeaderAttachStyle"
   >
     <!-- 左侧图标 -->
@@ -195,6 +196,7 @@ export default {
           let res = response.data;
           console.log(res)
           this.$store.commit("initialUser", {user: res});
+          this.getDataCompleted = true;
         },
         errorCallback: (error) => {
           console.log(error);

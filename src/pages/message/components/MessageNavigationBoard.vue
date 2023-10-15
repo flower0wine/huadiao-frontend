@@ -60,44 +60,6 @@ export default {
     };
   },
   watch: {
-    "$store.state.message.replyMeMessage": {
-      deep: true,
-      immediate: true,
-      handler(newValue) {
-        this.config.navigation[0].number = newValue.length;
-      }
-    },
-    "$store.state.message.whisper": {
-      deep: true,
-      immediate: true,
-      handler(newValue) {
-        let length = 0;
-        for(let whisper of newValue) {
-          let temp = 0;
-          for(let message of whisper.messageList) {
-            if(!message.me) {
-              temp++;
-            }
-          }
-          length += temp;
-        }
-        this.config.navigation[1].number = length;
-      }
-    },
-    "$store.state.message.likeMeMessage": {
-      deep: true,
-      immediate: true,
-      handler(newValue) {
-        this.config.navigation[2].number = newValue.length;
-      }
-    },
-    "$store.state.message.systemMessage": {
-      deep: true,
-      immediate: true,
-      handler(newValue) {
-        this.config.navigation[3].number = newValue.length;
-      }
-    }
   },
   methods: {},
   beforeDestroy() {

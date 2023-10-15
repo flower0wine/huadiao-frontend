@@ -36,6 +36,8 @@
 <script>
 import SettingSlider from "@/pages/components/SettingSlider";
 import constants from "@/assets/js/constants";
+import {apis} from "@/assets/js/constants/request-path";
+import {statusCode} from "@/assets/js/constants/status-code";
 
 let accountSettingResponse = constants.accountSettingResponse;
 
@@ -79,15 +81,15 @@ export default {
         description: "点赞消息提醒",
       }],
       userSettings: {
-        messageLikeStatus: 1,
-        messageRemindStatus: 1,
-        messageReplyStatus: 1,
+        messageLikeStatus: 0,
+        messageRemindStatus: 0,
+        messageReplyStatus: 0,
         publicBornStatus: 0,
         publicCanvasesStatus: 0,
         publicFanjuStatus: 0,
-        publicFollowStatus: 1,
-        publicHomepageStatus: 1,
-        publicSchoolStatus: 1,
+        publicFollowStatus: 0,
+        publicHomepageStatus: 0,
+        publicSchoolStatus: 0,
         publicStarStatus: 0,
       },
     };
@@ -99,12 +101,14 @@ export default {
     // 获取用户账号设置
     getUserAccountSettings() {
       this.sendRequest({
-        path: "accountSettings",
+        path: apis.setting.accountGet,
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          this.userSettings = {...res};
-          this.$store.commit("initialUserSettings", {settings: res});
+          if(res.code === statusCode.succeed) {
+            this.userSettings = {...res.data};
+            this.$store.commit("initialUserSettings", {settings: res.data});
+          }
         },
         errorCallback: (error) => {
           console.log(error);
@@ -114,7 +118,7 @@ export default {
     // 点击滑块
     clickSettingItem(settingName) {
       this.sendRequest({
-        path: "accountSettings",
+        path: apis.setting.modify,
         method: "post",
         data: {
           [`${settingName}Status`]: `${settingName}Status`,
@@ -122,7 +126,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(accountSettingResponse.accountSettingUpdateSucceed === res) {
+          if(res.code === statusCode.succeed) {
             // 改变按钮
             this.userSettings[settingName + "Status"] = !this.userSettings[settingName + "Status"];
           } else {

@@ -39,7 +39,17 @@ export const mixin = {
         },
         // 弹窗提示
         huadiaoPopupWindow(iconType, operationType, tip, confirmFn, cancelFn) {
-            this.$bus.$emit("huadiaoPopupWindow", iconType, operationType, tip, confirmFn, cancelFn);
+            return new Promise((resolve, reject) => {
+                let confirmCallback = () => {
+                    confirmFn && confirmFn(...arguments);
+                    resolve();
+                };
+                let cancelCallback = () => {
+                    cancelFn && cancelFn(...arguments);
+                    reject();
+                }
+                this.$bus.$emit("huadiaoPopupWindow", iconType, operationType, tip, confirmCallback, cancelCallback);
+            });
         },
         // 发送请求, 由于请求 url 由 http://localhost:9090/huadiao/ 和 path 组成, 故 path 不需要加斜杆
         sendRequest({path, method, params, data, headers, thenCallback, errorCallback}) {
@@ -76,13 +86,19 @@ export const mixin = {
                 if (!error.response) {
                     this.huadiaoWarningTip("连接服务器失败!可能是网络原因");
                 }
+                console.log(error);
                 // 额外的错误执行函数
                 errorCallback && errorCallback(error);
             };
-            // 发送请求
-            axios(srcObj)
-                .then(defaultThenCallback)
-                .catch(defaultErrorCallback);
+            if(typeof thenCallback === "function") {
+                // 发送请求
+                return axios(srcObj)
+                    .then(defaultThenCallback)
+                    .catch(defaultErrorCallback);
+            }
+            else {
+                return axios(srcObj);
+            }
         },
         // 清除 this 的 ref 的事件
         clearAllRefsEvents() {
@@ -285,5 +301,35 @@ export const mixin = {
             }
             return url;
         },
+        // 如果没有昵称则用 userId 代替
+        getNickname(obj) {
+            return obj.nickname ?? obj.userId;
+        },
+        // 头像
+        generateUserAvatar(avatar) {
+            if(!avatar) {
+                return '';
+            }
+            return `background-image: url('${this.userAvatarImagePath}${avatar}')`;
+        },
+        homepage(uid) {
+            return `/homepage/${uid}`;
+        },
+        noteLink(authorUid, noteId) {
+            return `/singlenote/${authorUid}/${noteId}`;
+        },
+        getKey(args, split = '/') {
+            return args.join(split);
+        },
+        getIntersectionObserver(intersectionCallback = () => {}) {
+            this.observer = new IntersectionObserver((entries) => {
+                let entry = entries[0];
+                if(entry.isIntersecting) {
+                    intersectionCallback();
+                }
+            }, {
+                threshold: 0.1
+            });
+        }
     },
 }

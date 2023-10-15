@@ -64,11 +64,13 @@ export default {
       // 数据是否有错误, 0: 角度, 1: 渐变色
       hasError: [],
       errorTip: ["角度应为 0 ~ 360 之间的数字", "渐变色一仅支持颜色进制表示法", "渐变色二仅支持颜色进制表示法", "渐变色三仅支持颜色进制表示法"],
+      preBackground: null,
       // 最终结果
       finallyResult: "",
       // 之前的角度
       preAngle: "",
       angle: "",
+      preRealTimeCallback: null,
       // 之前的渐变色
       preMultiplyColor: [{color: ""}],
       multiplyRightInput: [{
@@ -84,9 +86,10 @@ export default {
   watch: {
     background: {
       immediate: true,
-      handler(newValue) {
+      handler(newValue, oldValue) {
         this.reset();
         if(newValue) {
+          this.preBackground = oldValue;
           let color = newValue.startsWith("#");
           let image = newValue.startsWith("url");
           let gradient = newValue.startsWith("-webkit-linear-gradient");

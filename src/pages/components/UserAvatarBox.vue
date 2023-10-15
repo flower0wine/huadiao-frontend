@@ -7,21 +7,20 @@
         <div class="default-user-avatar" v-html="svg.avatar"></div>
         <div class="user-avatar"
              v-if="hasAvatar"
-             :style="`${userAvatar}; ${borderColorStyle}`"></div>
+             :style="`${userAvatar};`"></div>
       </a>
     </template>
     <template v-else>
       <div class="default-user-avatar" v-html="svg.avatar"></div>
       <div class="user-avatar"
            v-if="hasAvatar"
-           :style="`${userAvatar}; ${borderColorStyle}`"></div>
+           :style="`${userAvatar}; ${borderStyle}`"></div>
     </template>
   </div>
 </template>
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
-import constants from "@/assets/js/constants";
 
 export default {
   name: "UserAvatarBox",
@@ -55,7 +54,8 @@ export default {
       }
     }
   },
-  mounted() {
+  created() {
+    this.modifySrcObject(this.defaultOptions, this.options);
   },
   computed: {
     hasAvatar() {
@@ -70,17 +70,14 @@ export default {
       return `--scale: ${defaultOptions.scale}; --transitionTime: ${defaultOptions.transitionTime};
       ${defaultOptions.shadow && !this.defaultOptions.hover ? `box-shadow: var(--box-shadow-min);` : ''};`;
     },
-    borderColorStyle() {
+    borderStyle() {
       let defaultOptions = this.defaultOptions;
-      return `${defaultOptions.borderColor ? 'border: 2px solid ' + defaultOptions.borderColor : ''}`
-    },
-  },
-  beforeMount() {
-    this.modifySrcObject(this.defaultOptions, this.options);
+      return defaultOptions.borderColor ? 'border: 2px solid ' + defaultOptions.borderColor : '';
+    }
   },
   methods: {
     parseUserAvatar(userAvatar) {
-      if(!userAvatar.startsWith("blob:http://localhost") && !userAvatar.startsWith("http")) {
+      if (!userAvatar.startsWith("blob:http://localhost") && !userAvatar.startsWith("http")) {
         userAvatar = `${this.userAvatarImagePath}${userAvatar}`;
       }
       return `background-image: url('${userAvatar}')`;
@@ -95,11 +92,21 @@ export default {
 .user-avatar-box {
   position: relative;
   --scale: "";
+  --borderColor: "";
   --transitionTime: "";
   width: var(--scale);
   height: var(--scale);
   border-radius: 50%;
   transition: all var(--transitionTime);
+}
+
+.default-user-avatar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: var(--scale);
+  height: var(--scale);
+  border-radius: 50%;
 }
 
 .default-user-avatar /deep/ svg {
@@ -111,6 +118,7 @@ export default {
 .user-avatar {
   position: absolute;
   top: 0px;
+  left: 0px;
   width: var(--scale);
   height: var(--scale);
   border-radius: 50%;

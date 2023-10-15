@@ -117,7 +117,7 @@
                      maxlength="32"
                      v-model="register.confirmPassword"
                      @mousemove="registerPasswordInputMouseOver"
-                     @focusout="ConfirmRegisterPassword"
+                     @focusout="sameRegisterPassword"
                      ref="confirmRegisterPassword"
               >
             </div>
@@ -149,10 +149,7 @@
 
 <script>
 import {Timer} from "@/assets/js/utils";
-import constants from "@/assets/js/constants";
 import {statusCode} from "@/assets/js/constants/status-code.js";
-
-let registerResponse = constants.registerResponse;
 
 export default {
   name: "HuadiaoLoginRegister",
@@ -234,15 +231,9 @@ export default {
           thenCallback: (response) => {
             console.log(response.data);
             let res = response.data;
-            // 注册响应处理
-            if (registerResponse[res]) {
-              if (res === "succeedRegister") {
-                this.$refs.loginBtn.click();
-                this.register.username = this.register.password = this.register.confirmPassword = this.register.checkCode = "";
-              }
-              this.huadiaoWarningTip(registerResponse[res]);
-            } else {
-              this.huadiaoWarningTip("出现未知错误!");
+            if (res === "succeedRegister") {
+              this.$refs.loginBtn.click();
+              this.register.username = this.register.password = this.register.confirmPassword = this.register.checkCode = "";
             }
           },
           errorCallback: () => {
@@ -265,10 +256,10 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if(res.code === statusCode.succeed) {
+            if (res.code === statusCode.succeed) {
               // 刷新网页
               window.location.reload();
-            } else if(res.code === statusCode.notExist) {
+            } else if (res.code === statusCode.notExist) {
               this.huadiaoMiddleTip("用户名或密码输入错误!");
             }
           },
@@ -281,16 +272,16 @@ export default {
     // 检查用户名是否符合标准
     checkUsername(username) {
       if (!username) {
-        this.huadiaoWarningTip(registerResponse.nullUsername);
+        this.huadiaoWarningTip("请填写您的用户名!");
         return false;
       }
       if (!(8 <= username.length && username.length <= 20)) {
-        this.huadiaoWarningTip(registerResponse.wrongUsernameLength);
+        this.huadiaoWarningTip("您的用户名长度应在8-20之间!");
         return false;
       }
       let reg = /[^0-9a-zA-Z_]/;
       if (reg.test(username)) {
-        this.huadiaoWarningTip(registerResponse.wrongUsername);
+        this.huadiaoWarningTip("您的用户名应仅包含数字、字母、下划线!");
         return false;
       }
       return true;
@@ -308,60 +299,42 @@ export default {
       if (this.register.password === this.register.confirmPassword) {
         return true;
       }
-      this.huadiaoWarningTip(registerResponse.noSamePassword);
-      return false;
-    },
-    // 根据前后输入的密码来给出相应的提示
-    ConfirmRegisterPassword() {
-      if (this.sameRegisterPassword()) {
-        this.huadiaoWarningTip("密码一致!");
-        return true;
-      }
+      this.huadiaoWarningTip("您两次输入的密码不一致!\n按下 ctrl + alt 可以返回重新输入!");
       return false;
     },
     // 检查密码是否符合标准
     checkPassword(password) {
       if (!password) {
-        this.huadiaoWarningTip(registerResponse.nullPassword);
+        this.huadiaoWarningTip("您未填写密码!");
         return false;
       }
       if (!(8 <= password.length && password.length <= 32)) {
-        this.huadiaoWarningTip(registerResponse.wrongPasswordLength);
+        this.huadiaoWarningTip("您的密码长度应在8-32之间!");
         return false;
       }
       let reg = /[^0-9a-zA-Z_!@-]/;
       if (reg.test(password)) {
-        this.huadiaoWarningTip(registerResponse.wrongPassword);
+        this.huadiaoWarningTip("您的密码应仅包含数字、字母、下划线或者!@-");
         return false;
       }
-      // 密码要求下面三种都必须要有
-      let requireChar = {
-        // 大写字母
-        capital: 0,
-        // 小写字母
-        ordinary: 1,
-        // 数字
-        number: 1,
-      };
-      for (let c of password) {
-        if ('0' <= c && c <= '9') {
-          requireChar.number--;
-        } else if ('A' <= c && c <= 'Z') {
-          requireChar.capital--;
-        } else if ('a' <= c && c <= 'z') {
-          requireChar.ordinary--;
-        }
-      }
-      if (requireChar.ordinary <= 0 && requireChar.capital <= 0 && requireChar.number <= 0) {
+      /**
+       * 密码检查 (必须包含大写字母, 小写字母, 数字)
+       * 解释:
+       * (?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]): 前瞻表达式, 不消耗字符, ?= 每次从头向后匹配字符, 每个前瞻表达式之间互不影响
+       * [0-9a-zA-Z]+: 消耗字符, 全部匹配
+       */
+      reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[0-9a-zA-Z]+$/;
+      return true;
+      if (reg.test(password)) {
         return true;
       }
-      this.huadiaoWarningTip(registerResponse.wrongPassword);
+      this.huadiaoWarningTip("您的密码应仅包含数字、字母");
       return false;
     },
     // 检查验证码
     checkCheckCode() {
       if (!this.register.checkCode) {
-        this.huadiaoWarningTip(registerResponse.nullCheckCode)
+        this.huadiaoWarningTip("您未填写验证码!");
         return false;
       }
       return true;

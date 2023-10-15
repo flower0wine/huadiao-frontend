@@ -93,13 +93,16 @@ export default {
   methods: {
     // 初始化
     initial() {
+      this.$bus.$on("getFollowGroup", this.getUserFollowGroup);
+      this.$bus.$on("flushFollowFanGroup", this.getCurrentUserFollowFanInfo);
+
       let myUid = this.$store.state.user.uid;
       this.viewedUid = +this.$route.params.viewedUid;
       this.$store.commit("initialMe", {me: myUid === this.viewedUid});
-      this.visible.followFanBoard = true;
+      this.$store.commit("initialViewedUid", {viewedUid:  this.viewedUid});
+
       this.getCurrentUserFollowFanInfo();
-      this.$bus.$on("getFollowGroup", this.getUserFollowGroup);
-      this.$bus.$on("flushFollowFanGroup", this.getCurrentUserFollowFanInfo);
+      this.visible.followFanBoard = true;
     },
     setGroupMore() {
       let array = new Array(this.followGroup.length);
@@ -171,6 +174,7 @@ export default {
               this.$store.dispatch("deleteFollowGroup", {
                 deleteIndex,
               });
+              this.getCurrentUserFollowFanInfo();
               this.$router.replace(`/followfan/${this.viewedUid}/follow/-1`)
             })
           });

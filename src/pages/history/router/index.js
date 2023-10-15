@@ -13,14 +13,14 @@ export default new VueRouter({
     routes: [
         {
             path: "/history",
-            redirect: "/history/:name(note)",
+            redirect: "/history/note",
         },
         {
-            path: "/history/:name(note)",
+            path: "/history/note",
             component: () => import("@/pages/history/pages/NoteHistoryList"),
         },
         {
-            path: "/history/:name(fanju)",
+            path: "/history/fanju",
             component: () => import("@/pages/history/pages/AnimeHistoryList"),
         }
     ],
