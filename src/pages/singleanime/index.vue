@@ -1,11 +1,13 @@
 <template>
-  <div class="huadiao-build-note">
-    <huadiao-header :user="user" :isLogin="isLogin"/>
+  <div class="huadiao-anime-container">
+    <huadiao-header/>
+    <div class="video-container">
+      <video src=""></video>
+    </div>
   </div>
 </template>
 
 <script>
-import {mapState} from "vuex";
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
 
 export default {
@@ -14,7 +16,6 @@ export default {
     return {}
   },
   computed: {
-    ...mapState(["isLogin", "user"]),
   },
   beforeMount() {
   },
@@ -30,5 +31,10 @@ export default {
 </script>
 
 <style scoped>
-
+.video-container {
+  width: 700px;
+  height: 500px;
+  margin: 100px auto;
+  background-color: #5374de;
+}
 </style>

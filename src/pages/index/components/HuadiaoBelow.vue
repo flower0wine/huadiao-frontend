@@ -1,38 +1,29 @@
 <template>
   <div class="huadiao-below">
-    <div v-for="(belowConfig, index) in huadiaoBelowConfig"
-         :key="index"
-    >
-      <img :src="belowConfig.svg"
-           :class="belowConfig.className"
-           :title="belowConfig.title"
-           :ref="belowConfig.name"
-           @click="belowConfig.clickCallback"
-           alt
-      >
+    <div v-html="svg.add"
+           class="add-note-icon"
+           title="好记性不如烂笔头"
+           ref="addNote"
+           @click="clickToCreateNewNote">
+    </div>
+    <div v-html="svg.menu"
+         class="menu-icon"
+         title="这个好像可以点"
+         ref="menu"
+         @click="openMenu">
     </div>
   </div>
 </template>
 
 <script>
+import {svg} from "@/assets/js/constants/svgs";
+
 export default {
   name: "HuadiaoBelow",
   props: ["openMenu", "login"],
   data() {
     return {
-      huadiaoBelowConfig: [{
-        name: "addNote",
-        className: "add-note-icon",
-        title: "好记性不如烂笔头",
-        svg: "/svg/newAdd.svg",
-        clickCallback: this.clickToCreateNewNote
-      }, {
-        name: "menu",
-        className: "menu-icon",
-        title: "这个好像可以点",
-        svg: "/svg/menu.svg",
-        clickCallback: this.openMenu
-      }]
+      svg,
     }
   },
   methods: {
@@ -62,11 +53,12 @@ export default {
   padding: 0 0 10px 20px;
 }
 
-.menu-icon,
-.add-note-icon {
+.menu-icon /deep/ svg,
+.add-note-icon /deep/ svg {
   width: 20px;
   height: 20px;
   margin-bottom: 20px;
+  fill: #fff;
   cursor: pointer;
 }
 </style>

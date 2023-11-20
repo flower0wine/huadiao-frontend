@@ -1,21 +1,21 @@
 <template>
   <div class="huadiao-build-note">
     <huadiao-header :huadiao-header-style="huadiaoHeaderStyle"/>
-    <div class="history-header">
-      <img src="/img/history/historyBackground.png" alt="">
+    <div class="history-header" ref="historyHeader">
+      <img src="@/../public/img/history/historyBackground.png" alt="">
     </div>
     <div class="history-history-board">
-      <img src="/img/history/history.png" alt="">
+      <img src="@/../public/img/history/history.png" alt="">
     </div>
     <div class="history-guidepost">
-      <img src="/img/history/indicator.png" alt="">
+      <img src="@/../public/img/history/indicator.png" alt="">
       <router-link to="/history/note"
                    tag="div"
                    active-class="history-link"
                    class="note-history-link"
       >笔记
       </router-link>
-      <router-link to="/history/fanju"
+      <router-link to="/history/anime"
                    tag="div"
                    active-class="history-link"
                    class="fanju-history-link"
@@ -46,33 +46,24 @@ export default {
   name: "HuadiaoHistory",
   data() {
     return {
+      timer: new Timer(),
+      observer: null,
       huadiaoHeaderStyle: {
         backgroundColor: null,
       },
-      timer: new Timer(),
     }
   },
-  computed: {},
   mounted() {
     this.initial();
   },
   methods: {
     initial() {
-      this.clickToHidden();
-      this.scrollEvent();
+      this.observeHistoryHeader();
     },
-    scrollEvent() {
-      window.addEventListener("wheel", (e) => {
-        // 文档下移
-        let pageDown = e.wheelDeltaY > 0;
-        this.changeHuadiaoHeaderStyle();
-      });
-    },
-    // 改变头部样式
-    changeHuadiaoHeaderStyle() {
-      this.timer.destroy();
-      this.timer.timeout(() => {
-        if (window.scrollY <= 10) {
+    observeHistoryHeader() {
+      this.observer = new IntersectionObserver((entries) => {
+        let entry = entries[0];
+        if(entry.isIntersecting) {
           this.$bus.$emit("modifyHuadiaoHeaderStyle", {
             backgroundColor: "transparent",
             entryColor: "#fff",
@@ -85,15 +76,8 @@ export default {
             shadow: true,
           });
         }
-      }, 100);
-    },
-    // 点击隐藏
-    clickToHidden() {
-      window.addEventListener("click", (e) => {
-        if (!this.$refs.historyTools.$refs.historyTitleContainer.contains(e.target)) {
-          this.$refs.historyTools.isShow.choiceHistoryBoard = false;
-        }
       });
+      this.observer.observe(this.$refs.historyHeader);
     },
   },
   beforeDestroy() {
@@ -107,6 +91,16 @@ export default {
   },
 }
 </script>
+
+<style>
+/* 加载完成文字 */
+.simple-loading .loaded-text {
+  font-size: 14px;
+  text-align: center;
+  letter-spacing: 1px;
+  color: #a9a9a9;
+}
+</style>
 
 <style scoped>
 .huadiao-build-note {

@@ -14,6 +14,10 @@ const state = {
     page: {
         comment: 0,
     },
+    // 被回复的用户
+    replied: {
+        uid: null,
+    },
     // 当前用户信息
     user: {
         login: null,
@@ -98,6 +102,10 @@ const mutations = {
     // 添加笔记评论
     addNoteComment(state, {comment}) {
         state.noteInfo.commentList.push(...comment);
+    },
+    // 设置被回复的用户的信息
+    setRepliedUserInfo(state, {repliedUserInfo: {uid}}) {
+        state.replied.uid = uid;
     },
     // 给页码加一
     pageIncrement(state, {pageName}) {

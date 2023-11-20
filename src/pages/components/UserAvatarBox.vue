@@ -77,7 +77,7 @@ export default {
   },
   methods: {
     parseUserAvatar(userAvatar) {
-      if (!userAvatar.startsWith("blob:http://localhost") && !userAvatar.startsWith("http")) {
+      if (!userAvatar.startsWith("blob:http://") && !userAvatar.startsWith("http")) {
         userAvatar = `${this.userAvatarImagePath}${userAvatar}`;
       }
       return `background-image: url('${userAvatar}')`;

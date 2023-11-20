@@ -20,7 +20,7 @@ export default new VueRouter({
             component: () => import("@/pages/history/pages/NoteHistoryList"),
         },
         {
-            path: "/history/fanju",
+            path: "/history/anime",
             component: () => import("@/pages/history/pages/AnimeHistoryList"),
         }
     ],

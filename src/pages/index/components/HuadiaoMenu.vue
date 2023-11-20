@@ -9,7 +9,7 @@
          class="huadiao-menu-item"
     >
       <a :href="menuConfig.url" target="_blank">
-        <img :src="menuConfig.svg" alt>
+        <span v-html="menuConfig.svg" class="svg-icon"></span>
         <span>{{ menuConfig.description }}</span>
       </a>
     </div>
@@ -18,6 +18,7 @@
 
 <script>
 import constants from "@/assets/js/constants";
+import {svg} from "@/assets/js/constants/svgs";
 
 export default {
   name: "HuadiaoMenu",
@@ -26,37 +27,37 @@ export default {
     return {
       huadiaoMenuConfig: [{
         title: "该替键盘清灰了",
-        svg: "/svg/newAdd.svg",
+        svg: svg.add,
         description: "新建笔记",
         url: this.getLinkByUserLogged("/buildnote"),
       }, {
         title: "回顾一下以前的艰辛",
-        svg: "/svg/notes.svg",
+        svg: svg.notes,
         description: "我的笔记",
         url: this.getLinkByUserLogged(`/notes/${this.user.uid}`),
       }, {
         title: "收藏都在这里",
-        svg: "/svg/star.svg",
+        svg: svg.star,
         description: "我的收藏",
         url: this.getLinkByUserLogged(`/star/${this.user.uid}/note`),
       }, {
         title: "瞅一瞅关注了谁",
-        svg: "/svg/follow.svg",
+        svg: svg.follow,
         description: "我的关注",
         url: this.getLinkByUserLogged(`/followfan/${this.user.uid}/follow`),
       }, {
         title: "打造属于我的番剧馆",
-        svg: "/svg/fanju.svg",
+        svg: svg.fanju,
         description: "我的番剧馆",
         url: this.getLinkByUserLogged("/animehouse/" + this.user.uid),
       }, {
         title: "有个性的个人主页",
-        svg: "/svg/user.svg",
+        svg: svg.user,
         description: "我的主页",
         url: this.getLinkByUserLogged("/homepage/" + this.user.uid),
       }, {
         title: "核心隐私地带",
-        svg: "/svg/setting.svg",
+        svg: svg.setting,
         description: "我的设置",
         url: this.getLinkByUserLogged("/account/settings")
       }],
@@ -126,9 +127,10 @@ export default {
   margin-left: 10px;
 }
 
-.huadiao-menu-bar img {
-  width: 20px;
-  height: 20px;
+.svg-icon /deep/ svg {
+  width: 18px;
+  height: 18px;
+  fill: #fff;
 }
 
 </style>

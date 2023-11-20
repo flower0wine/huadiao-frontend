@@ -16,7 +16,7 @@
     <template v-if="visible.note">
       <left-slider-board :authorInfo="authorInfo"/>
       <note-content-board :showCatalogue="visible.catalogue"/>
-      <sun-light-theme/>
+      <sun-light-theme :change-theme-callback="changeTheme"/>
     </template>
     <huadiao-warning-top-container/>
     <huadiao-middle-tip/>
@@ -34,6 +34,7 @@ import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopCont
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import {statusCode} from "@/assets/js/constants/status-code";
+import {singleNoteHuadiaoHeaderStyle} from "@/assets/js/constants/huadiao_header_style/singlenote";
 
 export default {
   name: "HuadiaoSingleNote",
@@ -44,19 +45,7 @@ export default {
         catalogue: false
       },
       // huadiaoHeader 样式
-      huadiaoHeaderStyle: {
-        backgroundColor: "#e3e3e3",
-        shadow: true,
-        entryColor: "#414141",
-        inputTheme: {
-          inputBackgroundColor: "#bebebe",
-          searchBackgroundColor: "#797979",
-        },
-        loggedBoardStyle: {
-          borderColor: "#9d9d9d",
-          background: "-webkit-linear-gradient(left bottom, rgb(174 174 174), rgb(59 59 59))",
-        }
-      }
+      huadiaoHeaderStyle: singleNoteHuadiaoHeaderStyle,
     }
   },
   computed: {
@@ -74,9 +63,37 @@ export default {
     }
   },
   created() {
+    this.setLightTheme();
     this.searchNote();
   },
   methods: {
+    changeTheme(theme) {
+      if(theme === "dark") {
+        this.huadiaoHeaderStyle.backgroundColor = "#4a4a4a";
+        this.huadiaoHeaderStyle.entryColor = "#b0b0b0";
+        this.huadiaoHeaderStyle.customShadow = "2px 2px 3px 1px #0000006E";
+        this.$bus.$emit("modifyHuadiaoHeaderStyle");
+      }
+      else {
+        this.huadiaoHeaderStyle.backgroundColor = "#e3e3e3";
+        this.huadiaoHeaderStyle.entryColor = "#414141";
+        this.huadiaoHeaderStyle.customShadow = "1px 1px 3px 1px #5b5b5b94";
+        this.$bus.$emit("modifyHuadiaoHeaderStyle");
+      }
+    },
+    setLightTheme() {
+      let classList = document.body.classList;
+      let light = "light";
+      let dark = "dark";
+      if(classList.contains(light)) {
+        classList.remove(light);
+        classList.add(dark);
+      }
+      else {
+        classList.remove(dark);
+        classList.add(light);
+      }
+    },
     // 获取笔记
     searchNote() {
       let noteId = this.$route.params.noteId;
@@ -126,9 +143,16 @@ export default {
   },
 }
 </script>
+
 <style>
+@import "~@/assets/css/theme/singlenote/light.css";
+@import "~@/assets/css/theme/singlenote/dark.css";
 html {
   scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--single-note-bg-color);
 }
 </style>
 
@@ -156,20 +180,20 @@ html {
 }
 
 .catalogue-icon-top {
-  background-color: #c2c2c2;
-  box-shadow: 2px 2px 3px 1px #0000006E;
+  background-color: var(--catalogue-icon-color);
+  box-shadow: var(--catalogue-box-shadow);
   transform-origin: 28px 7px;
   transition: var(--transition-500ms);
 }
 
 .catalogue-icon-middle {
-  background-color: #c2c2c2;
-  box-shadow: 2px 2px 3px 1px #0000006E;
+  background-color: var(--catalogue-icon-color);
+  box-shadow: var(--catalogue-box-shadow);
 }
 
 .catalogue-icon-bottom {
-  background-color: #c2c2c2;
-  box-shadow: 2px 2px 3px 1px #0000006E;
+  background-color: var(--catalogue-icon-color);
+  box-shadow: var(--catalogue-box-shadow);
   transform-origin: 24px 2px;
   transition: var(--transition-500ms);
 }

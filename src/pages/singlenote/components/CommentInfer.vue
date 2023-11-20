@@ -189,6 +189,12 @@ export default {
         rootIndex: this.rootIndex,
         subIndex: this.subIndex,
       });
+
+      this.$store.commit("setRepliedUserInfo", {
+        repliedUserInfo: {
+          uid: this.item.uid,
+        }
+      });
     },
     // 点击喜欢评论
     clickToLikeComment() {
@@ -288,7 +294,7 @@ export default {
 .comment-infer {
   max-width: 100%;
   padding: 0 0 10px 20px;
-  color: #3a3a3a;
+  color: var(--comment-color);
 }
 
 .user-nickname {
@@ -366,7 +372,7 @@ export default {
 .unlike-icon:hover,
 .reply-comment-user:hover,
 .comment-operations span:hover {
-  background-color: #ececec;
+  background-color: var(--comment-icon-hover-bg-color);
 }
 
 .unlike-icon {
@@ -396,7 +402,8 @@ export default {
   top: 26px;
   left: -13px;
   border-radius: 4px;
-  background-color: #fff;
+  color: var(--comment-more-coard-color);
+  background-color: var(--comment-more-board-bg-color);
   box-shadow: var(--box-shadow-min);
   overflow: hidden;
 }
@@ -407,6 +414,6 @@ export default {
 }
 
 .more-element:hover {
-  background-color: #f4f4f4;
+  background-color: var(--comment-more-board-hover-bg-color);
 }
 </style>

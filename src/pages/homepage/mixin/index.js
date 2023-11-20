@@ -7,13 +7,13 @@
 'use strict';
 
 import {mapState} from "vuex";
-import constants from "@/assets/js/constants";
+import {apis} from "@/assets/js/constants/request-path";
 
 export default {
     data() {
         return {
-            homepageBackgroundImagePath: `${constants.imageHost}homepageBackground/`,
-            userAvatarImagePath: `${constants.imageHost}userAvatar/`,
+            homepageBackgroundImagePath: `${apis.imageHost}homepageBackground/`,
+            userAvatarImagePath: `${apis.imageHost}userAvatar/`,
         }
     },
     computed: {

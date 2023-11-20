@@ -4,9 +4,8 @@
          v-if="!me"
     >
       <div class="chat-container">
-        <img src="/svg/chat.svg"
-             class="chat-icon"
-             alt>
+        <span v-html="svg.chat"
+              class="chat-icon"></span>
         <span>私信</span>
       </div>
       <div class="follow-container"
@@ -62,6 +61,7 @@
 <script>
 import {svg} from "@/assets/js/constants/svgs";
 import {mapState} from "vuex";
+import {apis} from "@/assets/js/constants/request-path";
 
 export default {
   name: "HomepageUserInferBoard",
@@ -72,7 +72,11 @@ export default {
       // 关注
       follow: false,
       fan: false,
-      svg,
+      svg: {
+        chat: svg.chat,
+        access: svg.access,
+        follow:  svg.follow,
+      },
     }
   },
   computed: {
@@ -123,9 +127,9 @@ export default {
   methods: {
     // 改变关注状态
     clickToChangeFollow() {
-      let followStatus = this.follow ? "modify" : "newFriend";
+      let path = this.follow ? apis.followFan.deleteFollow : apis.followFan.newFollow;
       this.sendRequest({
-        path: `relation/${followStatus}`,
+        path,
         params: {
           uid: this.viewedUid,
         },
@@ -174,8 +178,9 @@ export default {
   color: #EEEEEEFF;
 }
 
-.chat-icon {
+.chat-icon /deep/ svg {
   width: 20px;
+  height: 20px;
   margin-right: 8px;
 }
 

@@ -6,7 +6,7 @@
            :key="index"
            class="introduce-item"
       >
-        <img :src="intro.svg" alt>
+        <span v-html="intro.svg"></span>
         <span>{{intro.description}}</span>
       </span>
     </div>
@@ -94,13 +94,13 @@ export default {
 }
 
 /* 图标 */
-.introduce-item img {
+.introduce-item > span:nth-child(1) /deep/ svg {
   width: 20px;
   height: 20px;
   margin: 0 4px 0 6px;
 }
 
-.introduce-item span {
+.introduce-item span:nth-child(2) {
   margin-right: 20px;
 }
 

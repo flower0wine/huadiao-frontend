@@ -4,10 +4,10 @@
     <template v-if="visible">
       <star-img-animation/>
       <router-link class="note-star-btn" :to="`/star/${viewedUid}/note/-1`" title="打开笔记收藏" tag="div">
-        <img src="/svg/access.svg" alt="">
+        <span v-html="svg.access"></span>
       </router-link>
       <router-link class="fanju-star-btn" :to="`/star/${viewedUid}/anime/-1`" title="打开番剧收藏" tag="div">
-        <img src="/svg/access.svg" alt="">
+        <span v-html="svg.access"></span>
       </router-link>
       <div class="star-container">
         <!--目录-->
@@ -41,11 +41,15 @@ import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopCont
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import TransferNoteFavorite from "@/pages/star/components/TransferNoteFavorite";
 import {mapState} from "vuex";
+import {svg} from "@/assets/js/constants/svgs";
 
 export default {
   name: "HuadiaoStar",
   data() {
     return {
+      svg: {
+        access: svg.access,
+      },
       visible: false,
     }
   },
@@ -90,6 +94,25 @@ export default {
 </script>
 
 <style>
+.note-star-btn svg,
+.fanju-star-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+}
+
+.note-star-btn svg {
+  transform: rotate(-90deg);
+  margin: 14px 4px 0px 0px;
+}
+
+.fanju-star-btn svg {
+  transform: rotate(90deg);
+  margin: 0px 0px -20px 4px;
+}
+</style>
+
+<style scoped>
 .huadiao-star {
   position: relative;
   min-width: 1100px;
@@ -135,18 +158,6 @@ export default {
   text-align: left;
   transform: translate(75px, -50%);
   background-color: rgba(173, 58, 102, 0.98);
-}
-
-.note-star-btn img {
-  width: 20px;
-  transform: rotate(-90deg);
-  margin: 14px 4px 0px 0px;
-}
-
-.fanju-star-btn img {
-  width: 20px;
-  transform: rotate(90deg);
-  margin: 0px 0px -20px 4px;
 }
 
 .note-star-btn:hover {

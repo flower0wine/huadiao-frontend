@@ -6,12 +6,12 @@
 // 使用严格模式
 'use strict';
 
-import constants from "@/assets/js/constants";
+import {apis} from "@/assets/js/constants/request-path";
 
 export default {
     data() {
         return {
-            followFanImagePath: `${constants.imageHost}followFan/`,
+            followFanImagePath: `${apis.imageHost}followFan/`,
         }
     },
     methods: {

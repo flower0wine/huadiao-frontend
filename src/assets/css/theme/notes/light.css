@@ -1,0 +1,23 @@
+/*
+* 功能描述：
+* 创建日期：2023 年 10 月 
+*/
+
+.light {
+    --body-background-color: #ececec;
+    /* -- 笔记列表面板 -- */
+    --note-list-board-bgcolor: #ececec;
+    --note-box-shadow: 1px 1px 3px 1px #5b5b5b94;
+    --note-item-border-color: #c2c2c2;
+    --note-item-footer-icon-color: #807d7d;
+    --note-title-color: #4b4949;
+    --note-title-hover-color: #b00b0b;
+    --note-item-footer-word-color: #9f9c9c;
+    --note-item-footer-item-hover-color: #c95050;
+    --note-item-footer-item-hover-bg-color: #e1e0e0;
+    /* -- 左侧面板 -- */
+    --left-slider-board-bg-color: #ececec;
+    --left-slider-user-info-color: #727070;
+    --left-slider-user-info-hover-color: #f53e3e;
+    --left-slider-user-info-hover-bg-color: #e1e1e1;
+}

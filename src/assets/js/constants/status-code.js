@@ -6,6 +6,10 @@
 // 使用严格模式
 'use strict';
 
+/**
+ * 状态码
+ * @type {{succeed: number, exceedLimit: number, notAllowed: number, blankParam: number, existed: number, errorParam: number, notExist: number}}
+ */
 export const statusCode = {
     succeed: 1000,
     exceedLimit: 1001,

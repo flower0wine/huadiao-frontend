@@ -1,26 +1,26 @@
 <template>
   <div class="history-tool-container">
     <div class="history-title-container"
-         @click="isShow.choiceHistoryBoard = !isShow.choiceHistoryBoard"
+         @click="visible.choiceHistoryBoard = !visible.choiceHistoryBoard"
          ref="historyTitleContainer"
     >
-      <div v-html="$route.path === '/history/note' ? svg.noteHistory : svg.fanjuHistory"
+      <div v-html="routeFullPath === searchType.note ? svg.noteHistory : svg.fanjuHistory"
            class="history-title-icon"
       ></div>
-      <div class="history-title">{{ $route.path === "/history/note" ? "笔记" : "番剧" }}历史记录</div>
+      <div class="history-title">{{ routeFullPath === searchType.note ? "笔记" : "番剧" }}历史记录</div>
       <div class="drop-down">
         <div></div>
       </div>
       <transition name="fade">
         <div class="choice-history-board"
-             v-show="isShow.choiceHistoryBoard"
+             v-show="visible.choiceHistoryBoard"
         >
-          <router-link to="/history/note"
+          <router-link :to="searchType.note"
                        tag="div"
                        class="choice-history-board-link"
           >笔记历史记录
           </router-link>
-          <router-link to="/history/fanju"
+          <router-link :to="searchType.anime"
                        tag="div"
                        class="choice-history-board-link"
           >番剧历史记录
@@ -34,14 +34,15 @@
              maxlength="20"
              class="search-input"
              placeholder="搜索历史记录"
-             @click="clickToSearchInput"
+             @keyup.enter="searchHistory"
+             @focusin="focusinSearchInput"
              @focusout="focusoutSearchInput"
-             v-model="searchContext"
+             v-model.trim="searchContent"
       >
       <div class="clear-search-icon"
            v-html="svg.close"
-           v-show="isShow.clearIcon"
-           @click="searchContext = ''"
+           v-show="visible.clearIcon"
+           @click="searchContent = ''"
       ></div>
     </div>
     <div class="other-tools-container">
@@ -55,12 +56,31 @@
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 
+/**
+ * 搜索类型
+ * @type {{note: string, anime: string}}
+ */
+let searchType = {
+  note: "/history/note",
+  anime: "/history/anime",
+}
+
+/**
+ * 根据查询类型暂存调用的函数
+ * @type {{request: function, clear: function}}
+ */
+let functionCollection = {
+  request: null,
+  clear: null,
+};
+
 export default {
   name: "HistoryTools",
   data() {
     return {
-      searchContext: "",
-      isShow: {
+      searchType,
+      searchContent: "",
+      visible: {
         choiceHistoryBoard: false,
         clearIcon: false,
       },
@@ -72,33 +92,58 @@ export default {
       }
     }
   },
+  computed: {
+    routeFullPath() {
+      return this.$route.fullPath;
+    }
+  },
   watch: {
-    "searchContext": {
+    searchContent: {
       immediate: true,
       handler(newValue) {
-        this.isShow.clearIcon = newValue.length !== 0;
+        this.visible.clearIcon = newValue.length !== 0;
       },
+    },
+    "$route.fullPath": {
+      immediate: true,
+      deep: true,
+      handler(type) {
+        if (type === searchType.note) {
+          functionCollection.request = this.requestNoteHistoryByTitle;
+          functionCollection.clear = this.clearNoteHistory;
+        } else if (type === searchType.anime) {
+          functionCollection.request = this.requestAnimeHistoryByTitle;
+          functionCollection.clear = this.clearAnimeHistory;
+        }
+      }
     }
   },
   methods: {
-    // 点击搜索框
-    clickToSearchInput() {
-      this.$refs.historySearchContainer.classList.add("click-history-search");
+    focusinSearchInput() {
+      if (this.searchContent !== "") {
+        this.visible.clearIcon = true;
+      }
+      this.$refs.historySearchContainer.classList.add("focus-history-search");
     },
-    // 搜索框失去焦点
     focusoutSearchInput() {
-      this.$refs.historySearchContainer.classList.remove("click-history-search");
+      this.visible.clearIcon = false;
+      this.$refs.historySearchContainer.classList.remove("focus-history-search");
+    },
+    searchHistory() {
+      functionCollection.request();
+    },
+    // 获取笔记
+    requestNoteHistoryByTitle() {
+      this.$bus.$emit("searchNoteHistory", this.searchContent);
+    },
+    // 获取番剧
+    requestAnimeHistoryByTitle() {
+      this.$bus.$emit("searchAnimeHistory", this.searchContent);
     },
     // 清空历史记录
     clearAllHistory() {
-      this.huadiaoPopupWindow("warning", "confirmOrCancel", "清空后就什么都没有了哦!", () => {
-        let name = this.$route.params.name;
-        if(name === "note") {
-          this.clearNoteHistory();
-        }
-        else if(name === "fanju") {
-          this.clearAnimeHistory();
-        }
+      this.huadiaoPopupWindow("warning", "confirmOrCancel", "清空后就什么都没有了哦!").then(() => {
+        functionCollection.clear();
       });
     },
     // 清空笔记历史记录
@@ -108,12 +153,8 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
-            this.$store.commit("clearNoteHistory", {
-              succeedCallback: () => {
-                this.huadiaoMiddleTip("删除成功");
-              },
-            });
+          if (res.code === statusCode.succeed) {
+            this.$store.commit("clearNoteHistory");
           }
         },
         errorCallback: (error) => {
@@ -128,12 +169,8 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
-            this.$store.commit("clearAnimeHistory", {
-              succeedCallback: () => {
-                this.huadiaoMiddleTip("删除成功");
-              },
-            });
+          if (res.code === statusCode.succeed) {
+            this.$store.commit("clearAnimeHistory");
           }
         },
         errorCallback: (error) => {
@@ -227,8 +264,8 @@ export default {
   border: 1px solid #9a9898;
 }
 
-/* 点击输入框后 */
-.click-history-search {
+/* 聚焦输入框 */
+.focus-history-search {
   border: 1px solid #e34040;
 }
 
@@ -265,7 +302,7 @@ export default {
 }
 
 /* 搜索图标 */
-.click-history-search .history-search-icon /deep/ svg {
+.focus-history-search .history-search-icon /deep/ svg {
   fill: #e34040;
 }
 

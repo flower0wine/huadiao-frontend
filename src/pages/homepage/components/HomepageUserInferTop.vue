@@ -16,8 +16,10 @@
       <span v-html="sexSvg" class="sex-icon"></span>
     </div>
     <div class="born-date-school">
-      <span class="born-date" v-if="userInfo.bornDate">{{userInfo.bornDate}}</span>
+      <span class="born-date info-item"
+            v-if="userInfo.bornDate">{{huadiaoDateFormat(userInfo.bornDate, "date")}}</span>
       <a :href="baiduSearch + userInfo.school"
+         class="info-item"
          v-if="userInfo.school"
          target="_blank">
         <span class="school">{{userInfo.school}}</span>
@@ -165,17 +167,19 @@ export default {
 }
 
 .born-date-school {
+  display: flex;
+  justify-content: space-between;
   margin-top: 5px;
   font-size: 14px;
   color: #EEEEEEFF;
 }
 
-.born-date-school a {
-  color: #EEEEEEFF;
+.info-item:nth-child(2) {
+  margin-left: 40px;
 }
 
-.born-date {
-  margin-right: 40px;
+.born-date-school a {
+  color: #EEEEEEFF;
 }
 
 .homepage-canvases {

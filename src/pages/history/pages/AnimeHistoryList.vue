@@ -1,11 +1,13 @@
 <template>
   <div class="anime-history-list">
     <transition-group name="right-slide">
-      <anime-history-item v-for="(item, index) in animeHistory"
+      <anime-history-item v-for="(item) in animeHistory"
                           :key="`${item.uid}/${item.animeId}`"
                           :animeItem="item"/>
     </transition-group>
-    <div class="no-anime" ref="noAnime">你到了世界的尽头...</div>
+    <simple-loading :option="{loadedText: `你到了世界的尽头...`}"
+                    :observe-callback="observeCallback"
+                    :get-hooks="getHooks"/>
   </div>
 </template>
 
@@ -13,17 +15,17 @@
 import {mapState} from "vuex";
 import AnimeHistoryItem from "@/pages/history/components/AnimeHistoryItem";
 import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
+import OperationThrottle from "@/assets/js/utils/operation-throttle";
+import SimpleLoading from "@/pages/components/loading/SimpleLoading";
+import RequestPager from "@/assets/js/utils/request-pager";
 
 export default {
   name: "AnimeHistoryList",
-  components: {AnimeHistoryItem},
+  components: {SimpleLoading, AnimeHistoryItem},
   data() {
     return {
-      offset: 0,
-      row: 10,
-      requesting: false,
-      observer: null,
+      pager: null,
+      operationThrottle: new OperationThrottle(),
     }
   },
   computed: {
@@ -32,50 +34,35 @@ export default {
   created() {
     this.initial();
   },
+  mounted() {
+    this.getAnimeHistory();
+  },
   methods: {
     initial() {
-      this.observer = new IntersectionObserver((entries) => {
-        let observerInfo = entries[0];
-        if(observerInfo.isIntersecting) {
-          this.getAnimeHistory();
-        }
-      }, {
-        threshold: 0.1
-      });
-      this.$nextTick(() => {
-        this.observer.observe(this.$refs.noAnime);
-      });
+      this.pager = new RequestPager();
+      this.$bus.$on("searchAnimeHistory", this.getAnimeHistory);
+    },
+    getHooks({unobserve}) {
+      this.pager.setCompleteCallback(unobserve);
+    },
+    observeCallback() {
+      this.getAnimeHistory();``      ``
     },
     // 获取番剧馆历史记录
     getAnimeHistory() {
-      if(this.requesting) return;
-      this.requesting = true;
-      this.sendRequest({
-        path: apis.history.anime,
-        params: {
-          row: this.row,
-          offset: this.offset,
-        },
-        thenCallback: (response) => {
+      if (!this.operationThrottle.access()) return;
+      this.pager.requestModel((params, requestCallback, errorCallback) => {
+        this.sendRequest({
+          path: apis.history.anime,
+          params,
+        }).then((response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
-            let length = res.data.length;
-            this.$store.commit("addAnimeHistory", {animeHistory: res.data});
-            this.offset += length;
-          }
-          else if(res.code === statusCode.notExist) {
-            this.$nextTick(() => {
-              this.observer.unobserve(this.$refs.noAnime);
-            });
-          }
-          this.requesting = false;
-        },
-        errorCallback: (error) => {
-          console.log(error);
-          this.requesting = false;
-        }
-      })
+          requestCallback(res).succeed((data) => {
+            this.$store.commit("addAnimeHistory", {animeHistory: data});
+          });
+        }).catch(errorCallback);
+      });
     },
   },
   beforeDestroy() {
@@ -90,10 +77,5 @@ export default {
   transition: var(--transition-500ms);
 }
 
-.no-anime {
-  text-align: center;
-  font-size: 14px;
-  margin-top: 40px;
-  color: #adadad;
-}
+
 </style>

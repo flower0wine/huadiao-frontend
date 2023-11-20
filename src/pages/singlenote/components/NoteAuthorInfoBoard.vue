@@ -1,27 +1,28 @@
 <template>
-  <div class="author-infer-box">
+  <div class="author-info-box">
     <div class="author-infer">
       <user-avatar-box :options="userAvatarOptions"/>
       <div class="author-nickname">{{ noteInfo.authorInfo.nickname || noteInfo.authorInfo.userId }}</div>
       <div class="follow-or-cancel"
            v-if="!me"
-           @click="clickToFollowOrCancelFollow"
+           @click="checkLogin && clickToFollowOrCancelFollow"
            ref="followOrCancelBtn"
-      >{{judgeRelation(fan, follow)}}</div>
+      >{{ judgeRelation(fan, follow) }}
+      </div>
     </div>
-    <div class="note-infer">
-      <div class="note-infer-item">
-        <span v-html="svg.colorLike" class="icon" @click="clickNoteLikeIcon" ref="likeIcon"></span>
+    <div class="note-info">
+      <div class="note-info-item">
+        <span v-html="svg.colorLike" class="icon" @click="checkLogin && clickNoteLikeIcon" ref="likeIcon"></span>
         <span>{{ noteInfo.likeCount }}</span>
       </div>
-      <div class="note-infer-item">
-        <span v-html="svg.colorLike" class="icon" @click="clickNoteUnlikeIcon" ref="unlikeIcon"></span>
+      <div class="note-info-item">
+        <span v-html="svg.colorLike" class="icon" @click="checkLogin && clickNoteUnlikeIcon" ref="unlikeIcon"></span>
       </div>
-      <div class="note-infer-item">
-        <span v-html="svg.colorStar" class="icon" @click="clickNoteStarIcon" ref="starIcon"></span>
+      <div class="note-info-item">
+        <span v-html="svg.colorStar" class="icon" @click="checkLogin && clickNoteStarIcon" ref="starIcon"></span>
         <span>{{ noteInfo.starCount }}</span>
       </div>
-      <div class="note-infer-item">
+      <div class="note-info-item">
         <a href="#comment-title">
           <span v-html="svg.colorComment" class="icon"></span>
           <span>{{ noteInfo.commentCount }}</span>
@@ -59,8 +60,11 @@ export default {
         return state.noteInfo.authorInfo;
       },
       me(state) {
-        return state.noteInfo.noteAndMeRelation.me;
+        return state.noteInfo.me;
       },
+      login(state) {
+        return state.user.login;
+      }
     }),
   },
   mounted() {
@@ -69,14 +73,27 @@ export default {
   methods: {
     // 初始化
     initial() {
+      let noteAndMeRelation = this.noteInfo.noteAndMeRelation;
+      let authorAndMeRelation = this.$store.state.noteInfo.authorAndMeRelation;
+      let refs = this.$refs;
       // 初始化点赞, 不喜欢, 收藏, 关注信息及关注按钮等
-      !this.noteInfo.noteAndMeRelation.myLike && this.$refs.likeIcon.classList.add("like-unlike-icon");
-      !this.noteInfo.noteAndMeRelation.myUnlike && this.$refs.unlikeIcon.classList.add("like-unlike-icon");
-      !this.noteInfo.noteAndMeRelation.myStar && this.$refs.starIcon.classList.add("star-icon");
-      this.judgeMeAndOtherRelation(this.$store.state.noteInfo.authorAndMeRelation);
-      if(this.follow) {
-        this.$refs.followOrCancelBtn.classList.add("following");
+      !noteAndMeRelation?.myLike && refs.likeIcon.classList.add("like-unlike-icon");
+      !noteAndMeRelation?.myUnlike && refs.unlikeIcon.classList.add("like-unlike-icon");
+      !noteAndMeRelation?.myStar && refs.starIcon.classList.add("star-icon");
+      if (authorAndMeRelation) {
+        this.judgeMeAndOtherRelation(this.$store.state.noteInfo.authorAndMeRelation);
+        if (this.follow) {
+          refs.followOrCancelBtn.classList.add("following");
+        }
       }
+    },
+    // 由于未登录可以访问笔记页面, 所以需要检查是否登录
+    checkLogin() {
+      if(!this.login) {
+        this.huadiaoMiddleTip("您还未登录!");
+        return false;
+      }
+      return true;
     },
     // 点击关注或者取消关注
     clickToFollowOrCancelFollow() {
@@ -196,7 +213,7 @@ export default {
 
 <style scoped>
 
-.author-infer-box {
+.author-info-box {
   position: sticky;
   bottom: 0px;
   display: flex;
@@ -204,14 +221,14 @@ export default {
   justify-content: space-between;
   height: 60px;
   padding: 0 16px;
-  color: #6c6c6c;
-  border-top: 1px solid #b9b9b9;
-  border-bottom: 1px solid #b9b9b9;
-  background-color: #fff;
+  color: var(--author-info-box-color);
+  border-top: 1px solid var(--author-info-box-border-color);
+  border-bottom: 1px solid var(--author-info-box-border-color);
+  background-color: var(--author-info-box-bg-color);
 }
 
-.note-infer-item a {
-  color: #6c6c6c;
+.note-info-item a {
+  color: var(--note-info-item-a-color);
 }
 
 .author-infer {
@@ -230,40 +247,40 @@ export default {
   line-height: 30px;
   margin-left: 20px;
   border-radius: 15px;
-  color: #fff;
-  background-color: #f13f3f;
+  color: var(--follow-or-cancel-color);
+  background-color: var(--follow-or-cancel-bg-color);
   cursor: pointer;
   transition: var(--transition-300ms);
 }
 
 .following {
   width: 76px;
-  background-color: #c5c5c5;
+  background-color: var(--following-bg-color);
 }
 
 .follow-or-cancel:hover {
-  background-color: #de3737;
+  background-color: var(--follow-or-cancel-hover-bg-color);
 }
 
 .following:hover {
-  background-color: #b4b4b4;
+  background-color: var(--following-hover-bg-color);
 }
 
-.note-infer {
+.note-info {
   display: flex;
 }
 
-.note-infer > div {
+.note-info > div {
   font-size: 14px;
   margin-left: 20px;
 }
 
-.note-infer /deep/ svg {
+.note-info /deep/ svg {
   width: 24px;
   height: 24px;
 }
 
-.note-infer-item:nth-child(2) /deep/ svg {
+.note-info-item:nth-child(2) /deep/ svg {
   transform: rotateX(-180deg);
 }
 
@@ -283,11 +300,11 @@ export default {
   fill: #cbcbcb;
 }
 
-.star-icon /deep/path:nth-child(1) {
+.star-icon /deep/ path:nth-child(1) {
   fill: #c9c9c9;
 }
 
-.star-icon /deep/path:nth-child(2) {
+.star-icon /deep/ path:nth-child(2) {
   fill: #dadada;
 }
 </style>

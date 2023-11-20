@@ -35,11 +35,9 @@
 
 <script>
 import SettingSlider from "@/pages/components/SettingSlider";
-import constants from "@/assets/js/constants";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 
-let accountSettingResponse = constants.accountSettingResponse;
 
 export default {
   name: "HuadiaoAccountSettings",
@@ -142,7 +140,6 @@ export default {
     }
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   }
 }
 </script>

@@ -6,30 +6,39 @@
 
 'use strict';
 
-// 只开启单个定时器时使用
 const {statusCode} = require("@/assets/js/constants/status-code");
 
+// 只开启单个定时器时使用
 class Timer {
-    timerId;
+    timeoutTimerId;
+    intervalTimerId;
+
     constructor() {
-        this.timerId = undefined;
     }
-    timeout(fn, time) {
-        if(this.timerId) {
+
+    // 如果计时器存在则删除旧的创建新的计时器
+    timeout(fn, delay) {
+        if(this.timeoutTimerId) {
             // 确保每次调用时都只有一个定时器
-            clearTimeout(this.timerId);
+            clearTimeout(this.timeoutTimerId);
         }
-        this.timerId = setTimeout(fn, time);
+        this.timeoutTimerId = setTimeout(fn, delay);
     }
-    interval(fn, time) {
-        if(this.timerId) {
-            clearInterval(this.timerId);
+
+    interval(fn, delay) {
+        if(this.intervalTimerId) {
+            clearInterval(this.intervalTimerId);
         }
-        this.timerId = setInterval(fn, time);
+        this.intervalTimerId = setInterval(fn, delay);
     }
+
+    // 清除计时器
     destroy() {
-        if(this.timerId) {
-            clearTimeout(this.timerId);
+        if(this.timeoutTimerId) {
+            clearTimeout(this.timeoutTimerId);
+        }
+        if(this.intervalTimerId) {
+            clearInterval(this.intervalTimerId);
         }
     }
 }
@@ -55,6 +64,14 @@ class ResponseHandler {
     // 没有获取到结果回调
     notExist(callback) {
         if(this.response.code === statusCode.notExist) {
+            callback && callback(this.response.data);
+        }
+        return this;
+    }
+
+    // 参数存在错误
+    errorParam(callback) {
+        if(this.response.code === statusCode.errorParam) {
             callback && callback(this.response.data);
         }
         return this;

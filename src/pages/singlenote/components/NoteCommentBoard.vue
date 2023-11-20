@@ -95,21 +95,23 @@ export default {
     },
     // 判断点击对象是否为当前根评论或者其子评论的回复按钮,
     judgeClickObject({pointerEvent, rootIndex, subIndex}) {
-      if(this.$refs.rootCommentItem) {
+      let rootCommentItem = this.$refs.rootCommentItem;
+      if(rootCommentItem) {
         // 隐藏其他根评论的输入框, 打开该回复按钮的根评论对应的输入框
-        for(let ref of this.$refs.rootCommentItem) {
+        for(let ref of rootCommentItem) {
           ref.visible.replyBox = ref.$el.contains(pointerEvent.target);
         }
 
         // 修改 输入框的 placeholder, 为（回复 @昵称）格式
         let nickname;
         if(Number.isInteger(rootIndex) && rootIndex >= 0) {
-          nickname = this.$store.state.noteInfo.commentList[rootIndex].nickname;
+          let comment = this.$store.state.noteInfo.commentList[rootIndex];
+          nickname = comment.nickname;
           if(Number.isInteger(subIndex) && subIndex >= 0) {
-            nickname = this.$store.state.noteInfo.commentList[rootIndex].commentList[subIndex].nickname;
+            nickname = comment.commentList[subIndex].nickname;
           }
         }
-        this.$refs.rootCommentItem[rootIndex].config.commentInputBoard.defaultPlaceholder = this.config.replyPlaceholder + nickname;
+        rootCommentItem[rootIndex].config.commentInputBoard.defaultPlaceholder = this.config.replyPlaceholder + nickname;
       }
     },
     // 根据滚动距离来判断是否显示固定的输入框
@@ -202,6 +204,7 @@ export default {
 
 .comment-title-box {
   font-size: 24px;
+  color: var(--comment-title-color);
 }
 
 .comment-number {
@@ -220,7 +223,7 @@ export default {
   z-index: 10;
   width: 100%;
   bottom: 0;
-  background-color: #fff;
+  background-color: var(--fixed-comment-board-bg-color);
   transition: var(--transition-500ms);
 }
 
@@ -232,7 +235,7 @@ export default {
   position: relative;
   z-index: 2;
   padding: 10px;
-  background-color: #fff;
+  background-color: var(--fixed-comment-board-bg-color);
 }
 
 .fixed-comment-mask {

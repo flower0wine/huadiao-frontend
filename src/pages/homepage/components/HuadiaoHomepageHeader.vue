@@ -2,7 +2,7 @@
   <div class="huadiao-homepage-header">
     <div class="huadiao-index">
       <a href="/">
-        <img src="/img/authority.png" alt>
+        <img :src="logoPath" alt>
       </a>
     </div>
     <div class="homepage-header-tools"

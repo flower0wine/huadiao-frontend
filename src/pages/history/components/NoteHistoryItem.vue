@@ -3,23 +3,25 @@
     <div class="last-time">
       <div class="left-blank"></div>
       <div class="triangle"></div>
-      <div class="visited-date">{{huadiaoDateFormat(noteHistory.visitTime)}}</div>
+      <div class="visited-date">{{huadiaoDateFormat(noteHistory.time)}}</div>
     </div>
     <div class="note-history-infer">
       <div class="note-title">
-        <a :href="`/singlenote/${noteHistory.uid}/${noteHistory.noteId}`">{{noteHistory.noteTitle}}</a>
+        <a :href="`/${pageLinkStart.note}/${noteHistory.authorUid}/${noteHistory.noteId}`">{{noteHistory.title}}</a>
       </div>
-      <div class="note-abstract" v-html="noteHistory.noteContent"></div>
+      <div class="note-abstract" v-html="noteHistory.summary"></div>
       <div class="note-author-infer">
         <div class="user-avatar-box">
-          <a :href="`/homepage/${noteHistory.uid}`">
+          <a :href="`/${pageLinkStart.homepage}/${noteHistory.authorUid}`">
             <span v-html="svg.avatar"></span>
-            <div class="user-avatar" :style="`background-image: url('${userAvatarImagePath}${noteHistory.userAvatar}')`"></div>
+            <div class="user-avatar" :style="`background-image: url('${userAvatarImagePath}${noteHistory.author.avatar}')`"></div>
           </a>
         </div>
-        <div class="user-nickname">{{noteHistory.nickname || noteHistory.userId}}</div>
+        <div class="user-nickname">{{noteHistory.author.nickname || noteHistory.author.userId}}</div>
       </div>
-      <div v-html="svg.deleteTrashcan" class="delete-icon" @click="deleteNoteHistory(noteHistory.uid, noteHistory.noteId)"></div>
+      <div v-html="svg.deleteTrashcan"
+           class="delete-icon"
+           @click="deleteNoteHistory(noteHistory.authorUid, noteHistory.noteId)"></div>
     </div>
   </div>
 </template>
@@ -28,17 +30,18 @@
 import {apis} from "@/assets/js/constants/request-path";
 import {svg} from "@/assets/js/constants/svgs";
 import {statusCode} from "@/assets/js/constants/status-code";
+
 export default {
   name: "NoteHistoryItem",
   props: ["noteHistory"],
   data() {
     return {
-      svg
+      pageLinkStart: apis.pageLinkStart,
+      svg: {
+        avatar: svg.avatar,
+        deleteTrashcan: svg.deleteTrashcan,
+      }
     }
-  },
-  computed: {
-  },
-  mounted() {
   },
   methods: {
     deleteNoteHistory(uid, noteId) {

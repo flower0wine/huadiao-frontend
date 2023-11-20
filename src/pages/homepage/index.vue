@@ -41,7 +41,7 @@ export default {
         if(!homepageBackground) {
           return `${this.homepageBackgroundImagePath}homepageDefaultBackground.jpg`;
         }
-        if(homepageBackground.startsWith("blob:http://localhost")) {
+        if(homepageBackground.startsWith("blob:http://")) {
           return homepageBackground;
         }
         return `${this.homepageBackgroundImagePath}${homepageBackground}`;
@@ -96,7 +96,7 @@ export default {
   min-width: 1200px;
   height: 100vh;
   min-height: 600px;
-  background: no-repeat fixed center;
+  background: no-repeat fixed center/cover;
 }
 
 .homepage-mark {

@@ -1,11 +1,13 @@
 <template>
   <div class="note-history-list">
     <transition-group name="right-slide">
-      <note-history-item v-for="(item, index) in noteHistory"
+      <note-history-item v-for="(item) in noteHistory"
                          :key="`${item.uid}/${item.noteId}`"
                          :noteHistory="item"/>
     </transition-group>
-    <div class="no-note" ref="noNote">去发现更多有意思的人吧!</div>
+    <simple-loading :option="{loadedText: `去发现更多有意思的人吧!`}"
+                    :observe-callback="observeCallback"
+                    :get-hooks="getHooks"/>
   </div>
 </template>
 
@@ -13,15 +15,18 @@
 import NoteHistoryItem from "@/pages/history/components/NoteHistoryItem";
 import {mapState} from "vuex";
 import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
+import SimpleLoading from "@/pages/components/loading/SimpleLoading";
+import RequestPager from "@/assets/js/utils/request-pager";
+
+let pager = new RequestPager();
+
 export default {
   name: "NoteHistoryList",
+  components: {SimpleLoading, NoteHistoryItem},
   data() {
     return {
-      offset: 0,
-      row: 10,
-      requesting: false,
-      observer: null,
+      searchContent: "",
+      searchContentChange: false,
     }
   },
   computed: {
@@ -30,55 +35,48 @@ export default {
   created() {
     this.initial();
   },
+  mounted() {
+    this.searchNoteHistory();
+  },
   methods: {
     initial() {
-      this.observer = new IntersectionObserver((entries) => {
-        let observerInfo = entries[0];
-        if(observerInfo.isIntersecting) {
-          this.getNoteHistory();
-        }
-      }, {
-        threshold: 0.1
-      });
-      this.$nextTick(() => {
-        this.observer.observe(this.$refs.noNote);
-      });
+      this.pager = new RequestPager();
+      this.$bus.$on("searchNoteHistory", this.chooseRequestType);
     },
-    // 获取笔记历史记录
-    getNoteHistory() {
-      if(this.requesting) return;
-      this.requesting = true;
-      this.sendRequest({
-        path: apis.history.note,
-        params: {
-          row: this.row,
-          offset: this.offset,
-        },
-        thenCallback: (response) => {
+    getHooks({unobserve}) {
+      pager.setCompleteCallback(unobserve);
+    },
+    observeCallback() {
+      this.searchNoteHistory();
+    },
+    chooseRequestType(searchContent) {
+      this.searchContent = searchContent;
+      pager.reset();
+      // 清空笔记记录
+      this.$store.commit("clearNoteHistory");
+      this.searchNoteHistory(searchContent);
+    },
+    searchNoteHistory(searchContent) {
+      pager.requestModel((params) => {
+        this.sendRequest({
+          path: apis.search.history.note.title,
+          params: {
+            title: searchContent,
+            ...params,
+          },
+        }).then((response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
-            let length = res.data.length;
-            this.$store.commit("addNoteHistory", {noteHistory: res.data});
-            this.offset += length;
-          }
-          else if(res.code === statusCode.notExist) {
-            this.$nextTick(() => {
-              this.observer.unobserve(this.$refs.noNote);
-            });
-          }
-          this.requesting = false;
-        },
-        errorCallback: (error) => {
-          console.log(error);
-          this.requesting = false;
-        }
-      })
+          pager.requestCallback(res).succeed((data) => {
+            data = Array.isArray(data) ? data : [];
+            this.$store.commit("addNoteHistory", {history: data});
+          });
+        }).catch(pager.errorCallback);
+      });
     },
   },
   beforeDestroy() {
   },
-  components: {NoteHistoryItem},
 }
 </script>
 
@@ -87,13 +85,5 @@ export default {
   width: 1200px;
   margin: 0 auto 100px;
   transition: var(--transition-500ms);
-}
-
-.no-note {
-  margin-top: 40px;
-  font-size: 14px;
-  text-align: center;
-  letter-spacing: 1px;
-  color: #a9a9a9;
 }
 </style>

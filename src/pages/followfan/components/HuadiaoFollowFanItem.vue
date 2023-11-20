@@ -11,7 +11,7 @@
        :title="'前往' + nickname + '的个人主页'"
        :href="`/homepage/${item.uid}`"
     >
-      <img src="/svg/noLoginAvatar.svg" alt="">
+      <span v-html="svg.avatar"></span>
       <div class="user-avatar"
            :style="`background-image: url('${userAvatarImagePath}${item.userAvatar}')`"
       ></div>
@@ -33,11 +33,10 @@
               :changeFollowStatus="changeFollowStatus"
               :follow="follow"
         ></slot>
-        <img src="/svg/more.svg"
-             @mouseenter="visible.toolMenu.render = visible.toolMenu.show = true"
-             @mouseleave="visible.toolMenu.show = false"
-             ref="more"
-             alt="">
+        <span v-html="svg.more"
+              @mouseenter="visible.toolMenu.render = visible.toolMenu.show = true"
+              @mouseleave="visible.toolMenu.show = false"
+              ref="more"></span>
       </div>
       <transition name="fade">
         <div class="tool-menu"
@@ -65,7 +64,10 @@ export default {
   props: ["item", "type", "index", "addFollow", "removeFollow", "patch", "mapKey", "groupId"],
   data() {
     return {
-      svg,
+      svg: {
+        avatar: svg.avatar,
+        more: svg.more,
+      },
       // 是否关注
       follow: this.type === "follow" ? true : (this.type === "fan" && this.item.friend),
       itemClass: "chose-follow-item",
@@ -198,14 +200,14 @@ export default {
   padding: 15px 0 0 15px;
 }
 
-.user-avatar-box img {
+.user-avatar-box /deep/ svg {
   width: 50px;
   height: 50px;
   border-radius: 50%;
   transition: var(--transition-500ms);
 }
 
-.user-avatar-box img:hover,
+.user-avatar-box /deep/ svg:hover,
 .user-avatar:hover {
   box-shadow: var(--box-shadow-min);
 }
@@ -261,9 +263,11 @@ export default {
   transition: var(--transition-500ms);
 }
 
-.user-relation img {
+.user-relation /deep/ svg {
   width: 15px;
+  height: 15px;
   margin-left: 10px;
+  fill: #747373;
 }
 
 .user-relation div:hover {

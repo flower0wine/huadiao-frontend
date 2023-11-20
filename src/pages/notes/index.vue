@@ -20,6 +20,7 @@ import SunLightTheme from "@/pages/notes/components/SunLightTheme";
 import LeftSliderBoard from "@/pages/components/NoteLeftSliderBoard";
 import NoteListBoard from "@/pages/notes/components/NoteListBoard";
 import {statusCode} from "@/assets/js/constants/status-code";
+import {apis} from "@/assets/js/constants/request-path";
 
 export default {
   name: "HuadiaoNotes",
@@ -37,13 +38,17 @@ export default {
     })
   },
   created() {
+    this.setLightTheme();
     this.getUserNotesByUid();
   },
   methods: {
+    setLightTheme() {
+      document.body.classList.add("light");
+    },
     // 获取用户所有笔记
     getUserNotesByUid() {
       this.sendRequest({
-        path: "note/all",
+        path: apis.note.all,
         params: {
           authorUid: this.viewedUid,
         },
@@ -77,8 +82,10 @@ export default {
 </script>
 
 <style>
+@import "~@/assets/css/theme/notes/light.css";
+@import "~@/assets/css/theme/notes/dark.css";
 body {
-  background-color: #ececec;
+  background-color: var(--body-background-color);
 }
 </style>
 

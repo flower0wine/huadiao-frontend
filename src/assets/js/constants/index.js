@@ -7,13 +7,7 @@
 'use strict';
 
 export default {
-    imageHost: "http://localhost:9090/images/",
-    statusCode: {
-        succeed: 1000,
-        errorParam: 2000,
-        blankParam: 2001,
-        notExist: 3000,
-        existed: 3001,
-    },
     wrongLink: "javascript:void(0);",
+    usernameReg: /(?=.*[0-9])(?=.*[a-zA-Z])[a-zA-Z0-9_]{8,20}/,
+    passwordReg: /(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9_,.+~&^%$#=-]{8,32}/,
 }

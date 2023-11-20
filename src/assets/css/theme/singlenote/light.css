@@ -1,0 +1,64 @@
+/*
+* 功能描述：
+* 创建日期：2023 年 10 月 
+*/
+
+.light {
+    --single-note-bg-color: #fff;
+    --catalogue-icon-color: #c2c2c2;
+    --note-info-color: #8c8c8c;
+    --note-info-bg-color: #f1f1f1;
+    --note-title-color: #000;
+    /* -- 复杂笔记信息 -- */
+    --create-author-color: #fff;
+    --original-author-bg-color: #DC4040AD;
+    --transfer-author-bg-color: #67CE2BAD;
+    --topping-color: #fff;
+    --topping-bg-color: #c2c2c2;
+    --concentration-color: #fff;
+    --concentration-bg-color: #eccf0d;
+    --concentration-border-color: #eccf0d;
+    --note-tag-item-color: #c24545;
+    --note-tag-item-bg-color: #fff;
+    --note-tag-item-border-color: #bcbcbc;
+    --note-tag-item-hover-color: #a13838;
+    --note-content-color: #282828;
+    --no-login-comment-tip-color: #929292;
+    /* -- 作者和我 -- */
+    --author-info-box-color: #6c6c6c;
+    --author-info-box-border-color: #b9b9b9;
+    --author-info-box-bg-color: #fff;
+    --note-info-item-a-color: #6c6c6c;
+    --follow-or-cancel-color: #fff;
+    --follow-or-cancel-bg-color: #f13f3f;
+    --follow-or-cancel-hover-bg-color: #de3737;
+    --following-bg-color: #c5c5c5;
+    --following-hover-bg-color: #b4b4b4;
+    /* -- 评论输入框 -- */
+    --comment-input-color: #6f6f6f;
+    --comment-input-bg-color: #ebebeb;
+    --comment-input-placeholder-color: #a9a9a9;
+    --publish-btn-color: #fff;
+    --publish-btn-bg-color: #f03838;
+    --publish-btn-hover-bg-color: #de3434;
+    --input-tools-color: #a6a6a6;
+    --input-tools-hover-color: #dc5959;
+    /* -- 评论 -- */
+    --comment-title-color: #000;
+    --comment-color: #3a3a3a;
+    --comment-more-coard-color: #000;
+    --comment-more-board-bg-color: #fff;
+    --comment-more-board-hover-bg-color: #f4f4f4;
+    --comment-icon-color: #858585;
+    --comment-icon-hover-bg-color: #ececec;
+    --fixed-comment-board-bg-color: #fff;
+    --root-coment-item-border-color: #d1d1d1;
+    /* -- 阴影 -- */
+    --note-box-shadow: 2px 2px 5px 2px #999999a1;
+    --catalogue-box-shadow: 2px 2px 3px 1px #0000006E;
+    /* -- 左侧面板 -- */
+    --left-slider-board-bg-color: #ececec;
+    --left-slider-user-info-color: #727070;
+    --left-slider-user-info-hover-color: #f53e3e;
+    --left-slider-user-info-hover-bg-color: #e1e1e1;
+}

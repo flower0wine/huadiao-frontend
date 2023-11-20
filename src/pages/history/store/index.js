@@ -31,8 +31,11 @@ const mutations = {
     initialUser(state, {user}) {
         state.user = user;
     },
-    addNoteHistory(state, {noteHistory}) {
-        state.noteHistory.push(...noteHistory);
+    clearNoteHistory(state) {
+        state.noteHistory = [];
+    },
+    addNoteHistory(state, {history}) {
+        state.noteHistory.push(...history);
     },
     addAnimeHistory(state, {animeHistory}) {
         state.animeHistory.push(...animeHistory);
@@ -52,16 +55,6 @@ const mutations = {
                 animeHistoryList.splice(index, 1);
             }
         }
-    },
-    // 清空笔记历史记录
-    clearNoteHistory(state, {succeedCallback}) {
-        state.noteHistory = [];
-        succeedCallback();
-    },
-    // 清空番剧馆历史记录
-    clearAnimeHistory(state, {succeedCallback}) {
-        state.animeHistory = [];
-        succeedCallback();
     },
 };
 const getters = {};

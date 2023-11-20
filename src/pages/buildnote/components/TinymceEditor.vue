@@ -16,16 +16,15 @@ import "tinymce/plugins/lists";
 import "tinymce/plugins/wordcount";
 import "tinymce/icons/default/icons";
 import "tinymce/models/dom";
+import "tinymce/langs/zh_CN";
 
 export default {
-  props: ["returnNoteContent"],
   data() {
     return {
       content: "",
       init: {
         language_url: "/tinymce/langs/zh_CN.js",
         language: "zh_CN",
-        height: 600,
         resize: false,
         toolbar_sticky: true,
         content_css: "tinymce/toolbar.css",
@@ -41,19 +40,28 @@ export default {
     this.init.height = window.innerHeight - 187;
   },
   mounted() {
-    tinymce.init({});
-    this.$bus.$on("getNoteContent", this.getNoteContent);
-    this.$bus.$on("setNoteContent", this.setNoteContent);
+    this.initial();
   },
   methods: {
+    initial() {
+      tinymce.init({});
+      this.$bus.$on("getNoteContent", this.getNoteContent);
+      this.$bus.$on("setNoteContent", this.setNoteContent);
+    },
     // 获取笔记内容
     getNoteContent(note) {
-      note.content = this.content;
+      let activeEditor = tinymce.activeEditor;
+      let editBody = activeEditor.getBody();
+      activeEditor.selection.select(editBody);
+      let text = activeEditor.selection.getContent({'format': 'text'});
+
+      note.htmlContent = this.content;
+      note.textContent = text;
     },
     // 设置笔记内容
     setNoteContent(content) {
       this.content = content;
-    }
+    },
   },
   components: {
     Editor

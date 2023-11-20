@@ -5,28 +5,38 @@
          :key="index"
     >
       <a :href="`/singlenote/${$route.params.viewedUid}/${noteItem.noteId}`">
-        <div class="note-title">{{noteItem.noteTitle}}</div>
-        <div class="note-abstract" v-html="noteItem.noteContent"></div>
-        <div class="note-infer">
-          <div>
-            <span v-html="svg.time"></span>
-            <span>{{ huadiaoDateFormat(noteItem.publishTime) }}</span>
+        <div class="note-title">{{ noteItem.noteTitle }}</div>
+        <div class="note-abstract" v-text="noteContent(noteItem.noteAbstract)"></div>
+        <div class="note-item-footer">
+          <div class="note-infer">
+            <div>
+              <span v-html="svg.time"></span>
+              <span>{{ huadiaoDateFormat(noteItem.publishTime) }}</span>
+            </div>
+            <div>
+              <span v-html="svg.eye"></span>
+              <span>{{ noteItem.viewCount }}</span>
+            </div>
+            <div>
+              <span v-html="svg.star"></span>
+              <span>{{ noteItem.starCount }}</span>
+            </div>
+            <div>
+              <span v-html="svg.comment"></span>
+              <span>{{ noteItem.commentCount }}</span>
+            </div>
+            <div>
+              <span v-html="svg.love"></span>
+              <span>{{ noteItem.likeCount }}</span>
+            </div>
           </div>
-          <div>
-            <span v-html="svg.eye"></span>
-            <span>{{noteItem.viewCount}}</span>
-          </div>
-          <div>
-            <span v-html="svg.star"></span>
-            <span>{{noteItem.starCount}}</span>
-          </div>
-          <div>
-            <span v-html="svg.comment"></span>
-            <span>{{noteItem.commentCount}}</span>
-          </div>
-          <div>
-            <span v-html="svg.love"></span>
-            <span>{{noteItem.likeCount}}</span>
+          <div class="edit-tools">
+            <div class="tool">
+              <a :href="`/buildnote/${noteItem.noteId}`">
+                <span v-html="svg.edit"></span>
+                <span>编辑</span>
+              </a>
+            </div>
           </div>
         </div>
       </a>
@@ -53,6 +63,12 @@ export default {
     })
   },
   methods: {
+    noteContent(noteAbstract) {
+      if (noteAbstract.length > 220) {
+        return noteAbstract.slice(0, 220) + '...';
+      }
+      return noteAbstract;
+    },
   },
   beforeDestroy() {
   }
@@ -65,41 +81,55 @@ export default {
   min-height: 600px;
   margin: 60px auto 200px;
   border-radius: 6px;
-  box-shadow: var(--box-shadow-min);
-  background-color: #ececec;
+  box-shadow: var(--note-box-shadow);
+  background-color: var(--note-list-board-bg-color);
 }
 
 .note-item {
   padding: 20px;
 }
 
-.note-item:nth-child(n + 1) {
-  border-top: 1px solid #c2c2c2;
+.note-item:hover .edit-tools {
+  display: block;
+}
+
+.note-item:nth-child(n + 2) {
+  border-top: 1px solid var(--note-item-border-color);
+}
+
+.note-item-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
 }
 
 .note-infer {
   display: flex;
 }
 
-.note-infer>div {
+.note-infer > div {
   margin-right: 30px;
 }
 
-.note-infer /deep/ svg {
+.edit-tools > div {
+  margin-left: 30px;
+}
+
+.note-item-footer /deep/ svg {
   width: 16px;
   height: 16px;
-  fill: #807d7d;
+  fill: var(--note-item-footer-icon-color);
   vertical-align: -3px;
 }
 
 .note-title {
   font-size: 24px;
   font-weight: 700;
-  color: #4b4949;
+  color: var(--note-title-color);
 }
 
 .note-title:hover {
-  color: #b00b0b;
+  color: var(--note-title-hover-color);
 }
 
 .note-abstract {
@@ -108,16 +138,36 @@ export default {
   margin-top: 10px;
 }
 
-.note-infer {
-  color: #9f9c9c;
-  margin-top: 10px;
-}
-
-.note-infer>div span {
+.note-infer > div span,
+.edit-tools > div span {
   font-size: 14px;
+  color: var(--note-item-footer-word-color);
 }
 
-.note-infer span:first-child {
+.note-infer span:first-child,
+.edit-tools span:first-child {
   margin-right: 6px;
+}
+
+.edit-tools {
+  display: none;
+}
+
+.tool {
+  padding: 5px;
+  border-radius: 6px;
+  transition: background-color 400ms;
+}
+
+.tool:hover span {
+  color: var(--note-item-footer-item-hover-color);
+}
+
+.tool:hover /deep/ svg {
+  fill: var(--note-item-footer-item-hover-color);
+}
+
+.tool:hover {
+  background-color: var(--note-item-footer-item-hover-bg-color);
 }
 </style>

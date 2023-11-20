@@ -8,7 +8,7 @@
     <ul class="left-entry">
       <li class="huadiao-index">
         <a href="/" title="花凋--不一样的世界">
-          <img class="huadiao-logo" :src="huadiaoIndexHeaderConfig.logoPath" alt="">
+          <img class="huadiao-logo" :src="logoPath" alt="">
         </a>
       </li>
     </ul>
@@ -33,42 +33,33 @@
       >
         <a :href="huadiaoIndexHeaderConfig.avatar.src"
            :title="huadiaoIndexHeaderConfig.avatar.title"
+           :style="login ? `--border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}` : ''"
            class="avatar-box"
-           target="_blank"
            ref="avatarBox"
         >
-            <img src="/svg/noLoginAvatar.svg"
-                 class="user-avatar-box"
-                 :style="login ? 'border: 2px solid ' + boardConfig.loggedBoardStyle.borderColor : ''"
-                 :class="login ? '' : 'no-logged'"
-                 alt=""
-            >
-            <div v-if="login && user.userAvatar"
-                 :style="`border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}; background-image: url('${userAvatarImagePath}${user.userAvatar}')`"
-                 class="user-avatar-box logged-avatar"
-                 ref="avatar"
-            ></div>
+          <div v-html="svg.noLoginAvatar"
+               class="user-avatar-box"
+               :class="login ? '' : 'no-logged'">
+          </div>
+          <div v-if="login && user.userAvatar"
+               :style="`background-image: url('${userAvatarImagePath}${user.userAvatar}')`"
+               class="user-avatar-box logged-avatar"
+               ref="avatar"
+          ></div>
         </a>
-        <!--未登录组件-->
-        <template v-if="!login">
-          <div class="login-box">登录</div>
-          <transition name="fade">
-            <no-login-board v-show="isShow.noLoggedOrLoggedBoard.show"
-                            v-if="isShow.noLoggedOrLoggedBoard.render"
-                            :noLogin="huadiaoIndexHeaderConfig.noLogin"
-                            :boardStyle="boardConfig.noLoggedBoardStyle"
-            />
-          </transition>
-        </template>
         <!--已登录组件-->
         <template v-if="login">
           <transition name="fade">
-            <logged-board v-show="isShow.noLoggedOrLoggedBoard.show"
-                          v-if="isShow.noLoggedOrLoggedBoard.render"
+            <logged-board v-show="visible.loggedBoard.show"
+                          v-if="visible.loggedBoard.render"
                           :user="user"
                           :boardStyle="boardConfig.loggedBoardStyle"
             />
           </transition>
+        </template>
+        <template v-else>
+          <div class="login-box">登录</div>
+          <slot name="noLoggedBoard"/>
         </template>
       </li>
     </ul>
@@ -76,13 +67,14 @@
 </template>
 
 <script>
-import NoLoginBoard from "@/pages/components/NoLoginBoard";
 import LoggedBoard from "@/pages/components/LoggedBoard";
 import {INDEX_TIPS} from "@/assets/js/tips";
-import HuadiaoSearch from "@/pages/components/HuadiaoSearch";
+import HuadiaoSearch from "@/pages/components/search/HuadiaoSearch";
 import constants from "@/assets/js/constants";
 import {mapState} from "vuex";
 import {svg} from "@/assets/js/constants/svgs";
+import defaultHuadiaoHeaderStyle from "@/assets/js/constants/huadiao_header_style/default";
+import {apis} from "@/assets/js/constants/request-path";
 
 export default {
   name: "HuadiaoHeader",
@@ -90,42 +82,15 @@ export default {
   data() {
     return {
       svg,
-      isShow: {
-        // 登录或未登录面板
-        noLoggedOrLoggedBoard: {
+      visible: {
+        // 已登录面板
+        loggedBoard: {
           render: false,
           show: false,
         },
+
       },
-      boardConfig: {
-        blur: false,
-        shadow: false,
-        backgroundColor: "transparent",
-        // 右侧入口颜色
-        entryColor: "#fff",
-        // 输入框颜色
-        inputTheme: {
-          searchIconColor: "#fff",
-          textColor: "#fff",
-          inputBackgroundColor: "#E06969A2",
-          searchBackgroundColor: "#E314148A",
-        },
-        // 登录面板
-        loggedBoardStyle: {
-          shadow: false,
-          borderColor: "#7C0628C1",
-          textColor: "#dad5d5",
-          accessColor: "#fff",
-          background: "-webkit-linear-gradient(left bottom, #454440b9, #84041bb6)",
-        },
-        // 未登录面板
-        noLoggedBoardStyle: {
-          boardTextColor: "#cecaca",
-          background: "-webkit-linear-gradient(left bottom, #454440b4, #84041bb9)",
-          ImmediatelyBtnBackgroundColor: "#4c829e",
-          registerTextColor: "#4c829e",
-        },
-      },
+      boardConfig: defaultHuadiaoHeaderStyle,
     };
   },
   computed: {
@@ -140,41 +105,29 @@ export default {
     // 首页头部配置
     huadiaoIndexHeaderConfig() {
       return {
-        // logo 路径
-        logoPath: "/img/authority.png",
         // 头像配置
         avatar: {
           title: this.login ? INDEX_TIPS.LOGGED : INDEX_TIPS.NOT_LOGGED,
-          src: this.login ? '/homepage/' + this.user.uid : constants.wrongLink,
+          src: this.login ? '/homepage/' + this.user.uid : '/',
         },
         // 头部右侧配置
         rightEntry: [{
           description: "历史",
           svg: svg.history,
-          url: this.login ? "/history" : constants.wrongLink,
+          // 由于后端使用 nginx 代理(/ 结尾代表一个文件夹), nginx 配置中以 /history/ 来匹配
+          url: this.login ? "/history/" : constants.wrongLink,
         }, {
           description: "消息",
           svg: svg.message,
           url: this.login ? "/message" : constants.wrongLink,
         }],
-        // 未登录面板配置
-        noLogin: [{
-          description: "发布博客",
-          svg: "/svg/blog.svg"
-        }, {
-          description: "发布视频",
-          svg: "/svg/fanju.svg"
-        }, {
-          description: "标记喜欢的番剧",
-          svg: "/svg/fanju.svg"
-        }],
       }
     },
     // 附加样式
     huadiaoHeaderAttachStyle() {
-      let blur = this.boardConfig.blur ? 'backdrop-filter: blur(3px);' : '';
-      let shadow = this.boardConfig.shadow ? 'box-shadow: var(--box-shadow-min);' : '';
-      let background = "background-color: " + this.boardConfig.backgroundColor + ";";
+      let blur = this.boardConfig.blur ? ';backdrop-filter: blur(3px)' : '';
+      let shadow = this.boardConfig.shadow ? ';box-shadow: ' + (this.boardConfig.customShadow || 'var(--box-shadow-min)') : '';
+      let background = ";background-color: " + this.boardConfig.backgroundColor;
       return blur + shadow + background;
     }
   },
@@ -191,10 +144,15 @@ export default {
     // 获取花凋头部数据
     getHuadiaoHeaderUserinfo() {
       this.sendRequest({
-        path: "huadiaoHeader",
+        path: apis.common.huadiaoHeader,
         thenCallback: (response) => {
           let res = response.data;
-          console.log(res)
+          console.log(res);
+          if (!res || !res.login) {
+            res = {
+              login: false,
+            }
+          }
           this.$store.commit("initialUser", {user: res});
           this.getDataCompleted = true;
         },
@@ -206,12 +164,18 @@ export default {
     },
     // 渲染之后再次修改头部样式
     modifyHuadiaoHeaderStyle(style) {
-      this.modifySrcObject(this.boardConfig, style);
+      if (style) {
+        this.modifySrcObject(this.boardConfig, style);
+      }
+      else {
+        this.modifySrcObject(this.boardConfig, this.huadiaoHeaderStyle);
+      }
     },
     // 鼠标进入头像
     mouseEnterAvatar() {
-      this.isShow.noLoggedOrLoggedBoard.render = true;
-      this.isShow.noLoggedOrLoggedBoard.show = true;
+      this.visible.loggedBoard.render = true;
+      this.visible.loggedBoard.show = true;
+      this.$bus.$emit("openNoLoggedBoard");
       if (this.login && this.$refs.avatarBox) {
         this.$refs.avatarBox.classList.add("mouse-enter-logged-avatar");
       }
@@ -219,7 +183,8 @@ export default {
     },
     // 鼠标离开头像
     mouseLeaveAvatar() {
-      this.isShow.noLoggedOrLoggedBoard.show = false;
+      this.visible.loggedBoard.show = false;
+      this.$bus.$emit("closeNoLoggedBoard");
       if (this.login && this.$refs.avatarBox) {
         this.$refs.avatarBox.classList.remove("mouse-enter-logged-avatar");
       }
@@ -228,11 +193,9 @@ export default {
   },
   components: {
     HuadiaoSearch,
-    NoLoginBoard,
     LoggedBoard
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   }
 }
 </script>
@@ -304,6 +267,7 @@ export default {
 
 /* a 标签, 头像盒子 */
 .avatar-box {
+  --border: '';
   position: absolute;
   z-index: 2;
   display: inline-block;
@@ -316,12 +280,11 @@ export default {
 }
 
 /* 未登录头像 */
-.user-avatar-box {
+.user-avatar-box /deep/ svg {
   width: 41px;
   height: 41px;
+  border: var(--border);
   border-radius: 50%;
-  background-size: cover;
-  background-position: center center;
   transition: var(--transition-500ms);
 }
 
@@ -329,6 +292,11 @@ export default {
 .logged-avatar {
   position: absolute;
   top: 0;
+  width: 41px;
+  height: 41px;
+  border-radius: 50%;
+  border: var(--border);
+  background: no-repeat center/cover;
   transition: var(--transition-500ms);
 }
 
@@ -341,7 +309,7 @@ export default {
 }
 
 .mouse-enter-logged-avatar .logged-avatar,
-.mouse-enter-logged-avatar img {
+.mouse-enter-logged-avatar /deep/ svg {
   width: 71px;
   height: 71px;
 }

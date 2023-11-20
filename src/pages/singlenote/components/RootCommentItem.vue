@@ -29,6 +29,7 @@ import CommentInfer from "@/pages/singlenote/components/CommentInfer";
 import CurrentUserCommentBoard from "@/pages/singlenote/components/CurrentUserCommentBoard";
 import {svg} from "@/assets/js/constants/svgs";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
+import {mapState} from "vuex";
 
 export default {
   name: "RootCommentItem",
@@ -55,6 +56,13 @@ export default {
       },
     }
   },
+  computed: {
+    ...mapState({
+      repliedUid(state) {
+        return state.replied.uid;
+      },
+    })
+  },
   mounted() {
   },
   methods: {
@@ -71,6 +79,7 @@ export default {
       this.addComment( {
         comment,
         root,
+        repliedUid: this.repliedUid,
         rootCommentIndex: this.rootIndex,
         succeedCallback: () => {
           this.publishing = false;
@@ -98,7 +107,7 @@ export default {
 .root-comment-item {
   position: relative;
   padding: 10px 0;
-  border-bottom: 1px solid #d1d1d1;
+  border-bottom: 1px solid var(--root-coment-item-border-color);
 }
 
 .root-comment-box {

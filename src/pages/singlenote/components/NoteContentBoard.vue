@@ -7,7 +7,7 @@
       <div class="note-title-box">
         <h1>{{ noteInfo.noteTitle }}</h1>
       </div>
-      <div class="note-infer-box">
+      <div class="note-info-box">
         <div class="note-extra-infer">
           <div class="create-author"
                :class="noteInfo.original ? 'original-author' : 'transfer-author'"
@@ -16,7 +16,7 @@
         </div>
         <div class="note-infer">
           <div class="public-time">
-            <span v-html="svg.public" class="infer-icon"></span>
+            <span v-html="svg.colorPublish" class="infer-icon"></span>
             <span>发布于 {{ huadiaoDateFormat(noteInfo.publishTime) }}</span>
           </div>
           <div class="view-number">
@@ -39,7 +39,8 @@
       </div>
       <div class="note-content" v-html="noteInfo.noteContent"></div>
       <note-author-info-board/>
-      <note-comment-board/>
+      <note-comment-board v-if="visible.commentBoard"/>
+      <div v-else class="no-login-comment-tip">~ 登录后可查看评论 ~</div>
     </div>
   </div>
 </template>
@@ -60,15 +61,21 @@ export default {
     return {
       visible: {
         catalogue: false,
+        commentBoard: false,
       },
       svg,
       timer: new Timer(),
     }
   },
   computed: {
-    ...mapState(["noteInfo"]),
+    ...mapState(["noteInfo", "user"]),
   },
   watch: {
+    "$store.state.user": {
+      handler() {
+        this.openCommentBoardByLogin();
+      },
+    },
     showCatalogue: {
       handler(newValue) {
         if (newValue) {
@@ -83,12 +90,18 @@ export default {
   },
   mounted() {
     this.clickContextMenuToOpenCatalogue();
+    this.openCommentBoardByLogin();
   },
   methods: {
+    openCommentBoardByLogin() {
+      if(this.user.login) {
+        this.visible.commentBoard = true;
+      }
+    },
     // 修改右键为打开目录
     clickContextMenuToOpenCatalogue() {
       this.$refs.noteDetails.addEventListener("contextmenu", (e) => {
-        e.preventDefault();
+        // e.preventDefault();
       });
     }
   },
@@ -96,6 +109,12 @@ export default {
   }
 }
 </script>
+
+<style>
+.note-content li {
+  list-style: unset;
+}
+</style>
 
 <style scoped>
 .note-content-board {
@@ -118,19 +137,24 @@ export default {
   min-height: 800px;
   border-radius: 6px;
   padding: 20px;
-  box-shadow: var(--box-shadow);
+  box-shadow: var(--note-box-shadow);
+  background-color: var(--note-content-board-bg-color);
   transition: var(--transition-500ms);
 }
 
-.note-infer-box {
+.note-title-box {
+  color: var(--note-title-color);
+}
+
+.note-info-box {
   position: relative;
   display: flex;
   flex-direction: column;
   margin-top: 20px;
   padding: 6px 70px;
   border-radius: 6px;
-  color: #8c8c8c;
-  background-color: #f1f1f1;
+  color: var(--note-info-color);
+  background-color: var(--note-info-bg-color);
 }
 
 .create-author {
@@ -143,17 +167,17 @@ export default {
   line-height: 30px;
   border-top-left-radius: 6px;
   border-bottom-right-radius: 6px;
-  color: #fff;
+  color: var(--create-author-color);
 }
 
 /* 原创 */
 .original-author {
-  background-color: #DC4040AD;
+  background-color: var(--original-author-bg-color);
 }
 
 /* 转载 */
 .transfer-author {
-  background-color: #67CE2BAD;
+  background-color: var(--transfer-author-bg-color);
 }
 
 .note-infer {
@@ -178,8 +202,8 @@ export default {
 .topping {
   padding: 1px 4px;
   border-radius: 4px;
-  color: #fff;
-  background-color: #c2c2c2;
+  color: var(--topping-color);
+  background-color: var(--topping-bg-color);
 }
 
 .concentration {
@@ -192,8 +216,8 @@ export default {
   text-align: center;
   line-height: 26px;
   transform: rotate(45deg);
-  color: #ffffff;
-  background-color: #eccf0d;
+  color: var(--concentration-color);
+  background-color: var(--concentration-bg-color);
 }
 
 .concentration::before {
@@ -204,7 +228,7 @@ export default {
   border-top: 0px solid transparent;
   border-right: 0px solid transparent;
   border-left: 26px solid transparent;
-  border-bottom: 26px solid #eccf0d;
+  border-bottom: 26px solid var(--concentration-border-color);
 }
 
 .concentration::after {
@@ -215,7 +239,7 @@ export default {
   border-top: 0px solid transparent;
   border-right: 26px solid transparent;
   border-left: 0px solid transparent;
-  border-bottom: 26px solid #eccf0d;
+  border-bottom: 26px solid var(--concentration-border-color);
 }
 
 .note-content {
@@ -239,19 +263,24 @@ export default {
   text-align: center;
   line-height: 18px;
   font-size: 12px;
-  color: #c24545;
-  background-color: #fff;
-  border: 1px solid #bcbcbc;
+  color: var(--note-tag-item-color);
+  background-color: var(--note-tag-item-bg-color);
+  border: 1px solid var(--note-tag-item-border-color);
 }
 
 .note-tag-item:hover {
-  color: #a13838;
+  color: var(--note-tag-item-hover-color);
 }
 
 .note-content {
-  color: #282828;
+  color: var(--note-content-color);
   letter-spacing: 2px;
   padding-bottom: 100px;
 }
 
+.no-login-comment-tip {
+  padding-top: 40px;
+  text-align: center;
+  color: var(--no-login-comment-tip-color);
+}
 </style>

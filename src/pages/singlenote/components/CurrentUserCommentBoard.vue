@@ -107,12 +107,12 @@ export default {
   border-radius: 6px;
   padding: 10px;
   font-size: 14px;
-  color: #6f6f6f;
-  background-color: #ebebeb;
+  color: var(--comment-input-color);
+  background-color: var(--comment-input-bg-color);
 }
 
 #comment-input::placeholder {
-  color: #a9a9a9;
+  color: var(--comment-input-placeholder-color);
 }
 
 .publish-comment-btn {
@@ -123,13 +123,13 @@ export default {
   height: 100%;
   border-radius: 6px;
   margin-left: 20px;
-  color: #fff;
-  background-color: #f03838;
+  color: var(--publish-btn-color);
+  background-color: var(--publish-btn-bg-color);
   cursor: pointer;
 }
 
 .publish-comment-btn:hover {
-  background-color: #de3434;
+  background-color: var(--publish-btn-hover-bg-color);
 }
 
 .input-tools {
@@ -143,28 +143,28 @@ export default {
   text-align: center;
   line-height: 30px;
   border-radius: 4px;
-  border: 1px solid #a6a6a6;
+  border: 1px solid var(--input-tools-color);
   cursor: pointer;
 }
 
 .input-tool:hover {
-  color: #dc5959;
-  border: 1px solid #dc5959;
+  color: var(--input-tools-hover-color);
+  border: 1px solid var(--input-tools-hover-color);
 }
 
 .emote-tool /deep/ svg {
   width: 20px;
   height: 20px;
-  fill: #a6a6a6;
+  fill: var(--input-tools-color);
   vertical-align: -3px;
 }
 
 .input-tool:hover /deep/ svg {
-  fill: #dc5959;
+  fill: var(--input-tools-hover-color);
 }
 
 .notice-other {
-  color: #a6a6a6;
+  color: var(--input-tools-color);
   font-weight: 700;
   margin-left: 10px;
 }

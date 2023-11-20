@@ -68,6 +68,7 @@ import {Timer} from "@/assets/js/utils";
 
 export default {
   name: "SunLightTheme",
+  props: ["changeThemeCallback"],
   data() {
     return {
       isShow: {
@@ -83,10 +84,25 @@ export default {
     changeTheme() {
       this.isShow.sun = !this.isShow.sun;
       this.isShow.changeAnimation = true;
+      this.modifyTheme();
       this.timer.timeout(() => {
         this.isShow.changeAnimation = false;
       }, 3000);
     },
+    modifyTheme() {
+      let classList = document.body.classList;
+      let light = "light";
+      let dark = "dark";
+      if(classList.contains(light)) {
+        classList.remove(light);
+        classList.add(dark);
+        this.changeThemeCallback && this.changeThemeCallback(dark);
+      } else {
+        classList.remove(dark);
+        classList.add(light);
+        this.changeThemeCallback && this.changeThemeCallback(light);
+      }
+    }
   },
   beforeDestroy() {
   }

@@ -1,7 +1,6 @@
 const {defineConfig} = require('@vue/cli-service')
 module.exports = defineConfig({
-    // 域名子路径,
-    publicPath: process.env.NODE_ENV === 'production' ? '/huadiao-user/' : '/',
+    publicPath: process.env.NODE_ENV === 'production' ? './' : '/huadiao/',
     lintOnSave: false,
     outputDir: "huadiao-user",
     assetsDir: "static",

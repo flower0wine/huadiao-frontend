@@ -1,12 +1,13 @@
 <template>
   <div class="left-slider-board"
-       @mouseenter="visible.userInfer.show = visible.userInfer.render = true"
-       @mouseleave="visible.userInfer.show = false"
+       @mouseenter.self="mouseenter"
+       @mouseleave.self="mouseleave"
+       @transitionend.self="transitionOver"
   >
     <user-avatar-box :options="userAvatarOptions"/>
     <transition name="fade">
-      <template v-if="visible.userInfer.render">
-        <div class="user-info" v-show="visible.userInfer.show">
+      <template v-if="visible.userInfo.render">
+        <div class="user-info" v-show="visible.userInfo.show">
           <div class="author-nickname">{{ cutStringByLength(authorInfo.nickname || authorInfo.userId, 14, true) }}</div>
           <div class="author-follow-fan">
             <a :href="`/followfan/${authorInfo.uid}/follow`">
@@ -39,8 +40,9 @@ export default {
   data() {
     return {
       svg,
+      enterLeftBoard: false,
       visible: {
-        userInfer: {
+        userInfo: {
           render: false,
           show: false
         },
@@ -61,20 +63,26 @@ export default {
   mounted() {
   },
   methods: {
+    mouseenter() {
+      this.visible.userInfo.render = true;
+      this.userAvatarOptions.scale = "60px";
+      this.enterLeftBoard = true;
+    },
+    mouseleave() {
+      this.visible.userInfo.show = false;
+      this.enterLeftBoard = false;
+      this.userAvatarOptions.scale = "30px";
+    },
+    transitionOver(e) {
+      if(e.propertyName === "width" && this.enterLeftBoard) {
+        this.visible.userInfo.show = true;
+      }
+    },
   },
   beforeDestroy() {
   }
 }
 </script>
-
-<style>
-.left-slider-board:hover .user-avatar-box,
-.left-slider-board:hover .user-avatar,
-.left-slider-board:hover .default-user-avatar svg {
-  width: 60px;
-  height: 60px;
-}
-</style>
 
 <style scoped>
 .left-slider-board {
@@ -88,8 +96,8 @@ export default {
   width: 50px;
   height: 100vh;
   padding-top: 80px;
-  background-color: #ececec;
-  box-shadow: var(--box-shadow-min);
+  background-color: var(--left-slider-board-bg-color);
+  box-shadow: var(--note-box-shadow);
   transition: var(--transition-500ms);
 }
 
@@ -102,7 +110,7 @@ export default {
 .user-info {
   width: 100%;
   margin-top: 20px;
-  color: #727070;
+  color: var(--left-slider-user-info-color);
 }
 
 .user-info > div {
@@ -110,7 +118,7 @@ export default {
 }
 
 .fade-enter-active {
-  transition: all 500ms 500ms;
+  transition: all 500ms;
 }
 
 .author-nickname {
@@ -130,14 +138,14 @@ export default {
   text-align: center;
   padding-top: 6px;
   border-radius: 6px;
-  color: #727070;
+  color: var(--left-slider-user-info-color);
   cursor: pointer;
   transition: var(--transition-500ms);
 }
 
 .follow:hover,
 .fan:hover {
-  color: #f53e3e;
-  background-color: #e1e1e1;
+  color: var(--left-slider-user-info-hover-color);
+  background-color:  var(--left-slider-user-info-hover-bg-color);
 }
 </style>

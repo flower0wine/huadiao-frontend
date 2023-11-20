@@ -7,15 +7,15 @@
 'use strict';
 import axios from "axios";
 import {apis} from "@/assets/js/constants/request-path.js";
-import constants from "@/assets/js/constants";
 
 export const mixin = {
     data() {
         return {
             // 是否获取了数据
             getDataCompleted: false,
-            userAvatarImagePath: `${constants.imageHost}userAvatar/`,
-            huadiaoHouseImagePath: `${constants.imageHost}huadiaoHouse/`,
+            logoPath: `${apis.imageHost}authority.png`,
+            userAvatarImagePath: `${apis.imageHost}userAvatar/`,
+            huadiaoHouseImagePath: `${apis.imageHost}huadiaoHouse/`,
         }
     },
     watch: {
@@ -67,7 +67,7 @@ export const mixin = {
                 headersProp = {...headers};
             }
             let srcObj = {
-                url: apis.host + path,
+                url: apis.huadiaoHost + path,
                 method: "get",
                 params: {},
                 data: {},
@@ -90,13 +90,12 @@ export const mixin = {
                 // 额外的错误执行函数
                 errorCallback && errorCallback(error);
             };
-            if(typeof thenCallback === "function") {
+            if (typeof thenCallback === "function") {
                 // 发送请求
                 return axios(srcObj)
                     .then(defaultThenCallback)
                     .catch(defaultErrorCallback);
-            }
-            else {
+            } else {
                 return axios(srcObj);
             }
         },
@@ -170,19 +169,34 @@ export const mixin = {
             }
         },
         // 修改源对象指定属性为提供的对象的属性, generate: 是否允许创建新属性
-        modifySrcObject(srcConfig, config, generate = true) {
-            for (let c in config) {
+        /**
+         *
+         * @param targetConfig {{}} 要粘贴属性到的目标对象
+         * @param srcConfig {{}}  要复制属性源对象
+         * @param option {{generate: boolean, proto: boolean}}
+         * 配置对象:
+         * 1. generate: 是否允许创建新属性, 默认为 true
+         * 2. proto: 是否复制原型的属性, 默认为 false
+         */
+        modifySrcObject(targetConfig, srcConfig, option = {generate: true, proto: false}) {
+            for (let c in srcConfig) {
+                // 不修改原型并且源对象上没有此属性
+                if (!option.proto && !Object.prototype.hasOwnProperty.call(srcConfig, c)) {
+                    continue;
+                }
                 // 可能为 对象 或者 null(属于对象)
-                if (typeof config[c] === "object") {
-                    if (!srcConfig[c]) {
-                        if (!generate) continue;
-                        srcConfig[c] = config[c] === null ? null : {};
+                if (typeof srcConfig[c] === "object") {
+                    if (!targetConfig[c]) {
+                        if (!option.generate) continue;
+                        targetConfig[c] = srcConfig[c] === null ? null : {};
                     }
-                    this.modifySrcObject(srcConfig[c], config[c], generate);
+                    if (srcConfig[c] !== null) {
+                        this.modifySrcObject(targetConfig[c], srcConfig[c], option);
+                    }
                 } else {
-                    if (!srcConfig[c] && !generate) continue;
-                    if (config[c] != null) {
-                        srcConfig[c] = config[c]
+                    if (!targetConfig[c] && !option.generate) continue;
+                    if (srcConfig[c] != null) {
+                        targetConfig[c] = srcConfig[c]
                     }
                 }
             }
@@ -243,12 +257,17 @@ export const mixin = {
         },
         /**
          * 将时间戳转换为年月日
-         * @param timestamp 时间戳
+         * @param timestamp {number} 时间戳
+         * @param type {string} 格式化类型, 允许 date 和 datetime
          * @returns {string} 返回格式为 (xxxx年xx月xx日 xx:xx)
          */
-        huadiaoDateFormat(timestamp) {
+        huadiaoDateFormat(timestamp, type = "datetime") {
             let date = new Date(timestamp);
-            return `${date.getFullYear()}年${this.numberFormat(date.getMonth() + 1)}月${this.numberFormat(date.getDate())}日 ${this.numberFormat(date.getHours())}:${this.numberFormat(date.getMinutes())}`;
+            if (type === "date") {
+                return `${date.getFullYear()}年${this.numberFormat(date.getMonth() + 1)}月${this.numberFormat(date.getDate())}日`;
+            } else if (type === "datetime") {
+                return `${date.getFullYear()}年${this.numberFormat(date.getMonth() + 1)}月${this.numberFormat(date.getDate())}日 ${this.numberFormat(date.getHours())}:${this.numberFormat(date.getMinutes())}`;
+            }
         },
         /**
          * 将 一位数转换为两位数, 如 1 返回 01, 10 返回 10
@@ -268,7 +287,6 @@ export const mixin = {
          */
         cutStringByLength(string, length, charAdjust) {
             let count = length;
-            console.log(11)
             if (charAdjust === true) {
                 count = 0;
                 let zhReg = /[\u4E00-\u9FA5]/;
@@ -307,7 +325,7 @@ export const mixin = {
         },
         // 头像
         generateUserAvatar(avatar) {
-            if(!avatar) {
+            if (!avatar) {
                 return '';
             }
             return `background-image: url('${this.userAvatarImagePath}${avatar}')`;
@@ -321,15 +339,17 @@ export const mixin = {
         getKey(args, split = '/') {
             return args.join(split);
         },
-        getIntersectionObserver(intersectionCallback = () => {}) {
+        getIntersectionObserver(intersectionCallback = () => {
+        }) {
             this.observer = new IntersectionObserver((entries) => {
                 let entry = entries[0];
-                if(entry.isIntersecting) {
+                if (entry.isIntersecting) {
                     intersectionCallback();
                 }
             }, {
                 threshold: 0.1
             });
-        }
+        },
+
     },
 }

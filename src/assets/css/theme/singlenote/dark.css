@@ -1,0 +1,67 @@
+/*
+* 功能描述：
+* 创建日期：2023 年 10 月 
+*/
+
+
+.dark {
+    --single-note-bg-color: #3a3a3a;
+    --catalogue-icon-color: #b0b0b0;
+    --note-content-board-bg-color: #4a4a4a;
+    --note-info-color: #898989;
+    --note-info-bg-color: #3b3b3b;
+    --note-title-color: #d4d4d4;
+    /* -- 复杂笔记信息 -- */
+    --original-author-bg-color: #DC4040AD;
+    --topping-color: #fff;
+    --topping-bg-color: #c2c2c2;
+    --concentration-color: #fff;
+    --concentration-bg-color: #eccf0d;
+    --concentration-border-color: #eccf0d;
+    --create-author-color: #d2d2d2;
+    --transfer-author-bg-color: #59bf58ad;
+    --note-tag-item-color: #939393;
+    --note-tag-item-bg-color: #535353;
+    --note-tag-item-border-color: #8d8d8d;
+    --note-tag-item-hover-color: #b6b6b6;
+    --note-content-color: #aaaaaa;
+    --no-login-comment-tip-color: #aaaaaa;
+    /* -- 作者 -- */
+    --author-info-box-color: #aaaaaa;
+    --author-info-box-border-color: #676767;
+    --author-info-box-bg-color: #4a4a4a;
+    --note-info-item-a-color: #aaaaaa;
+    /* -- 关注按钮 -- */
+    --follow-or-cancel-color: #fff;
+    --follow-or-cancel-bg-color: #f13f3f;
+    --follow-or-cancel-hover-bg-color: #de3737;
+    --following-bg-color: #c5c5c5;
+    --following-hover-bg-color: #b4b4b4;
+    /* -- 评论输入框 -- */
+    --comment-input-color: #cbcbcb;
+    --comment-input-bg-color: #5c5c5c;
+    --comment-input-placeholder-color: #a9a9a9;
+    --publish-btn-color: #fff;
+    --publish-btn-bg-color: #f03838;
+    --publish-btn-hover-bg-color: #de3434;
+    --input-tools-color: #a6a6a6;
+    --input-tools-hover-color: #dc5959;
+    /* -- 评论 -- */
+    --comment-title-color: #a7a7a7;
+    --comment-color: #aaa;
+    --comment-icon-color: #fff;
+    --comment-more-coard-color: #aaa;
+    --comment-icon-hover-bg-color: #696969;
+    --comment-more-board-bg-color: #616161;
+    --comment-more-board-hover-bg-color: #727272;
+    --fixed-comment-board-bg-color: #4a4a4a;
+    --root-coment-item-border-color: #707070;
+    /* -- 阴影 -- */
+    --note-box-shadow: 1px 1px 3px 1px rgba(40, 40, 40, 0.58);
+    --catalogue-box-shadow: 2px 2px 3px 1px #0000006E;
+    /* -- 左侧面板 -- */
+    --left-slider-board-bg-color: #4a4a4a;
+    --left-slider-user-info-color: #cdcdcd;
+    --left-slider-user-info-hover-color: #9c69e7;
+    --left-slider-user-info-hover-bg-color: #444343;
+}

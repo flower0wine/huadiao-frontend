@@ -1,8 +1,8 @@
 <template>
   <div class="huadiao-account-info">
     <transition name="fade" mode="out-in">
-      <request-fail v-if="isShow.loadingFail" :failCallback="getUserInfo"/>
-      <circle-loading v-else-if="isShow.loading"/>
+      <request-fail v-if="visible.loadingFail" :failCallback="getUserInfo"/>
+      <circle-loading v-else-if="visible.loading"/>
       <div v-else>
         <div class="account-info-header">我的信息</div>
         <div class="account-infer">
@@ -41,11 +41,11 @@
             >
               <span>男</span>
             </span>
-            <span class="women-button button"
-                  :class="tempUser.sex === '2' ? 'choice-button-sex' : ''"
-                  @click="tempUser.sex = '2'"
-                  ref="women"
-            >
+              <span class="women-button button"
+                    :class="tempUser.sex === '2' ? 'choice-button-sex' : ''"
+                    @click="tempUser.sex = '2'"
+                    ref="women"
+              >
             <span>女</span>
             </span>
               <span class="no-known-button button"
@@ -59,7 +59,7 @@
                           @after-enter="$refs.noKnowImg.classList.add('no-known-icon-enter-to')"
                           @after-leave="$refs.noKnowImg.classList.remove('no-known-icon-enter-to')"
                           appear>
-                <img src="/img/account/noknown.png"
+                <img src="@/../public/img/account/noknown.png"
                      class="no-known-icon"
                      v-show="tempUser.sex === '0'"
                      ref="noKnowImg"
@@ -69,7 +69,7 @@
                           @after-enter="$refs.manImg.classList.add('man-icon-enter-to')"
                           @after-leave="$refs.manImg.classList.remove('man-icon-enter-to')"
                           appear>
-                <img src="/img/account/man.png"
+                <img src="@/../public/img/account/man.png"
                      class="man-icon"
                      v-show="tempUser.sex === '1'"
                      ref="manImg"
@@ -79,7 +79,7 @@
                           @after-enter="$refs.womenImg.classList.add('women-icon-enter-to')"
                           @after-leave="$refs.womenImg.classList.remove('women-icon-enter-to')"
                           appear>
-                <img src="/img/account/women.png"
+                <img src="@/../public/img/account/women.png"
                      class="women-icon"
                      v-show="tempUser.sex === '2'"
                      ref="womenImg"
@@ -119,10 +119,12 @@
 </template>
 
 <script>
-import CircleLoading from "@/pages/components/CircleLoading";
+import CircleLoading from "@/pages/components/loading/CircleLoading";
 import RequestFail from "@/pages/components/RequestFail";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
+import {accountResponseMessage} from "@/assets/js/constants/response_message/account";
+import {ResponseHandler} from "@/assets/js/utils";
 
 export default {
   name: "HuadiaoAccountInfo",
@@ -135,7 +137,7 @@ export default {
           return time.getTime() > Date.now();
         },
       },
-      isShow: {
+      visible: {
         loading: true,
         loadingFail: false,
       },
@@ -146,66 +148,93 @@ export default {
         bornDate: null,
         school: null,
         sex: "0",
-      }
+      },
+      userInfo: null,
     }
   },
   created() {
     this.getUserInfo();
   },
   methods: {
-    // 获取用户信息并保存到 vuex 中
     getUserInfo() {
-      this.isShow.loadingFail = false;
+      this.visible.loadingFail = false;
       this.sendRequest({
         path: apis.account.info,
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if (res.code === statusCode.succeed) {
             let userInfo = res.data;
-            for(let key in userInfo) {
-              if(userInfo[key]) {
+            this.userInfo = userInfo;
+            for (let key in userInfo) {
+              if (userInfo[key]) {
                 this.tempUser[key] = userInfo[key];
               }
             }
-            if(!userInfo.nickname) {
+            if (!userInfo.nickname) {
               this.tempUser.nickname = userInfo.userId;
             }
-            this.isShow.loading = false;
+            this.visible.loading = false;
           }
         },
         errorCallback: (error) => {
           console.log(error);
-          this.isShow.loadingFail = true;
+          this.visible.loadingFail = true;
         }
       })
     },
     // 点击修改用户信息
     clickToUpdateUserInfo() {
       // 检查昵称
-      let nickname = this.tempUser.nickname ? this.tempUser.nickname.trim() : '';
-      if(nickname === '') {
+      let tempUserNickname = this.tempUser.nickname;
+      let nickname = tempUserNickname ? tempUserNickname.trim() : '';
+      if (nickname === '') {
         this.huadiaoMiddleTip("昵称不能为空或只包含空格");
         return;
-      } else if(!(0 < nickname.length && nickname.length <= 20)) {
+      } else if (!(0 < nickname.length && nickname.length <= 20)) {
         this.huadiaoMiddleTip("昵称长度最大为 20 个字符");
         return;
       }
-      // 检查出生日期
-      let bornDate = this.tempUser.bornDate.getTime();
-      // 检查个人简介
-      let canvases = this.tempUser.canvases ? this.tempUser.canvases.trim() : '';
-      if(canvases.length > 50) {
-        this.huadiaoMiddleTip("个人简介长度最长为 50 个字符");
-        return;
+      // 检查 bornDate
+      let bornDate = this.userInfo.bornDate;
+      // 用户没有设置出生日期时 bornDate 可能为 null
+      let tempUserBornDate = this.tempUser.bornDate;
+      if (tempUserBornDate && tempUserBornDate !== bornDate) {
+        if (tempUserBornDate > bornDate) {
+          this.huadiaoMiddleTip("出生日期大于当前时间");
+          return;
+        }
+        bornDate = tempUserBornDate;
+      }
+      // 检查 canvases
+      let canvases = this.userInfo.canvases;
+      let tempUserCanvases = this.tempUser.canvases;
+      tempUserCanvases = tempUserCanvases ? tempUserCanvases.trim() : '';
+      if (canvases !== tempUserCanvases) {
+        // 检查个人简介
+        canvases = tempUserCanvases;
+        if (canvases.length > 50) {
+          this.huadiaoMiddleTip("个人简介长度最长为 50 个字符");
+          return;
+        }
+        if (canvases.length === 0) {
+          canvases = null;
+        }
       }
       // 检查学校
-      let school = this.tempUser.school ? this.tempUser.school.trim() : '';
-      if(school.length > 30) {
-        this.huadiaoMiddleTip("学校长度最长为 30 个字符");
-        return;
+      let school = this.userInfo.school;
+      let tempUserSchool = this.tempUser.school;
+      tempUserSchool = tempUserSchool ? tempUserSchool.trim() : '';
+      if (tempUserSchool !== school) {
+        school = tempUserSchool;
+        if (school.length > 30) {
+          this.huadiaoMiddleTip("学校长度最长为 30 个字符");
+          return;
+        }
+        if (school.length === 0) {
+          school = null;
+        }
       }
-
       this.sendRequest({
         path: "userInfo",
         method: "post",
@@ -218,11 +247,16 @@ export default {
         },
         thenCallback: (response) => {
           let res = response.data;
-          if(res.code === statusCode.succeed) {
+          console.log(res);
+          new ResponseHandler(res).succeed(() => {
             this.huadiaoMiddleTip("修改用户信息成功");
-          } else {
-            this.huadiaoMiddleTip("修改信息失败");
-          }
+          }).errorParam((data) => {
+            if (data === accountResponseMessage.wrongBornDate) {
+              this.huadiaoMiddleTip("出生日期有误");
+            } else {
+              this.huadiaoMiddleTip("修改信息失败");
+            }
+          });
         },
         errorCallback: (error) => {
           console.log(error);

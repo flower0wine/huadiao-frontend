@@ -8,7 +8,7 @@
            :style="'color: ' + defaultTipStyle.color + ';background-color:' + defaultTipStyle.backgroundColor + ';'"
            ref="huadiaoWarningTip">
         <div class="warning-title">
-          <img :src="defaultTipStyle.svg" alt>
+          <span v-html="defaultTipStyle.svg"></span>
           <span>{{defaultTipStyle.title}}</span>
         </div>
         <div class="warning-tip-content">{{warningTip.warningTip}}</div>
@@ -19,6 +19,7 @@
 
 <script>
 import {Timer} from "@/assets/js/utils";
+import {svg} from "@/assets/js/constants/svgs";
 
 export default {
   name: "HuadiaoWarningTopContainer",
@@ -37,7 +38,7 @@ export default {
       defaultTipStyle: {
         color: "#fff",
         backgroundColor: "#7A2727A6",
-        svg: "/svg/warning.svg",
+        svg: svg.colorWarning,
         title: "警告",
       }
     }
@@ -90,13 +91,13 @@ export default {
   transition: var(--transition-500ms);
 }
 
-.warning-title img {
+.warning-title span:nth-child(1) /deep/ svg {
   width: 20px;
   height: 20px;
   margin-right: 10px;
 }
 
-.warning-title span {
+.warning-title span:nth-child(2) {
   font-weight: 700;
 }
 

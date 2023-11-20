@@ -22,7 +22,8 @@ export default {
   height: 600px;
   opacity: 0;
   border-radius: 6px;
-  box-shadow: var(--box-shadow);
+  box-shadow: var(--note-box-shadow);
+  background-color: var(--note-content-board-bg-color);
   transition: var(--transition-500ms);
 }
 </style>

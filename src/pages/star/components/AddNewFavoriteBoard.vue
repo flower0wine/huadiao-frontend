@@ -96,6 +96,7 @@ export default {
   beforeMount() {
     this.$bus.$on("addGroup", (viewedUid) => {
       this.flushBoard();
+      this.modify = false;
       this.viewedUid = viewedUid;
       this.visible.show = this.visible.render = true;
     });

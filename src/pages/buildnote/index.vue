@@ -26,6 +26,8 @@ export default {
       }
     }
   },
+  created() {
+  },
   methods: {
   },
   components: {

@@ -6,13 +6,13 @@
 // 使用严格模式
 'use strict';
 
-import constants from "@/assets/js/constants";
 import {mapState} from "vuex";
+import {apis} from "@/assets/js/constants/request-path";
 
 export const animeHouseMixin = {
     data() {
         return {
-            huadiaoHouseImageHost: `${constants.imageHost}huadiaoHouse/`,
+            huadiaoHouseImageHost: `${apis.imageHost}huadiaoHouse/`,
         }
     },
     computed: {
@@ -31,7 +31,7 @@ export const animeHouseMixin = {
             // 是否是图片
             if(!singleColor && !gradientColor) {
                 // 是否是本地图片
-                let nativePicture = background.startsWith("blob:http://localhost");
+                let nativePicture = background.startsWith("blob:http://");
                 background = nativePicture ? `url('${background}')` : `url('${this.huadiaoHouseImageHost}${background}')`;
             }
             background = singleColor ? `background-color: ${background};` : `background-image: ${background};`;
@@ -39,7 +39,7 @@ export const animeHouseMixin = {
         },
         // 本地图片 url 调整
         nativeUrlReject(url) {
-            let nativePicture = url.startsWith("blob:http://localhost");
+            let nativePicture = url.startsWith("blob:http://");
             let backgroundImage = nativePicture ? url : `${this.huadiaoHouseImageHost}${url}`;
             return `background-image: url('${backgroundImage}')`;
         },

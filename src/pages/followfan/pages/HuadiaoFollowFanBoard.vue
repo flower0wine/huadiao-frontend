@@ -4,12 +4,11 @@
       <div class="follow-group">
         <div class="group-header">
           <span>{{ $store.getters.call }}的关注</span>
-          <img src="/svg/add.svg"
-               title="新建分组"
-               v-if="me"
-               @click="openAddNewGroupBoard"
-               ref="addNewGroup"
-               alt>
+          <span v-html="svg.add"
+                title="新建分组"
+                v-if="me"
+                @click="openAddNewGroupBoard"
+                ref="addNewGroup"></span>
         </div>
         <router-link :to="`/followfan/${viewedUid}/follow/${item.groupId}`"
                      v-for="(item, index) in followGroup"
@@ -30,7 +29,7 @@
                 @click="visible.groupMore.splice(index, 1, false)"
                 ref="GroupMore"
           >
-            <img src="/svg/more.svg" title="更多操作" alt="">
+            <span v-html="svg.more" title="更多操作"></span>
             <transition name="fade">
               <div class="group-more-board"
                    title=""
@@ -68,12 +67,17 @@
 import {mapState} from "vuex";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {apis} from "@/assets/js/constants/request-path";
+import {svg} from "@/assets/js/constants/svgs";
 
 export default {
   name: "HuadiaoFollowFanBoard",
   data() {
     return {
       viewedUid: null,
+      svg: {
+        add: svg.circleAdd,
+        more: svg.more,
+      },
       visible: {
         followFanBoard: false,
         groupMore: [],
@@ -99,7 +103,7 @@ export default {
       let myUid = this.$store.state.user.uid;
       this.viewedUid = +this.$route.params.viewedUid;
       this.$store.commit("initialMe", {me: myUid === this.viewedUid});
-      this.$store.commit("initialViewedUid", {viewedUid:  this.viewedUid});
+      this.$store.commit("initialViewedUid", {viewedUid: this.viewedUid});
 
       this.getCurrentUserFollowFanInfo();
       this.visible.followFanBoard = true;
@@ -190,7 +194,7 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if(res.code === statusCode.succeed) {
+            if (res.code === statusCode.succeed) {
               resolve();
             }
           },
@@ -244,9 +248,12 @@ export default {
 }
 
 /* 添加分组 */
-.group-header img {
+.group-header /deep/ svg {
   width: 20px;
+  height: 20px;
   margin-left: 30px;
+  fill: #646464;
+  vertical-align: -3px;
   cursor: pointer;
 }
 
@@ -269,9 +276,11 @@ export default {
   background-color: rgba(236, 109, 109, 0.31);
 }
 
-.group-more img {
+.group-more /deep/ svg {
+  width: 16px;
   height: 16px;
   transform: translateX(3px);
+  fill: #747373;
 }
 
 .group-more {

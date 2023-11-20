@@ -5,13 +5,52 @@
 
 // 使用严格模式
 'use strict';
+// const hostIp = '1.94.55.79:8080/';
+const hostIp = 'localhost:9090/'
 
+/**
+ * 后端接口
+ */
 export const apis = {
-    // 主机地址
-    host: 'http://localhost:9090/huadiao/',
-    whisperHost: 'ws://localhost:9090/huadiao/message/whisper/talk',
+    // 网站访问地址
+    huadiaoHost: `http://${hostIp}huadiao/`,
+    whisperHost: `ws://${hostIp}huadiao/message/whisper/talk`,
+    imageHost: `http://${hostIp}images/`,
+    // 页面 url
+    pageLinkStart: {
+        homepage: "homepage",
+        note: "singlenote"
+    },
+    common: {
+        huadiaoHeader: "header",
+        register: "common/register",
+        login: "common/login",
+        registerCode: "common/registerCode",
+    },
+    // 搜索
+    search: {
+        user: {
+            nickname: "search/user/nickname",
+            userId: "search/user/userid",
+        },
+        note: {
+            title: "search/note/title",
+            summary: "search/note/summary",
+        },
+        history: {
+            note: {
+                title: "search/history/note/title",
+                deleteSpecific: "search/history/note/delete/specific",
+                deleteAll: "search/history/note/delete/all",
+            }
+        }
+    },
     // 笔记相关 api
     note: {
+        all:  "note/all",
+        edit: "note/edit",
+        modify: "note/modify",
+        publish: "note/publish",
         comment: "note/comment",
         commentStatus: "note/comment",
         commentDelete: "note/comment/delete",
