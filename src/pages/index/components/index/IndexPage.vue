@@ -14,9 +14,7 @@
     </huadiao-header>
     <huadiao-below :openMenu="clickIconToOpenMenu" :login="login" ref="huadiaoBelow"/>
     <transition name="left-slide">
-      <huadiao-menu v-if="getDataCompleted && visible.huadiaoMenu.render"
-                    v-show="visible.huadiaoMenu.show"
-                    :user="user"
+      <huadiao-menu v-show="visible.huadiaoMenu.show"
                     :login="login"
                     ref="menu"/>
     </transition>
@@ -37,7 +35,7 @@ import {mapState} from "vuex";
 import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
 import HuadiaoBelow from "@/pages/index/components/HuadiaoBelow";
 import HuadiaoMenu from "@/pages/index/components/HuadiaoMenu";
-import HuadiaoPoem from "@/pages/index/components/HuadiaoPoem";
+import HuadiaoPoem from "@/pages/index/components/index/HuadiaoPoem";
 import HuadiaoLoginRegister from "@/pages/index/components/HuadiaoLoginRegister";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
@@ -68,7 +66,6 @@ export default {
       visible: {
         // 菜单
         huadiaoMenu: {
-          render: false,
           show: false,
         },
         // 注册登录面板
@@ -105,7 +102,8 @@ export default {
     this.$bus.$on("openNoLoggedBoard", this.openNoLoggedBoard);
     this.$bus.$on("closeNoLoggedBoard", this.closeNoLoggedBoard);
   },
-  methods: {// 点击菜单按钮显示菜单
+  methods: {
+    // 点击菜单按钮显示菜单
     clickIconToOpenMenu() {
       if (!this.login) {
         this.huadiaoMiddleTip("登录后体验更多功能!");
@@ -183,7 +181,7 @@ export default {
   width: 100%;
   height: 100vh;
   scroll-snap-align: start;
-  background: url("~@/../public/img/index/indexPageOneBackground.png") no-repeat center center;
+  background: url("~../../../../../public/img/index/indexPageOneBackground.png") no-repeat center center;
   background-size: cover;
 }
 </style>

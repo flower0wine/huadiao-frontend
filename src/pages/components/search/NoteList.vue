@@ -18,7 +18,7 @@
 import {apis} from "@/assets/js/constants/request-path";
 import NoteItem from "@/pages/components/search/NoteItem";
 import {overallSearchType, overallType, searchType} from "@/assets/js/constants/search/search-header";
-import searchHistory from "@/assets/js/localforge/search-history";
+import searchHistory from "@/assets/js/utils/search-history";
 import SimpleLoading from "@/pages/components/loading/SimpleLoading";
 import RequestPager from "@/assets/js/utils/request-pager";
 

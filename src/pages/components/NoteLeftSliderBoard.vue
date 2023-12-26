@@ -1,9 +1,9 @@
 <template>
   <div class="left-slider-board"
+       v-if="getDataCompleted"
        @mouseenter.self="mouseenter"
        @mouseleave.self="mouseleave"
-       @transitionend.self="transitionOver"
-  >
+       @transitionend.self="transitionOver">
     <user-avatar-box :options="userAvatarOptions"/>
     <transition name="fade">
       <template v-if="visible.userInfo.render">
@@ -32,11 +32,13 @@
 <script>
 import {svg} from "@/assets/js/constants/svgs";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
+import {apis} from "@/assets/js/constants/request-path";
+import {ResponseHandler} from "@/assets/js/utils";
+import {mapState} from "vuex";
 
 export default {
   name: "NoteLeftSliderBoard",
   components: {UserAvatarBox},
-  props: ["authorInfo"],
   data() {
     return {
       svg,
@@ -47,22 +49,50 @@ export default {
           show: false
         },
       },
-      userAvatarOptions: {
+      userAvatarOptions: null,
+    }
+  },
+  computed: {
+    viewedUid() {
+      return this.$route.params.viewedUid;
+    },
+    ...mapState({
+      authorInfo(state) {
+        return state.author.authorInfo ?? {};
+      }
+    }),
+  },
+  created() {
+    this.getUserInfo();
+  },
+  methods: {
+    setUserAvatarOptions() {
+      this.userAvatarOptions = {
         href: `/homepage/${this.authorInfo.uid}`,
         userAvatar: this.authorInfo.userAvatar,
         scale: "30px",
         borderColor: "#d2d2d2",
         transitionTime: "500ms",
         shadow: true,
-      },
-    }
-  },
-  computed: {
+      };
+    },
+    getUserInfo() {
+      this.sendRequest({
+        path: apis.account.info,
+        params: {
+          uid: this.viewedUid,
+        }
+      }).then((response) => {
+        let res = response.data;
+        console.log(res);
 
-  },
-  mounted() {
-  },
-  methods: {
+        new ResponseHandler(res).succeed((data) => {
+          this.$store.commit("setAuthorInfo", {authorInfo: data.userInfo, me: data.me});
+          this.setUserAvatarOptions();
+          this.getDataCompleted = true;
+        });
+      })
+    },
     mouseenter() {
       this.visible.userInfo.render = true;
       this.userAvatarOptions.scale = "60px";

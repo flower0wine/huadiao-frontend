@@ -14,7 +14,7 @@
       </template>
     </huadiao-header>
     <template v-if="visible.note">
-      <left-slider-board :authorInfo="authorInfo"/>
+      <left-slider-board/>
       <note-content-board :showCatalogue="visible.catalogue"/>
       <sun-light-theme :change-theme-callback="changeTheme"/>
     </template>
@@ -49,10 +49,10 @@ export default {
     }
   },
   computed: {
+    viewedUid() {
+      return this.$route.params.viewedUid;
+    },
     ...mapState(["noteInfo"]),
-    authorInfo() {
-      return this.$store.state.noteInfo.authorInfo;
-    }
   },
   watch: {
     "$store.state.noteInfo": {
@@ -97,7 +97,7 @@ export default {
     // 获取笔记
     searchNote() {
       let noteId = this.$route.params.noteId;
-      let uid = this.$route.params.authorUid;
+      let uid = this.viewedUid;
       let reg = /\d+/;
       if(!reg.test(uid) || !reg.test(noteId)) {
         return;

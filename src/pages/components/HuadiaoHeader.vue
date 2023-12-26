@@ -88,7 +88,6 @@ export default {
           render: false,
           show: false,
         },
-
       },
       boardConfig: defaultHuadiaoHeaderStyle,
     };
@@ -209,6 +208,7 @@ export default {
 .huadiao-header {
   position: fixed;
   width: 100%;
+  height: 61px;
   z-index: 30;
   top: 0;
   left: 0;

@@ -75,6 +75,7 @@ export default {
 <style scoped>
 .huadiao-house-anime {
   position: relative;
+  scroll-snap-align: start;
   height: max(100vh, 600px);
   padding-top: max(10vh, 80px);
 }

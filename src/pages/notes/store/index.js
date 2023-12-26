@@ -21,24 +21,16 @@ const state = {
     },
     // 作者
     author: {
-        me: null,
+        me: false,
         authorInfo: {
-            nickname: "",
-            uid: 0,
-            userAvatar: "",
-            follows: 0,
-            fans: 0,
+            nickname: null,
+            uid: null,
+            userId: null,
+            userAvatar: null,
+            follows: null,
+            fans:null,
         },
-        noteList: [{
-          noteId: null,
-          noteTitle: null,
-          noteContent: null,
-          publishTime: null,
-          viewCount: null,
-          starCount: null,
-          likeCount: null,
-          commentCount: null,
-        }]
+        noteList: []
     }
 };
 const actions = {};
@@ -46,11 +38,17 @@ const mutations = {
     // 初始化 user
     initialUser(state, {user}) {
         state.user = user;
+        state.author.noteList = [];
     },
-    // 初始化作者信息和笔记信息
-    initialNoteAndAuthor(state, {author}) {
-        state.author = author;
+    // 添加笔记
+    addNotes(state, {noteList}) {
+        state.author.noteList.push(...noteList);
     },
+    // 设置作者信息
+    setAuthorInfo(state, {authorInfo, me}) {
+        state.author.me = me;
+        state.author.authorInfo = authorInfo;
+    }
 };
 const getters = {};
 

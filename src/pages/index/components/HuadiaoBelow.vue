@@ -1,13 +1,13 @@
 <template>
   <div class="huadiao-below">
     <div v-html="svg.add"
-           class="add-note-icon"
+           class="add-note-icon item"
            title="好记性不如烂笔头"
            ref="addNote"
            @click="clickToCreateNewNote">
     </div>
     <div v-html="svg.menu"
-         class="menu-icon"
+         class="menu-icon item"
          title="这个好像可以点"
          ref="menu"
          @click="openMenu">
@@ -43,22 +43,39 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+.menu-icon svg,
+.add-note-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+  vertical-align: -2px;
+}
+</style>
+
+<style scoped lang="scss">
 
 .huadiao-below {
   position: fixed;
   z-index: 1;
-  bottom: 0;
-  left: 0;
-  padding: 0 0 10px 20px;
+  width: 34px;
+  bottom: 10px;
+  left: 8px;
+  text-align: center;
 }
 
-.menu-icon /deep/ svg,
-.add-note-icon /deep/ svg {
-  width: 20px;
-  height: 20px;
-  margin-bottom: 20px;
-  fill: #fff;
+.item {
+  padding: 6px;
   cursor: pointer;
+  border-radius: 6px;
+
+  &:hover {
+     background-color: #f5f5f533;
+   }
+
+  &:nth-child(n + 1) {
+    margin-top: 10px;
+  }
 }
+
 </style>

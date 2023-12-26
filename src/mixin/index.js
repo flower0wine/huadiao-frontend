@@ -52,6 +52,7 @@ export const mixin = {
             });
         },
         // 发送请求, 由于请求 url 由 http://localhost:9090/huadiao/ 和 path 组成, 故 path 不需要加斜杆
+        // 使用 axios 作为请求工具
         sendRequest({path, method, params, data, headers, thenCallback, errorCallback}) {
             axios.defaults.withCredentials = true;
             // 可以选择的文本类型
@@ -271,11 +272,22 @@ export const mixin = {
         },
         /**
          * 将 一位数转换为两位数, 如 1 返回 01, 10 返回 10
-         * @param number 数字型
-         * @returns {string|*} 返回两个字符的字符串
+         * @param number {number} 数字型
+         * @returns {string} 返回两个字符的字符串
          */
         numberFormat(number) {
-            return number < 10 ? '0' + number : number;
+            return (number + "").padStart(2, "0");
+        },
+        /**
+         * 将数字转换为千单位, 如 1000 返回 1.0k, 保留一位小数
+         * @param number {number} 数字
+         * @returns {string} 返回数字字符串
+         */
+        numberFormatThousand(number) {
+            if(number > 1000) {
+                return `${(number / 1000).toFixed(1)}k`;
+            }
+            return `${number}`;
         },
         /**
          * 截断指定长度的字符串
@@ -350,6 +362,13 @@ export const mixin = {
                 threshold: 0.1
             });
         },
-
+        /**
+         * 在新标签页开启网页, 返回窗口对象
+         * @param url 网页 url
+         * @return {WindowProxy} 窗口对象
+         */
+        openNewPage(url) {
+            return window.open(url, "_blank");
+        }
     },
 }

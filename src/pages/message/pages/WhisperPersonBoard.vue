@@ -67,6 +67,9 @@ export default {
     },
     chatUid() {
       return parseInt(this.$route.params.uid);
+    },
+    currentRoute() {
+      return this.$route.path;
     }
   },
   watch: {
@@ -105,17 +108,17 @@ export default {
     jumpFirstUser() {
       let path;
       let whisper = this.$store.state.message.whisper;
-      if(whisper.length === 0) {
-        path = "/whisper";
+      let whisperPath = "/whisper";
+      if(whisper.length !== 0) {
+        path = `${whisperPath}/${whisper[0].uid}`
       }
-      else {
-        path = `/whisper/${whisper[0].uid}`
+      if(whisperPath !== this.currentRoute) {
+        this.$router.replace({
+          path,
+        }).catch((err) => {
+          console.log(err)
+        });
       }
-      this.$router.replace({
-        path,
-      }).catch((err) => {
-        console.log(err)
-      });
     },
     // 查找当前 uid 对应的索引
     findCurrentUid() {

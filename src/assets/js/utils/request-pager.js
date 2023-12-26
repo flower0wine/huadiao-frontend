@@ -100,7 +100,10 @@ class RequestPager {
         }
     }
 
-    // 重置, 如果传入了 option, 则以 option 的参数为重置结果, 传入 true 则清除回调, 默认不清除
+    /**
+     * 重置, 如果传入了 option, 则以 option 的参数为重置结果, 传入 true 则清除回调, 默认不清除
+     * @param clearCompleteCallback 是否清除回调, 默认为 false
+     */
     reset(clearCompleteCallback = false) {
         let defaultOption = this.defaultOption;
         let provideOption = this.provideOption;

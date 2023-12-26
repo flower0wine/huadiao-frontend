@@ -143,6 +143,7 @@ export default {
 
 <style scoped>
 .huadiao-house-slide {
+  scroll-snap-align: start;
   width: 100%;
   height: max(100vh, 600px);
   background-color: #000;

@@ -1,4 +1,5 @@
 const {defineConfig} = require('@vue/cli-service')
+
 module.exports = defineConfig({
     publicPath: process.env.NODE_ENV === 'production' ? './' : '/huadiao/',
     lintOnSave: false,
@@ -93,6 +94,12 @@ module.exports = defineConfig({
             filename: "singleanime.html",
             title: '花凋~~打造旷世巨作'
         }
+    },
+    css: {
+        loaderOptions: {
+            scss: {
+            },
+        },
     },
     devServer: {
         host: "localhost",

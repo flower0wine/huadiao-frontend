@@ -6,6 +6,10 @@
 // 使用严格模式
 'use strict';
 const indexPageOne = {
+    blur: false,
+    shadow: false,
+    customShadow: "",
+    backgroundColor: "",
     inputTheme: {
         inputBackgroundColor: "#E06969A2",
         searchBackgroundColor: "#E314148A",
@@ -27,6 +31,10 @@ const indexPageOne = {
 };
 
 const indexPageTwo = {
+    blur: true,
+    shadow: true,
+    customShadow: "0 2px 4px #00000030",
+    backgroundColor: "#202b3ae3",
     inputTheme: {
         inputBackgroundColor: "#a2a9b7a2",
         searchBackgroundColor: "#17a6988a",

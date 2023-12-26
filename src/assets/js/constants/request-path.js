@@ -45,6 +45,15 @@ export const apis = {
             }
         }
     },
+    // 首页相关 API
+    index: {
+        forum: {
+            note: {
+                recommend: "forum/note/recommend",
+                rank: "forum/note/rank",
+            }
+        },
+    },
     // 笔记相关 api
     note: {
         all:  "note/all",

@@ -67,6 +67,9 @@ export default {
     }
   },
   computed: {
+    viewedUid() {
+      return this.$route.params.viewedUid;
+    },
     ...mapState(["noteInfo"]),
   },
   mounted() {
@@ -129,7 +132,7 @@ export default {
       this.sendRequest({
         path: apis.note.comment,
         params: {
-          uid: this.$route.params.authorUid,
+          uid: this.viewedUid,
           noteId: this.$route.params.noteId,
           offset: this.offset,
           row: this.row

@@ -3,11 +3,11 @@
        :style="userAvatarStyle"
        :class="defaultOptions.hover ? 'userAvatarHover' : ''">
     <template v-if="defaultOptions.href">
-      <a :href="defaultOptions.href">
+      <a :href="defaultOptions.href" target="_blank">
         <div class="default-user-avatar" v-html="svg.avatar"></div>
         <div class="user-avatar"
              v-if="hasAvatar"
-             :style="`${userAvatar};`"></div>
+             :style="`${userAvatar}; ${borderStyle};`"></div>
       </a>
     </template>
     <template v-else>

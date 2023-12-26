@@ -8,11 +8,17 @@
 import VueRouter from "vue-router";
 
 export default new VueRouter({
-    base: '/',
-    mode: "history",
+    mode: "hash",
     routes: [
         {
-            path: '/',
+            path: "/",
+            alias: ["/note/:type(\\w+)", "/note"],
+            component: () => import("@/pages/index/components/forum/note/NoteList"),
         },
+        {
+            path: "/anime",
+            alias: ["/anime/:type(\\w+)"],
+            component: () => import("@/pages/index/components/forum/anime/AnimeList"),
+        }
     ]
 })

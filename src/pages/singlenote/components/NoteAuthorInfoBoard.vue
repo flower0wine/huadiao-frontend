@@ -1,8 +1,8 @@
 <template>
-  <div class="author-info-box">
+  <div class="author-info-box" v-if="authorInfo">
     <div class="author-infer">
       <user-avatar-box :options="userAvatarOptions"/>
-      <div class="author-nickname">{{ noteInfo.authorInfo.nickname || noteInfo.authorInfo.userId }}</div>
+      <div class="author-nickname">{{ authorInfo.nickname || authorInfo.userId }}</div>
       <div class="follow-or-cancel"
            v-if="!me"
            @click="checkLogin && clickToFollowOrCancelFollow"
@@ -46,18 +46,18 @@ export default {
       follow: null,
       fan: null,
       userAvatarOptions: {
-        userAvatar: this.$store.state.noteInfo.authorInfo.userAvatar,
-        href: `/homepage/${this.$store.state.noteInfo.authorInfo.uid}`,
-        scale: "30px",
-        shadow: true,
+        scale: "30px"
       },
     }
   },
   computed: {
+    viewedUid() {
+      return this.$route.params.viewedUid;
+    },
     ...mapState(["noteInfo"]),
     ...mapState({
       authorInfo(state) {
-        return state.noteInfo.authorInfo;
+        return state.author.authorInfo;
       },
       me(state) {
         return state.noteInfo.me;
@@ -66,6 +66,13 @@ export default {
         return state.user.login;
       }
     }),
+  },
+  watch: {
+    "authorInfo": {
+      handler() {
+        this.setUserAvatarOptions();
+      }
+    }
   },
   mounted() {
     this.initial();
@@ -86,6 +93,14 @@ export default {
           refs.followOrCancelBtn.classList.add("following");
         }
       }
+    },
+    setUserAvatarOptions() {
+      this.userAvatarOptions = {
+        userAvatar: this.authorInfo.userAvatar,
+        href: `/homepage/${this.authorInfo.uid}`,
+        scale: this.userAvatarOptions.scale,
+        shadow: true,
+      };
     },
     // 由于未登录可以访问笔记页面, 所以需要检查是否登录
     checkLogin() {
@@ -127,7 +142,7 @@ export default {
       this.sendRequest({
         path: `note/like/${path}`,
         params: {
-          uid: this.$route.params.authorUid,
+          uid: this.viewedUid,
           noteId: this.$route.params.noteId
         },
         thenCallback: (response) => {
@@ -155,7 +170,7 @@ export default {
       this.sendRequest({
         path: `note/unlike/${path}`,
         params: {
-          uid: this.$route.params.authorUid,
+          uid: this.viewedUid,
           noteId: this.$route.params.noteId
         },
         thenCallback: (response) => {
@@ -183,7 +198,7 @@ export default {
       this.sendRequest({
         path: `note/star/${path}`,
         params: {
-          uid: this.$route.params.authorUid,
+          uid: this.viewedUid,
           noteId: this.$route.params.noteId,
         },
         thenCallback: (response) => {

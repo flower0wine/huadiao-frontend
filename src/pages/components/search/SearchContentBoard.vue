@@ -50,7 +50,7 @@ import {svg} from "@/assets/js/constants/svgs";
 import {apis} from "@/assets/js/constants/request-path";
 import UserList from "@/pages/components/search/UserList";
 import NoteList from "@/pages/components/search/NoteList";
-import searchHistory from "@/assets/js/localforge/search-history";
+import searchHistory from "@/assets/js/utils/search-history";
 import {searchTypeMapping} from "@/assets/js/constants/search/search-header";
 
 export default {

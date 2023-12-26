@@ -1,20 +1,16 @@
 <template>
   <div class="huadiao-house-container"
        @wheel="mousewheelEvent">
-    <div v-huadiao-full-page class="scroller" v-if="getDataCompleted">
+    <div class="scroller" v-if="getDataCompleted">
       <anime-house-slide/>
       <huadiao-house-anime v-if="visible.animeHouse.render"/>
-      <div class="huadiao-house-header" :style="huadiaoHouseStyle">
-        <transition-group :name="transitionName">
+      <div class="huadiao-house-header">
+        <div class="header-transform" ref="headerTransform">
           <huadiao-header :huadiaoHeaderStyle="huadiaoHeaderConfig"
-                          key="indexHeader"
-                          :mouseenterAvatarCallback="mouseenterAvatar"
-                          v-show="visible.header.show"/>
+                          :mouseenterAvatarCallback="mouseenterAvatar"/>
           <div class="anime-header"
-               key="animeHeader"
-               :style="animeHeaderStyle"
-               v-show="!visible.header.show">番剧收藏馆</div>
-        </transition-group>
+               :style="animeHeaderStyle">番剧收藏馆</div>
+        </div>
       </div>
     </div>
     <huadiao-middle-tip/>
@@ -34,12 +30,13 @@ import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 
+let wheelUpClassName = "wheel-up";
+let wheelDownClassName = "wheel-down";
+
 export default {
   name: "HuadiaoHouse",
   data() {
     return {
-      transitionName: "top-slide",
-      huadiaoHouseStyle: "",
       visible: {
         header: {
           show: true,
@@ -127,13 +124,13 @@ export default {
       })
     },
     mousewheelEvent(e) {
-      this.huadiaoHouseStyle = "overflow: hidden";
+      let headerTransform = this.$refs.headerTransform;
       if (e.wheelDelta > 0) {
-        this.visible.header.show = true;
-        this.transitionName = "bottom-slide";
+        headerTransform.classList.add(wheelUpClassName);
+        headerTransform.classList.remove(wheelDownClassName);
       } else {
-        this.visible.header.show = false;
-        this.transitionName = "top-slide";
+        headerTransform.classList.add(wheelDownClassName);
+        headerTransform.classList.remove(wheelUpClassName);
       }
     },
     mouseenterAvatar() {
@@ -155,20 +152,24 @@ export default {
 <style>
 html {
   overflow-x: hidden;
+  scroll-snap-type: y mandatory;
 }
 
 .huadiao-house-header .huadiao-header {
   position: relative;
 }
 </style>
-<style scoped>
+<style scoped lang="scss">
+$headerHeight: 61px;
+
 .huadiao-house-header {
   position: fixed;
   top: 0px;
   z-index: 10;
   width: 100%;
-  height: 61px;
+  height: $headerHeight;
   box-shadow: var(--box-shadow-min);
+  overflow: hidden;
 }
 
 .swiper-container {
@@ -184,44 +185,19 @@ html {
   height: 100%;
   font-size: 24px;
   text-align: center;
-  line-height: 62px;
+  line-height: $headerHeight + 1;
 }
 
-/*元素本体上滑*/
-.top-slide-enter {
-  margin-top: 62px;
+.header-transform {
+  height: $headerHeight;
+  transition: transform 500ms;
 }
 
-.top-slide-enter-to,
-.top-slide-leave {
-  margin-top: 0;
+.wheel-up {
+  transform: translateY(0);
 }
 
-.top-slide-leave-to {
-  margin-top: -62px;
-}
-
-.top-slide-enter-active,
-.top-slide-leave-active {
-  transition: var(--transition-500ms);
-}
-
-/*元素本体上滑*/
-.bottom-slide-enter {
-  margin-top: -62px;
-}
-
-.bottom-slide-enter-to,
-.bottom-slide-leave {
-  margin-top: 0;
-}
-
-.bottom-slide-leave-to {
-  margin-top: 62px;
-}
-
-.bottom-slide-enter-active,
-.bottom-slide-leave-active {
-  transition: var(--transition-500ms);
+.wheel-down {
+  transform: translateY(-$headerHeight);
 }
 </style>

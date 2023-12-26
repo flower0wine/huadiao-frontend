@@ -12,7 +12,7 @@ export default new VueRouter({
     mode: "history",
     routes: [
         {
-            path: "/singlenote/:authorUid(\\d+)/:noteId(\\d+)",
+            path: "/singlenote/:viewedUid(\\d+)/:noteId(\\d+)",
         }
     ],
 })

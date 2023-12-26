@@ -28,7 +28,8 @@ const state = {
         follow: null,
         userAvatar: null
     },
-    noteInfo: {
+    author: {
+        me: false,
         authorInfo: {
             nickname: null,
             userAvatar: null,
@@ -37,6 +38,8 @@ const state = {
             follow: null,
             fan: null,
         },
+    },
+    noteInfo: {
         // 作者与我的关系
         authorAndMeRelation: {
             followed: false,
@@ -98,6 +101,9 @@ const mutations = {
     initialNoteInfo(state, {noteInfo}) {
         noteInfo.commentList = [];
         state.noteInfo = noteInfo;
+    },
+    setAuthorInfo(state, {authorInfo}) {
+        state.author.authorInfo = authorInfo;
     },
     // 添加笔记评论
     addNoteComment(state, {comment}) {

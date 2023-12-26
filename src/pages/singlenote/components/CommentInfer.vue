@@ -75,6 +75,9 @@ export default {
     sendDate() {
       return this.huadiaoDateFormat(this.item.commentDate);
     },
+    viewedUid() {
+      return this.$route.params.viewedUid;
+    },
     ...mapState({
       /*三种情况可删除评论
         1. 自己发布的评论可删除
@@ -83,7 +86,7 @@ export default {
         */
       deleteComment(state) {
         return this.myUid === this.item.uid ||
-            this.myUid === this.$route.params.authorUid ||
+            this.myUid === this.viewedUid ||
             state.noteInfo.commentList[this.rootIndex].uid === this.myUid;
       },
       // 当为子评论时 subIndex 不为 null, 否则为 null
@@ -120,7 +123,7 @@ export default {
         path: apis.note.commentReport,
         params: {
           uid: this.item.uid, // 被举报者
-          authorUid: this.$route.params.authorUid,
+          authorUid: this.viewedUid,
           noteId: this.$route.params.noteId,
           rootCommentId: this.rootCommentId,
           subCommentId: this.subCommentId
@@ -159,7 +162,7 @@ export default {
       this.sendRequest({
         path: apis.note.commentDelete,
         params: {
-          uid: this.$route.params.authorUid,
+          uid: this.viewedUid,
           noteId: this.$route.params.noteId,
           rootCommentId: this.rootCommentId,
           subCommentId: this.subCommentId,
@@ -257,7 +260,7 @@ export default {
       this.sendRequest({
         path: `${apis.note.commentStatus}/${type}/${path}`,
         params: {
-          uid: this.$route.params.authorUid,
+          uid: this.viewedUid,
           noteId: this.$route.params.noteId,
           rootCommentId,
           subCommentId,
