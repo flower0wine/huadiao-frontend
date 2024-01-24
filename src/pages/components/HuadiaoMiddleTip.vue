@@ -73,5 +73,6 @@ export default {
   box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.10);
   transform: translate(-50%, -50%);
   transition: var(--transition-1000ms);
+  pointer-events: none;
 }
 </style>

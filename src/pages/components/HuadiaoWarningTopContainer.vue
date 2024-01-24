@@ -79,6 +79,7 @@ export default {
   z-index: 999;
   bottom: 0px;
   right: 0px;
+  pointer-events: none;
 }
 
 .huadiao-warning-tip {

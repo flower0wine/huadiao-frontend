@@ -8,6 +8,6 @@
 
 export default {
     wrongLink: "javascript:void(0);",
-    usernameReg: /(?=.*[0-9])(?=.*[a-zA-Z])[a-zA-Z0-9_]{8,20}/,
-    passwordReg: /(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9_,.+~&^%$#=-]{8,32}/,
+    usernameReg: /(?=.*[0-9])(?=.*[a-zA-Z])^[a-zA-Z0-9_]{8,20}$/,
+    passwordReg: /(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])^[a-zA-Z0-9_,.+!~&^%$#=-]{8,32}$/,
 }

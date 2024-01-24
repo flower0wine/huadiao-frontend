@@ -82,7 +82,7 @@ export const apis = {
     },
     // 账号信息页面相关 api
     account: {
-        info: "userInfo",
+        info: "userinfo",
     },
     setting: {
         modify: "setting/modify",
