@@ -60,6 +60,7 @@
                    @focusout="checkPassword(login.password)"
                    ref="loginPassword"
             >
+          <login-way-list/>
             <button type="button"
                     class="login-btn"
                     @click="clickToLoginHuadiao">登录</button>
@@ -161,12 +162,14 @@ import {svg} from "@/assets/js/constants/svgs";
 import {indexResponseMessage} from "@/assets/js/constants/response_message";
 import constants from "@/assets/js/constants";
 import OperationThrottle from "@/assets/js/utils/operation-throttle";
+import LoginWayList from "@/pages/index/components/index/LoginWayList";
 
 let usernameReg = constants.usernameReg;
 let passwordReg = constants.passwordReg;
 
 export default {
   name: "HuadiaoLoginRegister",
+  components: {LoginWayList},
   data() {
     return {
       svg: {
@@ -559,7 +562,8 @@ export default {
 .register-btn {
   width: 120px;
   height: 40px;
-  margin: auto;
+  margin-top: 30px;
+  margin-inline: auto;
   text-align: center;
   line-height: 40px;
   border: 1px solid #CCBABA6F;

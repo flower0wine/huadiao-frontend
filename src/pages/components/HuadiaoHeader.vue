@@ -31,22 +31,17 @@
           @mouseleave="mouseLeaveAvatar"
           ref="indexUserAvatar"
       >
-        <a :href="huadiaoIndexHeaderConfig.avatar.src"
-           :title="huadiaoIndexHeaderConfig.avatar.title"
-           :style="login ? `--border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}` : ''"
-           class="avatar-box"
-           ref="avatarBox"
-        >
-          <div v-html="svg.noLoginAvatar"
-               class="user-avatar-box"
-               :class="login ? '' : 'no-logged'">
-          </div>
-          <div v-if="login && user.userAvatar"
-               :style="`background-image: url('${userAvatarImagePath}${user.userAvatar}')`"
-               class="user-avatar-box logged-avatar"
-               ref="avatar"
-          ></div>
-        </a>
+        <div ref="avatarBox"
+             :style="login ? `--border: 2px solid ${boardConfig.loggedBoardStyle.borderColor}` : ''"
+             :title="huadiaoIndexHeaderConfig.avatar.title"
+             class="avatar-box">
+          <user-avatar-box :options="{
+                        userAvatar: user.userAvatar,
+                        scale: userAvatarScale,
+                        href: huadiaoIndexHeaderConfig.avatar.src,
+                        transitionTime: '500ms',
+                    }"/>
+        </div>
         <!--已登录组件-->
         <template v-if="login">
           <transition name="fade">
@@ -75,6 +70,10 @@ import {mapState} from "vuex";
 import {svg} from "@/assets/js/constants/svgs";
 import defaultHuadiaoHeaderStyle from "@/assets/js/constants/huadiao_header_style/default";
 import {apis} from "@/assets/js/constants/request-path";
+import UserAvatarBox from "@/pages/components/UserAvatarBox";
+
+let smallUserAvatarScale = "41px";
+let bigUserAvatarScale = "71px";
 
 export default {
   name: "HuadiaoHeader",
@@ -90,6 +89,7 @@ export default {
         },
       },
       boardConfig: defaultHuadiaoHeaderStyle,
+      userAvatarScale: smallUserAvatarScale,
     };
   },
   computed: {
@@ -165,8 +165,7 @@ export default {
     modifyHuadiaoHeaderStyle(style) {
       if (style) {
         this.modifySrcObject(this.boardConfig, style);
-      }
-      else {
+      } else {
         this.modifySrcObject(this.boardConfig, this.huadiaoHeaderStyle);
       }
     },
@@ -177,6 +176,7 @@ export default {
       this.$bus.$emit("openNoLoggedBoard");
       if (this.login && this.$refs.avatarBox) {
         this.$refs.avatarBox.classList.add("mouse-enter-logged-avatar");
+        this.userAvatarScale = bigUserAvatarScale;
       }
       this.mouseenterAvatarCallback && this.mouseenterAvatarCallback();
     },
@@ -186,11 +186,13 @@ export default {
       this.$bus.$emit("closeNoLoggedBoard");
       if (this.login && this.$refs.avatarBox) {
         this.$refs.avatarBox.classList.remove("mouse-enter-logged-avatar");
+        this.userAvatarScale = smallUserAvatarScale;
       }
       this.mouseleaveAvatarCallback && this.mouseleaveAvatarCallback();
     },
   },
   components: {
+    UserAvatarBox,
     HuadiaoSearch,
     LoggedBoard
   },

@@ -78,7 +78,12 @@ class ResponseHandler {
     }
 }
 
+function getOauthPath(authorizeUri, clientId, redirectUri) {
+    return `${authorizeUri}?client_id=${clientId}&redirect_uri=${redirectUri}`;
+}
+
 module.exports = {
     Timer,
     ResponseHandler,
+    getOauthPath,
 }

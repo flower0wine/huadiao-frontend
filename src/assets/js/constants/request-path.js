@@ -25,6 +25,9 @@ export const apis = {
         huadiaoHeader: "header",
         register: "common/register",
         login: "common/login",
+        oauth: {
+            github: "common/register/github",
+        },
         registerCode: "common/registerCode",
     },
     // 搜索
