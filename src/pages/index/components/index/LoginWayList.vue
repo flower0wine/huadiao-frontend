@@ -1,14 +1,16 @@
 <template>
   <div class="login-way-list">
     <login-github/>
+    <login-google/>
   </div>
 </template>
 
 <script>
 import LoginGithub from "@/pages/index/components/index/LoginGithub";
+import LoginGoogle from "@/pages/index/components/index/LoginGoogle";
 export default {
   name: "LoginWayList",
-  components: {LoginGithub},
+  components: {LoginGoogle, LoginGithub},
   data() {
     return {}
   },
@@ -20,8 +22,10 @@ export default {
 
 <style lang="scss">
 .login-way-list {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
   margin-top: 40px;
-  text-align: center;
 
   .login-icon svg {
     width: 24px;

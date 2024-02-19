@@ -27,6 +27,7 @@ export const apis = {
         login: "common/login",
         oauth: {
             github: "common/register/github",
+            google: "common/register/google",
         },
         registerCode: "common/registerCode",
     },
