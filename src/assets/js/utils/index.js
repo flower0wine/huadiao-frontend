@@ -78,10 +78,15 @@ class ResponseHandler {
     }
 }
 
-function getOauthPath(authorizeUri, clientId, redirectUri) {
-    return `${authorizeUri}?client_id=${clientId}&redirect_uri=${redirectUri}`;
-}
+function getOauthPath(authorizeUri, clientId, redirectUri, scope, responseType) {
+    let uri = new URL(authorizeUri);
+    uri.searchParams.set("client_id", clientId);
+    uri.searchParams.set("redirect_uri", redirectUri);
 
+    scope && uri.searchParams.set("scope", scope);
+    responseType && uri.searchParams.set("response_type", responseType);
+    return uri.toString();
+}
 module.exports = {
     Timer,
     ResponseHandler,
