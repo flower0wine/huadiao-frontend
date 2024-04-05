@@ -62,6 +62,17 @@ export const mixin = {
             }
         }
     },
+    created() {
+        axios.interceptors.request.use((config) => {
+            const {url} = config;
+            if(url.includes("search")) {
+                const tip = "目前服务器配置低, 无法正常运行 Elasticsearch, 暂不支持搜索";
+                this.huadiaoMiddleTip(tip);
+                return Promise.reject(tip);
+            }
+            return config;
+        });
+    },
     methods: {
         // 警告提示
         huadiaoWarningTip(message) {
