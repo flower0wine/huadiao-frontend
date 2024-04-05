@@ -24,6 +24,8 @@ import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopCont
 import AddNewGroupBoard from "@/pages/followfan/components/AddNewGroupBoard";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import TransferFollowGroup from "@/pages/followfan/components/TransferFollowGroup";
+import FollowFanForeground from "@/assets/img/followfan/followFanForeground.webp";
+import FollowFanBackground from "@/assets/img/followfan/followFanBackground.webp";
 
 export default {
   name: "HuadiaoFollowFan",
@@ -42,10 +44,10 @@ export default {
   },
   computed: {
     foreground() {
-      return `background-image: url('${this.followFanImagePath}followFanForeground.png')`;
+      return this.packageBackgroundUrl(FollowFanForeground);
     },
     background() {
-      return `background-image: url('${this.followFanImagePath}followFanBackground.png');`;
+      return this.packageBackgroundUrl(FollowFanBackground);
     }
   },
   mounted() {

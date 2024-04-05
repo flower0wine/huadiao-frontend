@@ -34,7 +34,7 @@ import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopCont
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import {statusCode} from "@/assets/js/constants/status-code";
-import {singleNoteHuadiaoHeaderStyle} from "@/assets/js/constants/huadiao_header_style/singlenote";
+import {singleNoteHuadiaoHeaderStyle} from "@/assets/js/constants/style/huadiao_header_style/singlenote";
 
 export default {
   name: "HuadiaoSingleNote",
@@ -44,13 +44,11 @@ export default {
         note: false,
         catalogue: false
       },
-      // huadiaoHeader 样式
-      huadiaoHeaderStyle: singleNoteHuadiaoHeaderStyle,
     }
   },
   computed: {
-    viewedUid() {
-      return this.$route.params.viewedUid;
+    huadiaoHeaderStyle() {
+      return singleNoteHuadiaoHeaderStyle;
     },
     ...mapState(["noteInfo"]),
   },
@@ -97,7 +95,7 @@ export default {
     // 获取笔记
     searchNote() {
       let noteId = this.$route.params.noteId;
-      let uid = this.viewedUid;
+      let uid = this.authorUid;
       let reg = /\d+/;
       if(!reg.test(uid) || !reg.test(noteId)) {
         return;

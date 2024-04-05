@@ -11,7 +11,7 @@
               class="like-icon"
               :class="item.myLike ? 'active-icon' : ''"
         ></span>
-        <span>{{item.likeNumber}}</span>
+        <span>{{item.likeCount}}</span>
       </div>
       <div class="unlike-comment"
            @click="clickToUnlikeComment"
@@ -21,7 +21,8 @@
               :class="item.myUnlike ? 'active-icon' : ''"
         ></span>
       </div>
-      <div class="reply-comment-user" @click="replyCommentUser">回复</div>
+      <div class="reply-comment-user"
+           @click="replyCommentUser">回复</div>
       <div class="comment-operations">
         <span v-html="svg.more"
               class="more-btn"
@@ -31,7 +32,7 @@
                v-show="visible.more.show"
                v-if="visible.more.render"
                @mouseleave="hiddenMoreBoard">
-            <div v-if="deleteComment"
+            <div v-if="commentDeletable"
                  @click="clickDeleteComment"
                  class="more-element">删除</div>
             <div v-if="myUid !== item.uid"
@@ -46,11 +47,13 @@
 
 <script>
 import {mapState} from "vuex";
-import {svg} from "@/assets/js/constants/svgs";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
-import constants from "@/assets/js/constants";
+import {svg} from "@/assets/js/constants/svgs";
+
+const ADD = "add";
+const DELETE = "delete";
 
 export default {
   name: "CommentInfer",
@@ -63,7 +66,6 @@ export default {
           show: false,
         }
       },
-      svg,
       // 请求中
       requesting: {
         likeComment: false,
@@ -72,21 +74,23 @@ export default {
     }
   },
   computed: {
+    svg() {
+      return {
+        like: svg.like,
+      };
+    },
     sendDate() {
       return this.huadiaoDateFormat(this.item.commentDate);
-    },
-    viewedUid() {
-      return this.$route.params.viewedUid;
     },
     ...mapState({
       /*三种情况可删除评论
         1. 自己发布的评论可删除
         2. 作者可删除
-        3. 自己发布的根评论下的子评论
+        3. 自己发布的根评论下的子评论可删除
         */
-      deleteComment(state) {
+      commentDeletable(state) {
         return this.myUid === this.item.uid ||
-            this.myUid === this.viewedUid ||
+            this.myUid === this.authorUid ||
             state.noteInfo.commentList[this.rootIndex].uid === this.myUid;
       },
       // 当为子评论时 subIndex 不为 null, 否则为 null
@@ -120,10 +124,10 @@ export default {
     // 点击举报评论
     clickReportComment() {
       this.sendRequest({
-        path: apis.note.commentReport,
+        path: apis.note.comment.report,
         params: {
           uid: this.item.uid, // 被举报者
-          authorUid: this.viewedUid,
+          authorUid: this.authorUid,
           noteId: this.$route.params.noteId,
           rootCommentId: this.rootCommentId,
           subCommentId: this.subCommentId
@@ -132,7 +136,7 @@ export default {
           let res = response.data;
           console.log(res);
           if(res.code === statusCode.succeed) {
-            this.huadiaoMiddleTip(constants.singleNoteResponse.reportNoteCommentSucceed);
+            this.huadiaoMiddleTip("举报成功！我们将会尽快审核！");
           }
           else {
             // 举报失败
@@ -149,7 +153,7 @@ export default {
         // 删除根评论弹窗提醒
         this.huadiaoPopupWindow(huadiaoPopupWindowOptions.iconType.warning,
             huadiaoPopupWindowOptions.operate.confirmOrCancel,
-            constants.singleNoteResponse.chooseDeleteComment,
+            "确认删除吗？该评论下的所有评论都会被删除！",
             this.deleteCommentRequest
         );
       }
@@ -160,9 +164,9 @@ export default {
     // 删除评论请求
     deleteCommentRequest() {
       this.sendRequest({
-        path: apis.note.commentDelete,
+        path: apis.note.comment.delete,
         params: {
-          uid: this.viewedUid,
+          uid: this.authorUid,
           noteId: this.$route.params.noteId,
           rootCommentId: this.rootCommentId,
           subCommentId: this.subCommentId,
@@ -173,10 +177,9 @@ export default {
           if(res.code === statusCode.succeed) {
             let commit = this.subCommentId ? "deleteSubCommit" : "deleteRootComment"
             this.$store.commit(commit, {rootIndex: this.rootIndex, subIndex: this.subIndex});
-            this.huadiaoMiddleTip(constants.singleNoteResponse.deleteCommentSucceed);
           }
           else {
-            // 删除失败
+            this.huadiaoMiddleTip("评论删除失败");
           }
         },
         errorCallback: (error) => {
@@ -192,28 +195,21 @@ export default {
         rootIndex: this.rootIndex,
         subIndex: this.subIndex,
       });
-
-      this.$store.commit("setRepliedUserInfo", {
-        repliedUserInfo: {
-          uid: this.item.uid,
-        }
-      });
     },
     // 点击喜欢评论
     clickToLikeComment() {
-      if(this.requesting.unlikeComment) {
+      if(this.requesting.likeComment) {
         return;
       }
       this.requesting.likeComment = true;
-      let path = this.myLike ? "delete" : "add";
+
+      const like = apis.note.comment.like;
+      let path = this.myLike ? like[DELETE] : like[ADD];
+
       this.sendCommentStatus({
-        type: "like",
-        dispatch: "clickToLikeComment",
+        add: this.myLike,
         path,
-        rootIndex: this.rootIndex,
-        subIndex: this.subIndex,
-        rootCommentId: this.rootCommentId,
-        subCommentId: this.subCommentId,
+        dispatch: "clickToLikeComment",
         failCallback: () => {
           this.huadiaoMiddleTip("点赞失败!");
         },
@@ -228,15 +224,14 @@ export default {
         return;
       }
       this.requesting.unlikeComment = true;
-      let path = this.myUnlike ? "delete" : "add";
+
+      const unlike = apis.note.comment.unlike;
+      let path = this.myUnlike ? unlike[DELETE] : unlike[ADD];
+
       this.sendCommentStatus({
-        type: "unlike",
-        dispatch: "clickToUnlikeComment",
+        add: this.myUnlike,
         path,
-        rootIndex: this.rootIndex,
-        subIndex: this.subIndex,
-        rootCommentId: this.rootCommentId,
-        subCommentId: this.subCommentId,
+        dispatch: "clickToUnlikeComment",
         failCallback: () => {
           this.huadiaoMiddleTip("不喜欢失败!");
         },
@@ -246,48 +241,43 @@ export default {
       });
     },
     sendCommentStatus({
-                        type,
+                        add,
                         dispatch,
                         path,
-                        rootIndex,
-                        subIndex,
                         failCallback,
                         cancelFailCallback,
-                        rootCommentId,
-                        subCommentId,
                       }) {
-      let statusType = type === "like" ? this.myLike : this.myUnlike;
       this.sendRequest({
-        path: `${apis.note.commentStatus}/${type}/${path}`,
+        path,
         params: {
-          uid: this.viewedUid,
+          uid: this.authorUid,
           noteId: this.$route.params.noteId,
-          rootCommentId,
-          subCommentId,
+          rootCommentId: this.rootCommentId,
+          subCommentId: this.subCommentId,
         },
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
+
           if(res.code === 1000) {
             // 请求成功
-            this.$store.commit(dispatch, {rootIndex, subIndex, incr: statusType ? -1 : 1});
+            this.$store.commit(dispatch, {rootIndex: this.rootIndex, subIndex: this.subIndex, incr: add ? -1 : 1});
           } else {
             // 请求失败
-            !statusType ? failCallback() : cancelFailCallback();
+            !add ? failCallback() : cancelFailCallback();
           }
           this.requesting.likeComment = this.requesting.unlikeComment = false;
         },
         errorCallback: (error) => {
           console.log(error);
           // 请求失败
-          !statusType ? failCallback() : cancelFailCallback();
+          !add ? failCallback() : cancelFailCallback();
           this.requesting.likeComment = this.requesting.unlikeComment = false;
         }
       });
     },
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   }
 }
 </script>

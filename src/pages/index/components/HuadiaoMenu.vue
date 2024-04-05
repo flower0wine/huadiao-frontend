@@ -20,7 +20,7 @@
 import constants from "@/assets/js/constants";
 import {svg} from "@/assets/js/constants/svgs";
 import {mapState} from "vuex";
-import {menuPageOne} from "@/assets/js/constants/huadiao_menu_style";
+import {menuPageOne} from "@/assets/js/constants/style/huadiao_menu_style";
 
 export default {
   name: "HuadiaoMenu",

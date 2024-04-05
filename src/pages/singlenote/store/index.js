@@ -14,10 +14,6 @@ const state = {
     page: {
         comment: 0,
     },
-    // 被回复的用户
-    replied: {
-        uid: null,
-    },
     // 当前用户信息
     user: {
         login: null,
@@ -109,10 +105,6 @@ const mutations = {
     addNoteComment(state, {comment}) {
         state.noteInfo.commentList.push(...comment);
     },
-    // 设置被回复的用户的信息
-    setRepliedUserInfo(state, {repliedUserInfo: {uid}}) {
-        state.replied.uid = uid;
-    },
     // 给页码加一
     pageIncrement(state, {pageName}) {
         state.page[pageName] += 1;
@@ -161,37 +153,37 @@ const mutations = {
         state.noteInfo.commentCount--;
     },
     // 笔记点赞
-    clickNoteLikeIcon(state, {likeCallback, cancelLikeCallback}) {
+    clickNoteLikeIcon(state, {confirm, cancel}) {
         let myLike = state.noteInfo.noteAndMeRelation.myLike;
         state.noteInfo.noteAndMeRelation.myLike = !myLike;
         if (!myLike) {
             state.noteInfo.likeCount += 1;
-            likeCallback && likeCallback();
+            confirm && confirm();
         } else {
             state.noteInfo.likeCount -= 1;
-            cancelLikeCallback && cancelLikeCallback();
+            cancel && cancel();
         }
     },
     // 笔记不喜欢
-    clickNoteUnLikeIcon(state, {unlikeCallback, cancelUnlikeCallback}) {
+    clickNoteUnLikeIcon(state, {confirm, cancel}) {
         let myUnlike = state.noteInfo.noteAndMeRelation.myUnlike;
         state.noteInfo.noteAndMeRelation.myUnlike = !myUnlike;
         if (!myUnlike) {
-            unlikeCallback && unlikeCallback();
+            confirm && confirm();
         } else {
-            cancelUnlikeCallback && cancelUnlikeCallback();
+            cancel && cancel();
         }
     },
     // 笔记收藏
-    clickNoteStarIcon(state, {starCallback, cancelStarCallback}) {
+    clickNoteStarIcon(state, {confirm, cancel}) {
         let myStar = state.noteInfo.noteAndMeRelation.myStar;
         state.noteInfo.noteAndMeRelation.myStar = !myStar;
         if (!myStar) {
             state.noteInfo.starCount += 1;
-            starCallback && starCallback();
+            confirm && confirm();
         } else {
             state.noteInfo.starCount -= 1;
-            cancelStarCallback && cancelStarCallback();
+            cancel && cancel();
         }
     },
 };

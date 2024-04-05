@@ -67,9 +67,6 @@ export default {
     }
   },
   computed: {
-    viewedUid() {
-      return this.$route.params.viewedUid;
-    },
     ...mapState(["noteInfo"]),
   },
   mounted() {
@@ -130,9 +127,9 @@ export default {
     commentRequest() {
       // 发送获取笔记评论请求
       this.sendRequest({
-        path: apis.note.comment,
+        path: apis.note.comment.get,
         params: {
-          uid: this.viewedUid,
+          uid: this.authorUid,
           noteId: this.$route.params.noteId,
           offset: this.offset,
           row: this.row

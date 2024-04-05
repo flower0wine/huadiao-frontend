@@ -37,8 +37,6 @@ export default {
     },
   },
   beforeDestroy() {
-    // 移除事件
-    this.clearAllRefsEvents();
   }
 }
 </script>

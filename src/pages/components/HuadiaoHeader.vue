@@ -8,7 +8,7 @@
     <ul class="left-entry">
       <li class="huadiao-index">
         <a href="/" title="花凋--不一样的世界">
-          <img class="huadiao-logo" :src="logoPath" alt="">
+          <img class="huadiao-logo" :src="authorityImg" alt="">
         </a>
       </li>
     </ul>
@@ -68,9 +68,10 @@ import HuadiaoSearch from "@/pages/components/search/HuadiaoSearch";
 import constants from "@/assets/js/constants";
 import {mapState} from "vuex";
 import {svg} from "@/assets/js/constants/svgs";
-import defaultHuadiaoHeaderStyle from "@/assets/js/constants/huadiao_header_style/default";
+import defaultHuadiaoHeaderStyle from "@/assets/js/constants/style/huadiao_header_style/default";
 import {apis} from "@/assets/js/constants/request-path";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
+import AuthorityImg from "@/assets/img/authority.webp";
 
 let smallUserAvatarScale = "41px";
 let bigUserAvatarScale = "71px";
@@ -93,6 +94,9 @@ export default {
     };
   },
   computed: {
+    authorityImg() {
+      return AuthorityImg;
+    },
     login: {
       get() {
         return this.$store.state.user?.login || false;

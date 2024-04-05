@@ -1,5 +1,5 @@
 <template>
-  <div class="huadiao-star">
+  <div class="huadiao-star" :style="packageBackgroundUrl(starBackground)">
     <huadiao-header/>
     <template v-if="visible">
       <star-img-animation/>
@@ -42,6 +42,7 @@ import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import TransferNoteFavorite from "@/pages/star/components/TransferNoteFavorite";
 import {mapState} from "vuex";
 import {svg} from "@/assets/js/constants/svgs";
+import StarBackground from "@/assets/img/star/starBackground.webp";
 
 export default {
   name: "HuadiaoStar",
@@ -55,6 +56,9 @@ export default {
   },
   computed: {
     ...mapState(["viewedUid"]),
+    starBackground() {
+      return StarBackground;
+    }
   },
   watch: {
     "$store.state.user": {
@@ -117,7 +121,7 @@ export default {
   position: relative;
   min-width: 1100px;
   min-height: 100vh;
-  background: url("~/public/img/star/starBackground.png") no-repeat center center fixed;
+  background: no-repeat center center fixed;
   background-size: cover;
   overflow: hidden;
   /* 华文楷体 */

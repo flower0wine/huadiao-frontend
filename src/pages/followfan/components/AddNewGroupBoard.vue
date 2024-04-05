@@ -118,6 +118,8 @@ export default {
           this.$nextTick(() => {
             this.$router.replace(`/followfan/${this.viewedUid}/follow/${groupId}`);
           });
+        }).catch((err) => {
+          console.log(err);
         });
       } else if (this.tempGroupName.length === 0) {
         this.huadiaoMiddleTip("组名不能为空哦!");

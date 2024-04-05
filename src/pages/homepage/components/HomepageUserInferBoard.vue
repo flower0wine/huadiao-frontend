@@ -159,7 +159,6 @@ export default {
     },
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   }
 }
 </script>

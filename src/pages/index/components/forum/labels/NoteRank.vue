@@ -10,14 +10,19 @@
       </div>
     </div>
     <div class="article-list">
-      <a class="article-item"
-         :href="noteLink(item.article.noteId, item.article.uid)"
-         :title="`第 ${index + 1} 名 —— 《${item.article.title}》`"
-         v-for="(item, index) in currentArticle"
-         :key="index">
-        <span class="rank-medal" v-html="getRankMedal(item.index)"></span>
-        <span class="article-title">{{ item.article.title }}</span>
-      </a>
+      <template v-if="getNoteListCompleted">
+        <a class="article-item"
+           :href="noteLink(item.article.noteId, item.article.uid)"
+           :title="`第 ${index + 1} 名 —— 《${item.article.title}》`"
+           v-for="(item, index) in currentArticle"
+           :key="index">
+          <span class="rank-medal" v-html="getRankMedal(item.index)"></span>
+          <span class="article-title">{{ item.article.title }}</span>
+        </a>
+      </template>
+      <template v-else>
+        <content-loading :options="contentLoadingOptions"/>
+      </template>
     </div>
     <div class="pager">
       <div class="pager-control" @click="prePage">上一页</div>
@@ -30,11 +35,14 @@
 import {svg} from "@/assets/js/constants/svgs";
 import {apis} from "@/assets/js/constants/request-path";
 import {ResponseHandler} from "@/assets/js/utils";
+import ContentLoading from "@/pages/components/ContentLoading";
 
 export default {
   name: "NoteRank",
+  components: {ContentLoading},
   data() {
     return {
+      getNoteListCompleted: false,
       svg: {
         article: svg.article,
         rankNo1: svg.rankNo1,
@@ -49,6 +57,20 @@ export default {
     }
   },
   computed: {
+    contentLoadingOptions() {
+      return {
+        line: [{
+          width: "100%",
+          height: "30px"
+        }, {
+          width: "100%",
+          height: "30px"
+        }, {
+          width: "100%",
+          height: "30px"
+        }]
+      };
+    },
     noteRankUpdateTime() {
       return this.updateTime.getTime();
     },
@@ -74,6 +96,7 @@ export default {
         let res = response.data;
         console.log(res);
         new ResponseHandler(res).succeed((data) => {
+          this.getNoteListCompleted = true;
           let noteRank = data.noteRank;
           this.articleList = noteRank;
           this.updateTime = new Date(data.updateTime);
@@ -148,11 +171,6 @@ $medalColors: (#d2a201, #bdb90a, #a36404);
 </style>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: Archivo;
-  src: url('https://lf3-cdn-tos.bytescm.com/obj/static/xitu_juejin_web/fonts/Archivo-ExtraBold.361ffd6.ttf');
-}
-
 @import "../../../scss/forum/variables/index.scss";
 
 .note-rank {
@@ -229,7 +247,7 @@ $medalColors: (#d2a201, #bdb90a, #a36404);
   text-align: center;
   color: #898989;
   margin-right: 10px;
-  font-family: Archivo, sans-serif, serif;
+  font-family: sans-serif, serif;
 }
 
 .article-title {

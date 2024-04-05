@@ -27,23 +27,22 @@
 import SubCommentItem from "@/pages/singlenote/components/SubCommentItem";
 import CommentInfer from "@/pages/singlenote/components/CommentInfer";
 import CurrentUserCommentBoard from "@/pages/singlenote/components/CurrentUserCommentBoard";
-import {svg} from "@/assets/js/constants/svgs";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
-import {mapState} from "vuex";
 
 export default {
   name: "RootCommentItem",
-  props: ["rootCommentItem", "rootIndex"],
+  props: {
+    rootCommentItem: {
+      type: Object,
+      required: true
+    },
+    rootIndex: {
+      type: Number,
+      required: true
+    },
+  },
   data() {
     return {
-      userAvatarOptions: {
-        href: `/homepage/${this.rootCommentItem.uid}`,
-        userAvatar: this.rootCommentItem.userAvatar,
-        transitionTime: "500ms",
-        scale: "44px",
-        hover: true,
-      },
-      svg,
       // 发布评论中
       publishing: false,
       visible: {
@@ -57,11 +56,15 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      repliedUid(state) {
-        return state.replied.uid;
-      },
-    })
+    userAvatarOptions() {
+      return {
+        href: this.homepage(this.rootCommentItem.uid),
+        userAvatar: this.rootCommentItem.userAvatar,
+        transitionTime: "500ms",
+        scale: "44px",
+        hover: true,
+      };
+    },
   },
   mounted() {
   },
@@ -79,7 +82,7 @@ export default {
       this.addComment( {
         comment,
         root,
-        repliedUid: this.repliedUid,
+        repliedUid: this.rootCommentItem.uid,
         rootCommentIndex: this.rootIndex,
         succeedCallback: () => {
           this.publishing = false;

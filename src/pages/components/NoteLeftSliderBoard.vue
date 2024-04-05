@@ -10,13 +10,13 @@
         <div class="user-info" v-show="visible.userInfo.show">
           <div class="author-nickname">{{ cutStringByLength(authorInfo.nickname || authorInfo.userId, 14, true) }}</div>
           <div class="author-follow-fan">
-            <a :href="`/followfan/${authorInfo.uid}/follow`">
+            <a :href="followLink(authorInfo.uid)">
               <div class="follow">
                 <div>{{ authorInfo.follow }}</div>
                 <div>关注</div>
               </div>
             </a>
-            <a :href="`/followfan/${authorInfo.uid}/fan`">
+            <a :href="fanLink(authorInfo.uid)">
               <div class="fan">
                 <div>{{ authorInfo.fan }}</div>
                 <div>粉丝</div>
@@ -30,18 +30,19 @@
 </template>
 
 <script>
-import {svg} from "@/assets/js/constants/svgs";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
 import {apis} from "@/assets/js/constants/request-path";
 import {ResponseHandler} from "@/assets/js/utils";
 import {mapState} from "vuex";
+
+const SMALL_AVATAR_SCALE = "30px";
+const BIG_AVATAR_SCALE = "60px";
 
 export default {
   name: "NoteLeftSliderBoard",
   components: {UserAvatarBox},
   data() {
     return {
-      svg,
       enterLeftBoard: false,
       visible: {
         userInfo: {
@@ -53,34 +54,35 @@ export default {
     }
   },
   computed: {
-    viewedUid() {
-      return this.$route.params.viewedUid;
-    },
     ...mapState({
       authorInfo(state) {
         return state.author.authorInfo ?? {};
       }
     }),
   },
+  watch: {
+    authorInfo: {
+      handler() {
+        this.userAvatarOptions = {
+          href: this.homepage(this.authorInfo.uid),
+          userAvatar: this.authorInfo.userAvatar,
+          scale: SMALL_AVATAR_SCALE,
+          borderColor: "#d2d2d2",
+          transitionTime: "500ms",
+          shadow: true,
+        };
+      }
+    }
+  },
   created() {
     this.getUserInfo();
   },
   methods: {
-    setUserAvatarOptions() {
-      this.userAvatarOptions = {
-        href: `/homepage/${this.authorInfo.uid}`,
-        userAvatar: this.authorInfo.userAvatar,
-        scale: "30px",
-        borderColor: "#d2d2d2",
-        transitionTime: "500ms",
-        shadow: true,
-      };
-    },
     getUserInfo() {
       this.sendRequest({
         path: apis.account.info,
         params: {
-          uid: this.viewedUid,
+          uid: this.authorUid,
         }
       }).then((response) => {
         let res = response.data;
@@ -88,20 +90,19 @@ export default {
 
         new ResponseHandler(res).succeed((data) => {
           this.$store.commit("setAuthorInfo", {authorInfo: data.userInfo, me: data.me});
-          this.setUserAvatarOptions();
           this.getDataCompleted = true;
         });
       })
     },
     mouseenter() {
       this.visible.userInfo.render = true;
-      this.userAvatarOptions.scale = "60px";
       this.enterLeftBoard = true;
+      this.userAvatarOptions.scale = BIG_AVATAR_SCALE;
     },
     mouseleave() {
       this.visible.userInfo.show = false;
       this.enterLeftBoard = false;
-      this.userAvatarOptions.scale = "30px";
+      this.userAvatarOptions.scale = SMALL_AVATAR_SCALE;
     },
     transitionOver(e) {
       if(e.propertyName === "width" && this.enterLeftBoard) {

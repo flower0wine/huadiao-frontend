@@ -1,50 +1,62 @@
 <template>
   <editor v-model="content"
-          :init="init"/>
+          api-key="no-api-key"
+          ref="tinymce"
+          :init="tinymceInit"/>
 </template>
 
 <script>
-import tinymce from "tinymce";
-import "tinymce/themes/silver";
-import Editor from "@tinymce/tinymce-vue";
-import "tinymce/themes/silver";
-import "tinymce/plugins/image";
-import "tinymce/plugins/link";
-import "tinymce/plugins/code";
-import "tinymce/plugins/table";
-import "tinymce/plugins/lists";
-import "tinymce/plugins/wordcount";
-import "tinymce/icons/default/icons";
-import "tinymce/models/dom";
-import "tinymce/langs/zh_CN";
+import tinymce from 'tinymce/tinymce';
+import Editor from '@tinymce/tinymce-vue';
+import 'tinymce/themes/silver/theme';
+// 列表插件
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/advlist';
+// 上传图片插件
+import 'tinymce/plugins/image';
+import 'tinymce/plugins/imagetools';
+// 表格插件
+import 'tinymce/plugins/table';
+// 自动识别链接插件
+import 'tinymce/plugins/autolink';
+// 预览插件
+import 'tinymce/plugins/preview';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/wordcount';
+import 'tinymce/plugins/link';
+import 'tinymce/langs/zh_CN';
+import 'tinymce/skins/ui/oxide/content.min.css';
+import 'tinymce/skins/ui/oxide/skin.min.css';
+import 'tinymce/skins/content/default/content.css';
+
 
 export default {
   data() {
     return {
       content: "",
-      init: {
-        language_url: "/tinymce/langs/zh_CN.js",
-        language: "zh_CN",
+    };
+  },
+  computed: {
+    tinymceInit() {
+      return {
+        // 根据窗口大小设置编辑器区域高度, 187 由测试得出
+        height: window.innerHeight - 187,
         resize: false,
         toolbar_sticky: true,
-        content_css: "tinymce/toolbar.css",
-        plugins: "link lists image code table wordcount",
+        language: 'zh_CN',
+        plugins: "lists link image table code wordcount",
         toolbar: "bold italic underline strikethrough | fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignjustify|bullist numlist |outdent indent blockquote | undo redo | link unlink image code | removeformat",
         branding: false,
         paste_data_images: true,
-      },
-    };
-  },
-  beforeMount() {
-    // 根据窗口大小设置编辑器区域高度, 187 由测试得出
-    this.init.height = window.innerHeight - 187;
+      };
+    },
   },
   mounted() {
     this.initial();
   },
   methods: {
     initial() {
-      tinymce.init({});
+      tinymce.init(this.tinymceInit);
       this.$bus.$on("getNoteContent", this.getNoteContent);
       this.$bus.$on("setNoteContent", this.setNoteContent);
     },
@@ -76,6 +88,7 @@ export default {
 </style>
 
 <style>
+@import "tinymce/skins/content/default/content.css";
 @import "tinymce/skins/ui/oxide/content.css";
 @import "tinymce/skins/ui/oxide/skin.css";
 </style>

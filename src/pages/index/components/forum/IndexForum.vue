@@ -1,8 +1,10 @@
 <template>
-  <div class="huadiao-forum-page">
-    <div class="huadiao-forum-page-background" ref="forumBackground"></div>
+  <div class="huadiao-forum-page"
+       ref="huadiaoForumPage">
+    <div class="huadiao-forum-page-background"
+         :style="packageBackgroundUrl(indexForumBackground)"></div>
     <div class="forum-main-container">
-      <main class="forum-main">
+      <main class="forum-main" v-if="visible.content">
         <forum-navigation/>
         <forum-content/>
       </main>
@@ -13,14 +15,39 @@
 <script>
 import ForumContent from "@/pages/index/components/forum/ForumContent";
 import ForumNavigation from "@/pages/index/components/forum/navigation/ForumNavigation";
+import IndexForumBackground from "@/assets/img/index/indexPageTwoBackground.webp";
+
+let observer;
+
 export default {
   name: "IndexForum",
   components: {ForumNavigation, ForumContent},
   data() {
     return {
+      visible: {
+        content: false,
+      }
+    }
+  },
+  computed: {
+    indexForumBackground() {
+      return IndexForumBackground;
     }
   },
   created() {
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if(entry.isIntersecting) {
+          observer.unobserve(entry.target);
+          this.visible.content = true;
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+  },
+  mounted() {
+    observer.observe(this.$refs.huadiaoForumPage);
   },
   methods: {
   },
@@ -45,7 +72,7 @@ export default {
   z-index: -9;
   width: 100%;
   height: 100vh;
-  background: url("~../../../../../public/img/index/indexPageTwoBackground.jpg") no-repeat center center;
+  background: no-repeat center center;
   background-size: cover;
 }
 

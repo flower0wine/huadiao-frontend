@@ -2,7 +2,7 @@
   <div class="huadiao-homepage-header">
     <div class="huadiao-index">
       <a href="/">
-        <img :src="logoPath" alt>
+        <img :src="authorityImg" alt>
       </a>
     </div>
     <div class="homepage-header-tools"
@@ -30,12 +30,18 @@
 import {svg} from "@/assets/js/constants/svgs";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
+import AuthorityImg from "@/assets/img/authority.webp";
 
 export default {
   name: "HuadiaoHomepageHeader",
   data() {
     return {
       svg,
+    }
+  },
+  computed: {
+    authorityImg() {
+      return AuthorityImg;
     }
   },
   methods: {

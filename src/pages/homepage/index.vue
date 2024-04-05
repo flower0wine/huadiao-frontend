@@ -23,6 +23,7 @@ import HomepageUserInferBoard from "@/pages/homepage/components/HomepageUserInfe
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import {mapState} from "vuex";
+import HomepageBackground from "@/assets/img/homepage/homepageDefaultBackground.webp";
 
 export default {
   name: "HuadiaoHomepage",
@@ -39,7 +40,7 @@ export default {
       homepageBackground(state) {
         let homepageBackground = state.allInfo.homepageInfo.pageBackground;
         if(!homepageBackground) {
-          return `${this.homepageBackgroundImagePath}homepageDefaultBackground.jpg`;
+          return HomepageBackground;
         }
         if(homepageBackground.startsWith("blob:http://")) {
           return homepageBackground;
@@ -77,7 +78,6 @@ export default {
     },
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   },
   components: {
     HuadiaoWarningTopContainer,

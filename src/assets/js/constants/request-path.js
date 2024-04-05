@@ -5,17 +5,17 @@
 
 // 使用严格模式
 'use strict';
-// const hostIp = '1.94.55.79:8080/';
-const hostIp = 'localhost:9090/'
+
+const hostIp = process.env.VUE_APP_BACKEND_IP;
 
 /**
  * 后端接口
  */
 export const apis = {
     // 网站访问地址
-    huadiaoHost: `http://${hostIp}huadiao/`,
-    whisperHost: `ws://${hostIp}huadiao/message/whisper/talk`,
-    imageHost: `http://${hostIp}images/`,
+    huadiaoHost: `http://${hostIp}/huadiao/`,
+    whisperHost: `ws://${hostIp}/huadiao/message/whisper/talk`,
+    imageHost: `http://${hostIp}/images/`,
     // 页面 url
     pageLinkStart: {
         homepage: "homepage",
@@ -60,14 +60,37 @@ export const apis = {
     },
     // 笔记相关 api
     note: {
+        get: "note/get",
         all:  "note/all",
         edit: "note/edit",
         modify: "note/modify",
         publish: "note/publish",
-        comment: "note/comment",
-        commentStatus: "note/comment",
-        commentDelete: "note/comment/delete",
-        commentReport: "note/comment/report",
+        like: {
+            add: "note/like/add",
+            delete: "note/like/delete",
+        },
+        unlike: {
+            add: "note/unlike/delete",
+            delete: "note/unlike/delete",
+        },
+        star: {
+            add: "note/star/add",
+            delete: "note/star/delete",
+        },
+        comment: {
+            like: {
+                add: "note/comment/like/add",
+                delete: "note/comment/like/delete",
+            },
+            unlike: {
+                add: "note/comment/unlike/add",
+                delete: "note/comment/unlike/delete",
+            },
+            get: "note/comment",
+            add: "note/comment/add",
+            delete: "note/comment/delete",
+            report: "note/comment/report",
+        },
     },
     // 个人主页相关 api
     homepage: {

@@ -33,7 +33,6 @@ export default {
   methods: {
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   },
   components: {
     HuadiaoPopupWindow,

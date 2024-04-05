@@ -21,7 +21,12 @@ export default {
   name: "NoteNavigationList",
   data() {
     return {
-      navItem: [{
+
+    }
+  },
+  computed: {
+    navItem() {
+      return [{
         title: "关注",
         to: "/note/follow",
         svg: svg.follow,
@@ -38,7 +43,7 @@ export default {
         title: "后端",
         to: "/note/backend",
         svg: svg.backend,
-      }]
+      }];
     }
   },
   mounted() {

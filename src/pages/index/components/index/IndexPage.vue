@@ -1,5 +1,5 @@
 <template>
-  <div class="huadiao-index-page">
+  <div class="huadiao-index-page" :style="packageBackgroundUrl(indexPageBackground)">
     <huadiao-header>
       <!--未登录组件-->
       <template v-if="!login" v-slot:noLoggedBoard>
@@ -41,6 +41,7 @@ import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopCont
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import NoLoginBoard from "@/pages/components/NoLoginBoard";
 import {svg} from "@/assets/js/constants/svgs";
+import IndexPageBackground from "@/assets/img/index/indexPageOneBackground.webp";
 
 let huadiaoIndexHeaderConfig = {
   // 未登录面板配置
@@ -92,6 +93,9 @@ export default {
   },
   computed: {
     ...mapState(["refs", "user"]),
+    indexPageBackground() {
+      return IndexPageBackground;
+    }
   },
   created() {
   },
@@ -181,7 +185,7 @@ export default {
   width: 100%;
   height: 100vh;
   scroll-snap-align: start;
-  background: url("~../../../../../public/img/index/indexPageOneBackground.png") no-repeat center center;
+  background: no-repeat center center;
   background-size: cover;
 }
 </style>

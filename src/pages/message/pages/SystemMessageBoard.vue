@@ -5,7 +5,7 @@
            v-for="(item, index) in message"
            :key="item.messageId">
         <div class="authority-png">
-          <img src="@/../public/img/authority.png" alt="">
+          <img src="../../../assets/img/authority.webp" alt="">
         </div>
         <div class="message-content-box">
           <div>

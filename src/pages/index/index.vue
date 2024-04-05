@@ -7,8 +7,8 @@
 
 <script>
 
-import {indexPageOne, indexPageTwo} from "@/assets/js/constants/huadiao_header_style/index";
-import {menuPageOne, menuPageTwo} from "@/assets/js/constants/huadiao_menu_style";
+import {indexPageOne, indexPageTwo} from "@/assets/js/constants/style/huadiao_header_style/index";
+import {menuPageOne, menuPageTwo} from "@/assets/js/constants/style/huadiao_menu_style";
 import IndexPage from "@/pages/index/components/index/IndexPage";
 import IndexForum from "@/pages/index/components/forum/IndexForum";
 

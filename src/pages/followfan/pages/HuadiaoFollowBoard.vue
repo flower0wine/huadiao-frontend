@@ -2,7 +2,7 @@
   <div class="huadiao-follow-board">
     <div class="follow-fan-board-header">
       <div class="active-group-name">{{ groupName }}</div>
-      <div class="patch-board">
+      <div class="patch-board" v-if="me">
         <transition name="right-slide" mode="out-in">
           <div class="patch-enter"
                v-if="!visible.patch"
@@ -83,6 +83,9 @@ export default {
     }
   },
   computed: {
+    me() {
+      return this.$store.state.me;
+    },
     viewedUid() {
       return this.$route.params.viewedUid;
     },

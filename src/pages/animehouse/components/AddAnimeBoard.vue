@@ -1,7 +1,7 @@
 <template>
   <div class="add-anime-container">
     <div class="add-anime-board">
-      <div class="anime-picture"></div>
+      <div class="anime-picture" :style="packageBackgroundUrl(addAnimePicture)"></div>
       <div class="add-anime-info">
         <div class="close-add-anime" v-html="svg.fork" @click="closeAddAnimeBoard"></div>
         <div class="add-anime-header">新增番剧</div>
@@ -64,6 +64,7 @@
 import {svg} from "@/assets/js/constants/svgs";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
+import AddAnimePicture from "@/assets/img/huadiaohouse/addAnimePicture.webp";
 
 export default {
   name: "AddAnimeBoard",
@@ -75,6 +76,11 @@ export default {
     }
   },
   mounted() {
+  },
+  computed: {
+    addAnimePicture() {
+      return AddAnimePicture;
+    }
   },
   methods: {
     animeCoverInputChange() {
@@ -179,7 +185,7 @@ export default {
   float: left;
   width: 300px;
   height: 500px;
-  background: url("~@/../public/img/huadiaohouse/addAnimePicture.jpeg") no-repeat;
+  background: no-repeat;
   background-size: 350px;
 }
 

@@ -21,7 +21,12 @@ export default {
   name: "AnimeNavigationList",
   data() {
     return {
-      navItem: [{
+
+    }
+  },
+  computed: {
+    navItem() {
+      return [{
         title: "关注",
         to: "/anime/follow",
         svg: svg.follow,
@@ -30,8 +35,8 @@ export default {
         to: "/anime/comprehensiveness",
         svg: svg.comprehensiveness,
         alias: ["/anime"],
-      }],
-    }
+      }];
+    },
   },
   mounted() {
     this.initial();
