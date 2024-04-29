@@ -135,7 +135,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.huadiaoMiddleTip("举报成功！我们将会尽快审核！");
           }
           else {
@@ -174,7 +174,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             let commit = this.subCommentId ? "deleteSubCommit" : "deleteRootComment"
             this.$store.commit(commit, {rootIndex: this.rootIndex, subIndex: this.subIndex});
           }

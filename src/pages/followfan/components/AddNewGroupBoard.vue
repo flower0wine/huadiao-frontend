@@ -137,7 +137,7 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if(res.code === statusCode.succeed) {
+            if(res.code === statusCode.SUCCEED) {
               resolve(res.data.followGroupId);
             }
           },

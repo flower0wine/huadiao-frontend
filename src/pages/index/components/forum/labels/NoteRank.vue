@@ -12,7 +12,7 @@
     <div class="article-list">
       <template v-if="getNoteListCompleted">
         <a class="article-item"
-           :href="noteLink(item.article.noteId, item.article.uid)"
+           :href="noteLink(item.article.uid, item.article.noteId)"
            :title="`第 ${index + 1} 名 —— 《${item.article.title}》`"
            v-for="(item, index) in currentArticle"
            :key="index">
@@ -102,6 +102,8 @@ export default {
           this.updateTime = new Date(data.updateTime);
           this.realPageCount = Math.ceil(noteRank.length / this.pageLength);
         });
+      }).catch((error) => {
+        console.log(error);
       });
     },
     prePage() {

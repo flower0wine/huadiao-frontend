@@ -45,7 +45,7 @@ export default {
         }).then((response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             this.$store.commit("deleteReplyMessage", {messageIndex: this.index});
           }
         });

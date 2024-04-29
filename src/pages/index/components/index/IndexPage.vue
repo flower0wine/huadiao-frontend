@@ -27,6 +27,7 @@
                               ref="loginRegisterBoard"/>
     </transition>
     <huadiao-warning-top-container/>
+    <DownSlide/>
   </div>
 </template>
 
@@ -42,6 +43,7 @@ import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import NoLoginBoard from "@/pages/components/NoLoginBoard";
 import {svg} from "@/assets/js/constants/svgs";
 import IndexPageBackground from "@/assets/img/index/indexPageOneBackground.webp";
+import DownSlide from "@/pages/components/DownSlide";
 
 let huadiaoIndexHeaderConfig = {
   // 未登录面板配置
@@ -164,6 +166,7 @@ export default {
     },
   },
   components: {
+    DownSlide,
     NoLoginBoard,
     HuadiaoMiddleTip,
     HuadiaoWarningTopContainer,
@@ -187,5 +190,6 @@ export default {
   scroll-snap-align: start;
   background: no-repeat center center;
   background-size: cover;
+  overflow: hidden;
 }
 </style>

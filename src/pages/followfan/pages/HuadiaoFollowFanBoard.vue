@@ -127,7 +127,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             this.$store.commit("initialFollowGroup", {followGroup: res.data});
             this.setGroupMore();
           }
@@ -148,7 +148,7 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
+            if (res.code === statusCode.SUCCEED) {
               resolve();
               this.$store.commit("initialFollowFanCount", {stat: res.data});
             }
@@ -194,7 +194,7 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
+            if (res.code === statusCode.SUCCEED) {
               resolve();
             }
           },

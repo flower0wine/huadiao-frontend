@@ -177,7 +177,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             let userInfo = res.data;
             this.userInfo = userInfo;
             for (let key in userInfo) {

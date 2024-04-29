@@ -64,7 +64,7 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.succeed) {
+        if (res.code === statusCode.SUCCEED) {
           this.$store.commit("initialMessageSetting", {messageSettings: res.data});
         }
       }).catch((error) => {
@@ -87,7 +87,7 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.succeed) {
+        if (res.code === statusCode.SUCCEED) {
           this.messageSettings[setting] = !this.messageSettings[setting];
         }
       }).catch((error) => {

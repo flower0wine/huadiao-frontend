@@ -21,6 +21,9 @@ export const mixin = {
         authorUid() {
             return this.$route.params.authorUid;
         },
+        noteId() {
+            return this.$route.params.noteId;
+        },
         ...mapState({
             me(state) {
                 return state.noteInfo.noteAndMeRelation.me;

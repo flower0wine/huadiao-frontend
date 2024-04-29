@@ -93,6 +93,12 @@ module.exports = defineConfig({
             template: './src/pages/singleanime/index.html',
             filename: "singleanime.html",
             title: '花凋~~打造旷世巨作'
+        },
+        error: {
+            entry: "./src/pages/error/index.js",
+            template: './src/pages/error/index.html',
+            filename: "error.html",
+            title: '花凋~~路途似乎十分坎坷'
         }
     },
     css: {
@@ -134,12 +140,12 @@ module.exports = defineConfig({
         // 代理服务器
         proxy: {
             // 匹配路径后进行代理
-            "/huadiao": {
+            "^/(huadiao|images)": {
                 // 目标服务器
-                target: "http://127.0.0.1:9090/huadiao",
+                target: "http://127.0.0.1:9090",
                 // 是否跨域
                 changeOrigin: true,
-            }
+            },
         }
     }
 })

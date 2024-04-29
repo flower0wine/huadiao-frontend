@@ -60,7 +60,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.huadiaoMiddleTip("页面背景修改成功");
           }
         },

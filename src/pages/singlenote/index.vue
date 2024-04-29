@@ -35,6 +35,7 @@ import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {singleNoteHuadiaoHeaderStyle} from "@/assets/js/constants/style/huadiao_header_style/singlenote";
+import {apis} from "@/assets/js/constants/request-path";
 
 export default {
   name: "HuadiaoSingleNote",
@@ -94,14 +95,14 @@ export default {
     },
     // 获取笔记
     searchNote() {
-      let noteId = this.$route.params.noteId;
+      let noteId = this.noteId;
       let uid = this.authorUid;
       let reg = /\d+/;
       if(!reg.test(uid) || !reg.test(noteId)) {
         return;
       }
       this.sendRequest({
-        path: "note/search",
+        path: apis.note.get,
         params: {
           noteId,
           uid,
@@ -109,7 +110,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.$store.commit("initialNoteInfo", {noteInfo: res.data});
           }
         },

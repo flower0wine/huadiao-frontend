@@ -8,14 +8,17 @@
 
 /**
  * 状态码
- * @type {{succeed: number, exceedLimit: number, notAllowed: number, blankParam: number, existed: number, errorParam: number, notExist: number}}
  */
 export const statusCode = {
-    succeed: 1000,
-    exceedLimit: 1001,
-    errorParam: 2000,
-    blankParam: 2001,
-    notExist: 3000,
-    existed: 3001,
-    notAllowed: 3002,
+    SUCCEED: 1000,
+    EXCEED_LIMIT: 1001,
+    ERROR_PARAM: 2000,
+    BLANK_PARAM: 2001,
+    NOT_AUTHORITATIVE: 2003,
+    PAGE_NOT_EXIST: 3000,
+    EXISTED: 3001,
+    NOT_ALLOW: 3002,
+    EMPTY_DATA: 3003,
+    NOT_EXIST: 3004,
+    SERVER_ERROR: 5000
 }

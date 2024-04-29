@@ -64,10 +64,10 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(statusCode.succeed === res.code) {
+          if(statusCode.SUCCEED === res.code) {
             this.getDataCompleted = true;
             this.$store.commit("initialAllInfo", {allInfo: res.data});
-          } else if(statusCode.notAllowed === res.code) {
+          } else if(statusCode.NOT_ALLOW === res.code) {
             this.huadiaoPopupWindow(huadiaoPopupWindowOptions.iconType.error, huadiaoPopupWindowOptions.operate.hasRead, "用户不公开个人主页");
           }
         },

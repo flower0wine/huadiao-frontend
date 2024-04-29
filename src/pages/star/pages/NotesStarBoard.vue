@@ -166,10 +166,10 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
+            if (res.code === statusCode.SUCCEED) {
               this.$store.commit("addNoteStar", {mapKey, noteStar: res.data, hasNext: true});
               resolve();
-            } else if (res.code === statusCode.notExist) {
+            } else if (res.code === statusCode.NOT_EXIST) {
               this.$store.commit("addNoteStar", {mapKey, noteStar: [], hasNext: false});
               resolve();
             }
@@ -256,7 +256,7 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
+            if (res.code === statusCode.SUCCEED) {
               resolve();
             }
           },
@@ -310,7 +310,7 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
+            if (res.code === statusCode.SUCCEED) {
               resolve(res);
             }
           },
@@ -369,7 +369,7 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
+            if (res.code === statusCode.SUCCEED) {
               resolve();
             }
           },

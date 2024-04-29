@@ -77,10 +77,10 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.fan.push(...res.data);
             this.offset += res.data.length;
-          } else if(res.code === statusCode.notExist) {
+          } else if(res.code === statusCode.NOT_EXIST) {
             this.hasNext = false;
           }
         },
@@ -99,7 +99,7 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if(res.code === statusCode.succeed) {
+        if(res.code === statusCode.SUCCEED) {
           this.fan.splice(index, 1);
         }
       }).catch((error) => {

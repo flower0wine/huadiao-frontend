@@ -338,10 +338,10 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             // 刷新网页
             window.location.reload();
-          } else if (res.code === statusCode.notExist) {
+          } else if (res.code === statusCode.NOT_EXIST) {
             this.huadiaoMiddleTip("用户名或密码输入错误!");
           }
         },

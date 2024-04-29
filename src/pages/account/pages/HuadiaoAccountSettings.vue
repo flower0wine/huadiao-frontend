@@ -103,7 +103,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.userSettings = {...res.data};
             this.$store.commit("initialUserSettings", {settings: res.data});
           }
@@ -124,7 +124,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             // 改变按钮
             this.userSettings[settingName + "Status"] = !this.userSettings[settingName + "Status"];
           } else {

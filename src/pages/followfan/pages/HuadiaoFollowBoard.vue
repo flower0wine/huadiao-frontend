@@ -192,11 +192,11 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
+            if (res.code === statusCode.SUCCEED) {
               this.follow.push(...res.data.follow);
               this.offset += res.data.offset;
               resolve();
-            } else if (res.code === statusCode.notExist) {
+            } else if (res.code === statusCode.NOT_EXIST) {
               this.hasNext = false;
               resolve();
             }
@@ -264,7 +264,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             this.getFollowGroup();
             this.selectFollowArray = [];
             this.visible.patch = false;
@@ -285,7 +285,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             this.getFollowGroup();
             this.removeFollow().then(() => {
               this.visible.patch = false;

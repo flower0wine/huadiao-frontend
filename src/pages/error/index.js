@@ -7,14 +7,10 @@
 'use strict';
 import Vue from 'vue'
 import VueRouter from "vue-router";
-import index from "@/pages/notes/index.vue";
 import "@/assets/css/common.css";
-import "@/assets/css/animation.css";
 import {mixin} from "@/mixin";
-import $ from "jquery";
-import router from "@/pages/notes/router";
-import store from "@/pages/notes/store";
-import NotesMixin from "@/pages/notes/mixin";
+import App from "@/pages/error/App.vue";
+import router from "@/pages/error/router";
 
 Vue.config.productionTip = false;  // 生产提示
 
@@ -24,20 +20,14 @@ Vue.use(VueRouter);
 // 使用 VUE 混入
 // 引入所有页面公共 mixin
 Vue.mixin(mixin);
-Vue.mixin(NotesMixin);
 
 new Vue({
     beforeCreate() {
         // 全局事件总线, 声明 vm 为中间变量
         Vue.prototype.$bus = this;
-        // 全局 jquery
-        Vue.prototype.$ = $;
     },
-    // 渲染
-    render: h => h(index),
-    // 路由
     router,
-    // vuex
-    store,
+    // 渲染
+    render: h => h(App),
     // 挂载
 }).$mount('#app');

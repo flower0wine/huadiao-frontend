@@ -6,7 +6,7 @@
 
 <script>
 import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
+import {ResponseHandler} from "@/assets/js/utils";
 
 export default {
   name: "NewButton",
@@ -28,9 +28,10 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
-              this.buildGroupSucceed(res.data.groupId);
-            }
+
+            new ResponseHandler(res).succeed((data) => {
+              this.buildGroupSucceed(data.groupId);
+            });
           },
           errorCallback: (error) => {
             console.log(error);

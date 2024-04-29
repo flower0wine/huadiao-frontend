@@ -157,10 +157,10 @@ export default {
         }).then((response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             this.$store.commit("addLatestSingleUser", {user: res.data});
             resolve();
-          } else if (res.code === statusCode.notExist) {
+          } else if (res.code === statusCode.NOT_EXIST) {
             reject();
           }
         }).catch((error) => {
@@ -182,8 +182,9 @@ export default {
         }).then((response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
-            let users = res.data;
+
+          new ResponseHandler((data) => {
+            let users = data;
             // 如果 existUid 存在, 则过滤掉
             if (this.existedUid !== null) {
               users = users.filter((item) => item.uid !== this.existedUid);
@@ -203,9 +204,9 @@ export default {
             if (users.length < this.row) {
               this.notExistCallback();
             }
-          } else if (res.code === statusCode.notExist) {
+          }).notExist(() => {
             this.notExistCallback();
-          }
+          });
           this.accessing = false;
           resolve();
         }).catch((error) => {

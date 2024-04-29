@@ -5,8 +5,43 @@
 
 // 使用严格模式
 'use strict';
-import axios from "axios";
+import axios, {HttpStatusCode} from "axios";
 import {apis} from "@/assets/js/constants/request-path.js";
+import {statusCode} from "@/assets/js/constants/status-code";
+
+const excludeInterceptors = [
+    /\//,
+    /^\/search\/(user|note)\/.*/,
+    /^\/note\/(get|all)/,
+    /^\/common\/.*/,
+    /^\/forum\/.*/,
+    /^\/userinfo/,
+    /^\/homepage\/info/,
+    /^\/huadiaohouse\/info/,
+];
+
+function isExcludeInterceptors(pathname) {
+    for (let i = 0; i < excludeInterceptors.length; i++) {
+        if (excludeInterceptors[i].test(pathname)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+axios.interceptors.response.use((resp) => {
+    if(resp.status === HttpStatusCode.Ok) {
+        // 未登录跳转主页
+        if(resp.data.code === statusCode.NOT_AUTHORITATIVE && !isExcludeInterceptors(window.location.pathname)) {
+            window.location.href = "/";
+        }
+        // 页面不存在
+        else if(resp.data.code === statusCode.PAGE_NOT_EXIST) {
+            window.location.href = "/error/404";
+        }
+    }
+    return resp;
+});
 
 export const mixin = {
     data() {
@@ -26,9 +61,6 @@ export const mixin = {
                 this.getDataCompleted = true;
             }
         }
-    },
-    beforeDestroy() {
-        this.clearAllRefsEvents();
     },
     methods: {
         // 警告提示
@@ -100,23 +132,6 @@ export const mixin = {
                     .catch(defaultErrorCallback);
             } else {
                 return axios(srcObj);
-            }
-        },
-        // 清除 this 的 ref 的事件
-        clearAllRefsEvents() {
-            if (!this.$refs) {
-                return;
-            }
-            for (let elName in this.$refs) {
-                let el = this.$refs[elName];
-                // 如果是 VueComponent 实例对象
-                if (el instanceof this.__proto__.constructor) {
-                    this.$(el).off();
-                }
-                // 如果是 Element 实例对象
-                else if (el instanceof Element) {
-                    this.$(el[0]).off();
-                }
             }
         },
         // 将数字按照顺序插入有序数组中

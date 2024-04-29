@@ -57,7 +57,7 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.succeed) {
+        if (res.code === statusCode.SUCCEED) {
           let maxLength = Math.max(res.data.likeNoteMessageList.length, res.data.likeCommentMessageList.length);
           this.offset += maxLength;
           this.$store.dispatch("addLikeMessage", {
@@ -68,7 +68,7 @@ export default {
             this.observer.unobserve(this.$refs.noLikeItem);
           }
         }
-        else if(res.code === statusCode.notExist) {
+        else if(res.code === statusCode.NOT_EXIST) {
           this.hasNext = false;
           this.observer.unobserve(this.$refs.noLikeItem);
         }

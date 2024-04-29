@@ -6,23 +6,23 @@
 // 使用严格模式
 'use strict';
 
-const hostIp = process.env.VUE_APP_BACKEND_IP;
+const HUADIAO_HOST_IP = process.env.VUE_APP_HUADIAO_HOST_IP;
 
 /**
  * 后端接口
  */
 export const apis = {
     // 网站访问地址
-    huadiaoHost: `http://${hostIp}/huadiao/`,
-    whisperHost: `ws://${hostIp}/huadiao/message/whisper/talk`,
-    imageHost: `http://${hostIp}/images/`,
+    huadiaoHost: `http://${HUADIAO_HOST_IP}/huadiao/`,
+    whisperHost: `ws://${HUADIAO_HOST_IP}/huadiao/message/whisper/talk`,
+    imageHost: `http://${HUADIAO_HOST_IP}/images/`,
     // 页面 url
     pageLinkStart: {
         homepage: "homepage",
         note: "singlenote"
     },
+    huadiaoHeader: "header",
     common: {
-        huadiaoHeader: "header",
         register: "common/register",
         login: "common/login",
         oauth: {
@@ -65,6 +65,7 @@ export const apis = {
         edit: "note/edit",
         modify: "note/modify",
         publish: "note/publish",
+        delete: "note/delete",
         like: {
             add: "note/like/add",
             delete: "note/like/delete",
