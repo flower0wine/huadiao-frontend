@@ -3822,28 +3822,28 @@
       return anchor.x() - element.width();
     };
     var southeast$1 = function (anchor, element, bubbles) {
-      return nu$7(eastX(anchor), southY(anchor), bubbles.southeast(), southeast(), 'layout-se');
+      return nu$7(eastX(anchor), southY(anchor), bubbles.southeast(), southeast(), 'layoutList-se');
     };
     var southwest$1 = function (anchor, element, bubbles) {
-      return nu$7(westX(anchor, element), southY(anchor), bubbles.southwest(), southwest(), 'layout-sw');
+      return nu$7(westX(anchor, element), southY(anchor), bubbles.southwest(), southwest(), 'layoutList-sw');
     };
     var northeast$1 = function (anchor, element, bubbles) {
-      return nu$7(eastX(anchor), northY(anchor, element), bubbles.northeast(), northeast(), 'layout-ne');
+      return nu$7(eastX(anchor), northY(anchor, element), bubbles.northeast(), northeast(), 'layoutList-ne');
     };
     var northwest$1 = function (anchor, element, bubbles) {
-      return nu$7(westX(anchor, element), northY(anchor, element), bubbles.northwest(), northwest(), 'layout-nw');
+      return nu$7(westX(anchor, element), northY(anchor, element), bubbles.northwest(), northwest(), 'layoutList-nw');
     };
     var north$1 = function (anchor, element, bubbles) {
-      return nu$7(middleX(anchor, element), northY(anchor, element), bubbles.north(), north(), 'layout-n');
+      return nu$7(middleX(anchor, element), northY(anchor, element), bubbles.north(), north(), 'layoutList-n');
     };
     var south$1 = function (anchor, element, bubbles) {
-      return nu$7(middleX(anchor, element), southY(anchor), bubbles.south(), south(), 'layout-s');
+      return nu$7(middleX(anchor, element), southY(anchor), bubbles.south(), south(), 'layoutList-s');
     };
     var east$1 = function (anchor, element, bubbles) {
-      return nu$7(eastEdgeX(anchor), centreY(anchor, element), bubbles.east(), east(), 'layout-e');
+      return nu$7(eastEdgeX(anchor), centreY(anchor, element), bubbles.east(), east(), 'layoutList-e');
     };
     var west$1 = function (anchor, element, bubbles) {
-      return nu$7(westEdgeX(anchor, element), centreY(anchor, element), bubbles.west(), west(), 'layout-w');
+      return nu$7(westEdgeX(anchor, element), centreY(anchor, element), bubbles.west(), west(), 'layoutList-w');
     };
     var all$2 = function () {
       return [
@@ -5109,16 +5109,16 @@
       return anchor.y();
     };
     var southeast$2 = function (anchor, element, bubbles) {
-      return nu$7(eastX$1(anchor), southY$1(anchor), bubbles.southeast(), southeast(), 'link-layout-se');
+      return nu$7(eastX$1(anchor), southY$1(anchor), bubbles.southeast(), southeast(), 'link-layoutList-se');
     };
     var southwest$2 = function (anchor, element, bubbles) {
-      return nu$7(westX$1(anchor, element), southY$1(anchor), bubbles.southwest(), southwest(), 'link-layout-sw');
+      return nu$7(westX$1(anchor, element), southY$1(anchor), bubbles.southwest(), southwest(), 'link-layoutList-sw');
     };
     var northeast$2 = function (anchor, element, bubbles) {
-      return nu$7(eastX$1(anchor), northY$1(anchor, element), bubbles.northeast(), northeast(), 'link-layout-ne');
+      return nu$7(eastX$1(anchor), northY$1(anchor, element), bubbles.northeast(), northeast(), 'link-layoutList-ne');
     };
     var northwest$2 = function (anchor, element, bubbles) {
-      return nu$7(westX$1(anchor, element), northY$1(anchor, element), bubbles.northwest(), northwest(), 'link-layout-nw');
+      return nu$7(westX$1(anchor, element), northY$1(anchor, element), bubbles.northwest(), northwest(), 'link-layoutList-nw');
     };
     var all$3 = function () {
       return [
@@ -8822,22 +8822,22 @@
       return anchor.y() + anchor.height() - element.height();
     };
     var southeast$3 = function (anchor, element, bubbles) {
-      return nu$7(westEdgeX$1(anchor), southY$2(anchor, element), bubbles.innerSoutheast(), southeast(), 'layout-se');
+      return nu$7(westEdgeX$1(anchor), southY$2(anchor, element), bubbles.innerSoutheast(), southeast(), 'layoutList-se');
     };
     var southwest$3 = function (anchor, element, bubbles) {
-      return nu$7(eastEdgeX$1(anchor, element), southY$2(anchor, element), bubbles.innerSouthwest(), southwest(), 'layout-sw');
+      return nu$7(eastEdgeX$1(anchor, element), southY$2(anchor, element), bubbles.innerSouthwest(), southwest(), 'layoutList-sw');
     };
     var northeast$3 = function (anchor, element, bubbles) {
-      return nu$7(westEdgeX$1(anchor), northY$2(anchor), bubbles.innerNortheast(), northeast(), 'layout-ne');
+      return nu$7(westEdgeX$1(anchor), northY$2(anchor), bubbles.innerNortheast(), northeast(), 'layoutList-ne');
     };
     var northwest$3 = function (anchor, element, bubbles) {
-      return nu$7(eastEdgeX$1(anchor, element), northY$2(anchor), bubbles.innerNorthwest(), northwest(), 'layout-nw');
+      return nu$7(eastEdgeX$1(anchor, element), northY$2(anchor), bubbles.innerNorthwest(), northwest(), 'layoutList-nw');
     };
     var north$3 = function (anchor, element, bubbles) {
-      return nu$7(middleX$1(anchor, element), northY$2(anchor), bubbles.innerNorth(), north(), 'layout-n');
+      return nu$7(middleX$1(anchor, element), northY$2(anchor), bubbles.innerNorth(), north(), 'layoutList-n');
     };
     var south$3 = function (anchor, element, bubbles) {
-      return nu$7(middleX$1(anchor, element), southY$2(anchor, element), bubbles.innerSouth(), south(), 'layout-s');
+      return nu$7(middleX$1(anchor, element), southY$2(anchor, element), bubbles.innerSouth(), south(), 'layoutList-s');
     };
 
     var events$7 = function (optAction) {

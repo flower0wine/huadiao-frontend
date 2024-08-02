@@ -1,40 +1,57 @@
 <template>
   <div class="huadiao-anime-container">
-    <huadiao-header/>
-    <div class="video-container">
-      <video src=""></video>
-    </div>
+    <HuadiaoMiddleTip/>
+    <main class="main-container"
+          :style="mainContainerStyle">
+      <KeepAlive>
+        <RouterView/>
+      </KeepAlive>
+    </main>
   </div>
 </template>
 
 <script>
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
+import {mapState} from "vuex";
 
 export default {
   name: "HuadiaoSingleFanju",
-  data() {
-    return {}
-  },
-  computed: {
-  },
-  beforeMount() {
-  },
-  methods: {
 
-  },
-  beforeDestroy() {
-  },
   components: {
-    HuadiaoHeader
+    HuadiaoMiddleTip,
   },
+
+  computed: {
+    ...mapState("pageLayout", [
+      "margin",
+      "padding"
+    ]),
+
+    mainContainerStyle() {
+      return {
+        margin: `${this.margin}px`,
+        padding: `${this.padding}px`,
+      };
+    },
+  }
 }
 </script>
 
-<style scoped>
-.video-container {
-  width: 700px;
-  height: 500px;
-  margin: 100px auto;
-  background-color: #5374de;
+<style scoped lang="scss">
+
+.huadiao-anime-container {
+  // position: relative; 改变子元素 height: 100% 的相对元素
+  //position: relative;
+
+  // BFC 解决父子元素的 margin 重叠
+  overflow: auto;
 }
+
+.client-area {
+  height: 100%;
+  // 改变子元素的 fixed 定位对象
+  //transform: translateZ(0);
+}
+
+
 </style>

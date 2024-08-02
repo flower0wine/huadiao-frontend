@@ -7,25 +7,31 @@
 'use strict';
 
 import VueRouter from "vue-router";
+import {
+    LIKE_ROUTE_PATH,
+    MESSAGE_CHAT_BOARD_ROUTE_NAME,
+    REPLY_ROUTE_PATH, SYSTEM_ROUTE_PATH,
+    WHISPER_ROUTE_PATH
+} from "@/pages/message/config";
 
 export default new VueRouter({
     mode: "hash",
     routes: [
         {
             path: "/",
-            redirect: "/reply",
+            redirect: REPLY_ROUTE_PATH,
         },
         {
             name: "replyMeBoard",
-            path: "/reply",
+            path: REPLY_ROUTE_PATH,
             component: () => import("@/pages/message/pages/ReplyMeBoard"),
         },
         {
             name: "whisperBoard",
-            path: "/whisper",
+            path: WHISPER_ROUTE_PATH,
             component: () => import("@/pages/message/pages/WhisperBoard"),
             children: [{
-                name: "messageChatBoard",
+                name: MESSAGE_CHAT_BOARD_ROUTE_NAME,
                 path: ":uid(\\d+)",
                 components: {
                     whisperChatBoard: () => import("@/pages/message/pages/WhisperChatBoard"),
@@ -34,17 +40,17 @@ export default new VueRouter({
         },
         {
             name: "likeMeBoard",
-            path: "/like",
+            path: LIKE_ROUTE_PATH,
             component: () => import("@/pages/message/pages/LikeMeBoard"),
         },
         {
             name: "likeMeDetails",
-            path: "/like/:messageIndex(\\d+)",
+            path: `${LIKE_ROUTE_PATH}/:messageIndex(\\d+)`,
             component: () => import("@/pages/message/pages/LikeMeDetails"),
         },
         {
             name: "systemMessageBoard",
-            path: "/system",
+            path: SYSTEM_ROUTE_PATH,
             component: () => import("@/pages/message/pages/SystemMessageBoard"),
         },
         {

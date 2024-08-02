@@ -25,7 +25,6 @@
 
 <script>
 import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
 import {ResponseHandler} from "@/assets/js/utils";
 
 export default {
@@ -126,6 +125,10 @@ export default {
   border-radius: 6px;
   background-color: #fff;
   box-shadow: var(--box-shadow-min);
+}
+
+.system-message-item:nth-child(n + 2) {
+  margin-top: 10px;
 }
 
 .authority-png {

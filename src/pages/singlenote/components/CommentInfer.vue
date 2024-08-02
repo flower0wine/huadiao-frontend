@@ -166,7 +166,7 @@ export default {
       this.sendRequest({
         path: apis.note.comment.delete,
         params: {
-          uid: this.authorUid,
+          authorUid: this.authorUid,
           noteId: this.$route.params.noteId,
           rootCommentId: this.rootCommentId,
           subCommentId: this.subCommentId,
@@ -250,7 +250,7 @@ export default {
       this.sendRequest({
         path,
         params: {
-          uid: this.authorUid,
+          authorUid: this.authorUid,
           noteId: this.$route.params.noteId,
           rootCommentId: this.rootCommentId,
           subCommentId: this.subCommentId,

@@ -12,8 +12,11 @@
           </template>
           <span>{{ navigator[name] }}</span>
         </div>
-        <div class="router-view">
-          <transition name="top-show" mode="out-in">
+        <div class="router-view" ref="routerView">
+          <transition name="top-show"
+                      mode="out-in"
+                      @before-enter="$refs.routerView.style.overflow = 'hidden'"
+                      @after-leave="$refs.routerView.style.overflow = ''">
             <keep-alive>
               <router-view></router-view>
             </keep-alive>
@@ -78,20 +81,6 @@ export default {
     messageBackground() {
       return MessageBackground;
     }
-  },
-  mounted() {
-    this.clickToHidden();
-  },
-  methods: {
-    // 点击隐藏
-    clickToHidden() {
-      window.addEventListener("click", () => {
-        // 隐藏消息操作面板
-        this.$bus.$emit("hiddenMessageOperationBoard");
-      });
-    }
-  },
-  beforeDestroy() {
   },
   components: {
     MessageNavigationBoard,
@@ -161,7 +150,6 @@ body {
   background-color: rgba(255, 255, 255, 0.712);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  overflow: hidden;
 }
 
 .router-view::-webkit-scrollbar {

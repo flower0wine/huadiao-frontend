@@ -1,6 +1,6 @@
 <template>
   <svg t="1713583669561" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-       p-id="6376" v-bind="$props">
+       p-id="6376" :style="$props">
     <path
         d="M555.4176 577.4336l3.584-3.584 43.6224-43.6224 351.3344-351.4368a64 64 0 0 0 0.2048-90.4192 64.512 64.512 0 0 0-90.5216 0L512 439.808 160.5632 88.064a64.512 64.512 0 0 0-90.5216 0 64.512 64.512 0 0 0 0 90.624l351.3344 351.4368 43.008 43.008 4.4032 4.4032a63.3856 63.3856 0 0 0 43.008 16.5888 62.7712 62.7712 0 0 0 43.6224-16.7936z"
         p-id="6377"></path>
@@ -11,25 +11,12 @@
 </template>
 
 <script>
+import {SVG_COMPONENT_PROPS} from "@/pages/components/svg/svg-config";
+
 export default {
   name: "DownSlide",
-  props: {
-    width: {
-      type: String,
-      default: "16"
-    },
-    height: {
-      type: String,
-      default: "16"
-    },
-    fill: {
-      type: String,
-      default: '#000'
-    }
-  },
-  data() {
-    return {}
-  },
+
+  props: SVG_COMPONENT_PROPS,
 }
 </script>
 

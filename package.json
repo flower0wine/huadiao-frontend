@@ -14,10 +14,12 @@
     "element-ui": "^2.15.14",
     "jquery": "^3.6.3",
     "localforage": "^1.10.0",
+    "sortablejs": "^1.15.2",
     "swiper": "^5.4.5",
     "tinymce": "^5.1.0",
     "vue": "^2.6.14",
     "vue-awesome-swiper": "^4.1.1",
+    "vue-draggable-plus": "^0.4.0",
     "vue-router": "^3.6.5",
     "vuex": "^3.6.2"
   },

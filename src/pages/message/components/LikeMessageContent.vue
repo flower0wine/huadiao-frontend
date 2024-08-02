@@ -2,21 +2,17 @@
   <div class="message-info">
     <div class="message-abstract-box">
             <span class="message-abstract">
-                <a :href="homepage(userList[0].uid)" v-if="userList[0]">{{ getNickname(userList[0]) }}</a>
-                <template v-if="userList[1]">
-                  <span>、</span>
-                  <a :href="homepage(userList[1].uid)">{{ getNickname(userList[1]) }}</a>
-                </template>
+                <a :href="homepageLink(item.uid)">{{ huadiaoNickname(item.nickname, item.userId) }}</a>
             </span>
       <span class="user-number"
             @click="lookOverMoreUser"
             ref="userNumber"
-      >等 {{ `${item.count} 人赞了我的 ${likeText[item.type]}` }}</span>
+      >赞了我的{{ messageType }}</span>
     </div>
     <div class="message-fields">
-      <div class="message-date">{{ huadiaoDateFormat(item.time) }}</div>
-      <div class="delete-message" @click="deleteLikeNoteMessage">
-        <span class="delete-icon" v-html="svg.deleteTrashcan"></span>
+      <div class="message-date">{{ huadiaoDateFormat(item.likeTime) }}</div>
+      <div class="delete-message" @click="removeLikeMessage">
+        <span class="delete-icon" v-html="deleteTrashcan"></span>
         <span>删除该通知</span>
       </div>
     </div>
@@ -25,61 +21,56 @@
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
+import {homepageLink, huadiaoNickname} from "@/util/huadiao-tool";
+import {getNoteMessageType, LIKE_MESSAGE_TYPE_NAME} from "@/assets/js/constants/message/like";
+import {ResponseHandler} from "@/assets/js/utils";
 import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
-import {likeConstants} from "@/assets/js/constants/message/like";
-
-let type = likeConstants.type;
-let likeText = likeConstants.likeText;
+import {mapMutations} from "vuex";
 
 export default {
   props: ["item", "index"],
   name: "LikeMessageContent",
   data() {
     return {
-      svg,
-      type,
-      likeText,
-      // 删除点赞消息请求配置
-      deleteLikeRequestOption: {
-        path: null,
-        params: null,
-      },
-      likeUserRequestOption: {
-        path: null,
-        params: null,
-      }
     }
   },
   computed: {
-    userList() {
-      return this.item.userList;
+    deleteTrashcan() {
+      return svg.deleteTrashcan;
     },
-    likeItem() {
-      return this.item.likeMessageItem;
-    }
-  },
-  created() {
-    this.deleteLikeRequestOption = this.getDeleteLikeRequestOption();
-    this.likeUserRequestOption = this.getLikeUserRequestOption();
+
+    messageType() {
+      return LIKE_MESSAGE_TYPE_NAME[getNoteMessageType(this.item)];
+    },
   },
   methods: {
-    // 删除点赞笔记消息
-    deleteLikeNoteMessage() {
-      let tip = "确认删除该通知消息吗?删除后该通知下的所有点赞消息都会删除!";
-      this.huadiaoPopupWindow("warning", "confirmOrCancel", tip).then(this.requestDeleteLikeMessage).catch(() => {});
-    },
+    homepageLink,
+    huadiaoNickname,
+
+    ...mapMutations(["deleteLikeMessage"]),
+
     // 请求删除点赞消息
-    requestDeleteLikeMessage() {
+    removeLikeMessage() {
       this.sendRequest({
-        path: this.deleteLikeRequestOption.path,
-        params: this.deleteLikeRequestOption.params,
+        path: apis.message.likeDelete,
+        params: {
+          uid: this.item.uid,
+          authorUid: this.item.authorUid,
+          noteId: this.item.noteId,
+          replyUid: this.item.replyUid,
+          repliedUid: this.item.repliedUid,
+          rootCommentId: this.item.rootCommentId,
+          subCommentId: this.item.subCommentId,
+        },
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.SUCCEED) {
-          this.$store.commit("deleteLikeMessage", {messageIndex: this.index});
-        }
+
+        new ResponseHandler(response.data).succeed(() => {
+          this.deleteLikeMessage({
+            messageIndex: this.index,
+          });
+        });
       }).catch((error) => {
         console.log(error);
       });
@@ -90,53 +81,12 @@ export default {
         name: "likeMeDetails",
         params: {
           messageIndex: this.index,
-          path: this.likeUserRequestOption.path,
-          params: this.likeUserRequestOption.params,
+          path: apis.message.likeGet,
+          params: {},
         }
       });
     },
-    // 获取请求配置
-    getDeleteLikeRequestOption() {
-      let option = {
-        1: {
-          path: apis.message.likeNoteDelete,
-        },
-        2: {
-          path: apis.message.likeCommentDelete,
-        }
-      };
-      option = option[this.item.type];
-      return this.getRequestParams(option);
-    },
-    getLikeUserRequestOption() {
-      let option = {
-        1: {
-          path: apis.message.likeNoteUserGet,
-        },
-        2: {
-          path: apis.message.likeCommentUserGet,
-        }
-      }
-      option = option[this.item.type];
-      return this.getRequestParams(option);
-    },
-    getRequestParams(option) {
-      let params = {
-        1: {
-          noteId: this.likeItem.noteId,
-        },
-        2: {
-          noteId: this.likeItem.noteId,
-          rootCommentId: this.likeItem.rootCommentId,
-          subCommentId: this.likeItem.subCommentId,
-        }
-      }
-      option.params = params[this.item.type];
-      return option;
-    }
   },
-  beforeDestroy() {
-  }
 }
 </script>
 

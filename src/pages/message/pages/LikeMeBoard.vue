@@ -4,7 +4,7 @@
       <like-message-item v-for="(item, index) in message"
                          :item="item"
                          :index="index"
-                         :key="getLikeKey(item)"/>
+                         :key="index"/>
       <div class="no-like-item" ref="noLikeItem">没有更多消息了...</div>
     </div>
   </div>
@@ -13,7 +13,8 @@
 <script>
 import LikeMessageItem from "@/pages/message/components/LikeMessageItem";
 import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
+import {ResponseHandler} from "@/assets/js/utils";
+import {mapMutations} from "vuex";
 
 export default {
   name: "LikeMeBoard",
@@ -36,13 +37,11 @@ export default {
     this.initial();
   },
   methods: {
+    ...mapMutations(['addLikeMessage']),
+
     initial() {
       this.getIntersectionObserver(this.getLikeMessage);
       this.observer.observe(this.$refs.noLikeItem);
-    },
-    getLikeKey(item) {
-      return this.getKey([item.likeMessageItem.noteId, item.likeMessageItem.authorUid,
-        item.likeMessageItem.rootCommentId, item.likeMessageItem.subCommentId]);
     },
     // 获取点赞消息
     getLikeMessage() {
@@ -57,21 +56,23 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.SUCCEED) {
-          let maxLength = Math.max(res.data.likeNoteMessageList.length, res.data.likeCommentMessageList.length);
-          this.offset += maxLength;
-          this.$store.dispatch("addLikeMessage", {
-            listArray: [res.data.likeCommentMessageList, res.data.likeNoteMessageList]
+
+        new ResponseHandler(res).succeed((data) => {
+          console.log(data)
+
+          this.addLikeMessage({
+            messageList: Array.isArray(data) ? data : [],
           });
-          if(maxLength < this.row) {
+
+          let length = data.length;
+          if(length < this.row) {
             this.hasNext = false;
             this.observer.unobserve(this.$refs.noLikeItem);
           }
-        }
-        else if(res.code === statusCode.NOT_EXIST) {
+        }).notExist(() => {
           this.hasNext = false;
           this.observer.unobserve(this.$refs.noLikeItem);
-        }
+        });
         this.accessing = false;
       }).catch((error) => {
         console.log(error);

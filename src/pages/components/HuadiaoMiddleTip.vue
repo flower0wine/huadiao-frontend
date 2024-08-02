@@ -13,6 +13,15 @@
 
 <script>
 import {Timer} from "@/assets/js/utils";
+import Vue from "vue";
+
+const EVENT_NAME = "huadiaoMiddleTip";
+
+export const eventBus = new Vue();
+
+export function huadiaoMiddleTip(message) {
+  eventBus.$emit(EVENT_NAME, message);
+}
 
 export default {
   name: "HuadiaoMiddleTip",
@@ -34,7 +43,8 @@ export default {
   },
   beforeMount() {
     // 添加操作提示, 屏中展示
-    this.$bus.$on("huadiaoMiddleTip", this.addHuadiaoMiddleTip);
+    this.$bus.$on(EVENT_NAME, this.addHuadiaoMiddleTip);
+    eventBus.$on(EVENT_NAME, this.addHuadiaoMiddleTip);
     this.modifyDefaultStyle();
   },
   methods: {

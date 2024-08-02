@@ -1,0 +1,19 @@
+// 功能描述: 
+// 创建时间: 2024年 05月 09日
+
+@mixin flicker-animation($length) {
+  @keyframes flicker {
+    $step: 100 / $length;
+
+    @for $i from 0 through $length {
+      #{$step * $i}% {
+        @if $i % 2 == 0 {
+          opacity: 1;
+        }
+        @else {
+          opacity: 0.5;
+        }
+      }
+    }
+  }
+}

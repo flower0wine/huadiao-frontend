@@ -8,37 +8,44 @@
 
 import Vuex from "vuex";
 import Vue from "vue";
+import pageLayout from "@/pages/singleanime/store/page-layout";
+import component from "@/pages/singleanime/store/component";
+import taskWindow from "@/pages/singleanime/store/task-window";
 
 const state = {
-    isLogin: true,
     // 用户信息
     user: {
-        isLogin: null,
-        nickname: "花凋大总管",
-        canvases: "今天是花凋一周年!",
-        school: "东华理工大学",
-        userId: "huadiao_01234567890",
-        bornDate: "2003-03-15",
-        sex: "2",
-        uid: "1",
-        fans: 8,
-        follows: 8,
-        userAvatar: "https://img0.baidu.com/it/u=981218435,2998857702&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1677690000&t=d8a591b46edf38a8a1d31e5193e384a9",
+        login: false,
+        nickname: null,
+        canvases: null,
+        school: null,
+        userId: null,
+        bornDate: null,
+        sex: 0,
+        uid: 0,
+        fans: 0,
+        follows: 0,
+        userAvatar: ""
     },
 };
-const actions = {};
+
+
 const mutations = {
     initialUser(state, {user}) {
         state.user = user;
-    }
+    },
 };
-const getters = {};
+
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-   state,
-   actions,
-   mutations,
-   getters,
+    modules: {
+        component,
+        pageLayout,
+        taskWindow,
+    },
+
+    state,
+    mutations,
 });

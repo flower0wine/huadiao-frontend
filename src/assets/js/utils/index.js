@@ -76,6 +76,13 @@ class ResponseHandler {
         }
         return this;
     }
+
+    error(callback) {
+        if(this.response.code !== statusCode.SUCCEED) {
+            callback && callback(this.response);
+        }
+        return this;
+    }
 }
 
 function getOauthPath(authorizeUri, clientId, redirectUri, scope, responseType) {

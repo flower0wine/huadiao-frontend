@@ -71,7 +71,7 @@ export const apis = {
             delete: "note/like/delete",
         },
         unlike: {
-            add: "note/unlike/delete",
+            add: "note/unlike/add",
             delete: "note/unlike/delete",
         },
         star: {
@@ -157,10 +157,7 @@ export const apis = {
     message: {
         systemGet: "message/system/get",
         likeGet: "message/like/get",
-        likeNoteDelete: "message/like/note/delete",
-        likeCommentDelete: "message/like/comment/delete",
-        likeNoteUserGet: "message/like/note",
-        likeCommentUserGet: "message/like/comment",
+        likeDelete: "message/like/delete",
         replyGet: "message/reply/get",
         replyDelete: "message/reply/delete",
         latestUserGet: "message/whisper/user",

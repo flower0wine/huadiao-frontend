@@ -6,7 +6,7 @@
       <div class="author-nickname">{{ authorInfo.nickname || authorInfo.userId }}</div>
       <div class="follow-or-cancel"
            v-if="!me"
-           @click="checkLogin && clickToFollowOrCancelFollow"
+           @click="checkLogin() && clickToFollowOrCancelFollow()"
            ref="followOrCancelBtn"
       >{{ judgeRelation(fan, follow) }}
       </div>
@@ -15,20 +15,20 @@
       <div class="note-info-item">
         <span v-html="svg.colorLike"
               class="icon"
-              @click="checkLogin && clickNoteLikeIcon"
+              @click="checkLogin() && clickNoteLikeIcon()"
               ref="likeIcon"></span>
         <span>{{ noteInfo.likeCount }}</span>
       </div>
       <div class="note-info-item">
         <span v-html="svg.colorLike"
               class="icon"
-              @click="checkLogin && clickNoteUnlikeIcon"
+              @click="checkLogin() && clickNoteUnlikeIcon()"
               ref="unlikeIcon"></span>
       </div>
       <div class="note-info-item">
         <span v-html="svg.colorStar"
               class="icon"
-              @click="checkLogin && clickNoteStarIcon"
+              @click="checkLogin() && clickNoteStarIcon()"
               ref="starIcon"></span>
         <span>{{ noteInfo.starCount }}</span>
       </div>
@@ -73,6 +73,9 @@ export default {
         scale: "30px",
         shadow: true,
       };
+    },
+    authorUid() {
+      return this.$route.params.authorUid;
     },
     ...mapState(["noteInfo"]),
     ...mapState({
@@ -119,12 +122,12 @@ export default {
     clickToFollowOrCancelFollow() {
       this.follow = !this.follow;
       // 根据点击后的关系来判断是关注还是取消关注
-      let path = this.follow ? "newFriend" : "modify";
+      let path = this.follow ? apis.followFan.newFollow : apis.followFan.deleteFollow;
 
       this.sendRequest({
-        path: `relation/${path}`,
+        path,
         params: {
-          uid: this.noteInfo.authorInfo.uid,
+          uid: this.authorUid,
         },
         thenCallback: (response) => {
           let res = response.data;
@@ -144,21 +147,21 @@ export default {
     clickNoteLikeIcon() {
       const path = this.$store.state.noteInfo.noteAndMeRelation.myLike ? apis.note.like.delete : apis.note.like.add;
 
-      this.operateNote(path, "like-unlike", "clickNoteLikeIcon");
+      this.operateNote(path, "like-unlike", "clickNoteLikeIcon", "likeIcon");
     },
     // 点击不喜欢笔记图标
     clickNoteUnlikeIcon() {
       let path = this.$store.state.noteInfo.noteAndMeRelation.myUnlike ? apis.note.unlike.delete : apis.note.unlike.add;
 
-      this.operateNote(path, "like-unlike", "clickNoteUnLikeIcon");
+      this.operateNote(path, "like-unlike", "clickNoteUnLikeIcon", "unlikeIcon");
     },
     // 点击收藏笔记图标
     clickNoteStarIcon() {
       let path = this.$store.state.noteInfo.noteAndMeRelation.myStar ? apis.note.star.delete : apis.note.star.add;
 
-      this.operateNote(path, "star", "clickNoteStarIcon");
+      this.operateNote(path, "star", "clickNoteStarIcon", "starIcon");
     },
-    operateNote(path, type, commit) {
+    operateNote(path, type, commit, varName) {
       this.sendRequest({
         path,
         params: {
@@ -171,10 +174,10 @@ export default {
 
           this.$store.commit(commit, {
             confirm: () => {
-              this.$refs.starIcon.classList.remove(`${type}-icon`);
+              this.$refs[varName].classList.remove(`${type}-icon`);
             },
             cancel: () => {
-              this.$refs.starIcon.classList.add(`${type}-icon`);
+              this.$refs[varName].classList.add(`${type}-icon`);
             }
           });
         },
