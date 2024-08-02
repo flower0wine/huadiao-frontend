@@ -46,22 +46,22 @@ export default {
       this.pager.setCompleteCallback(unobserve);
     },
     observeCallback() {
-      this.getAnimeHistory();``      ``
+      this.getAnimeHistory();
     },
     // 获取番剧馆历史记录
     getAnimeHistory() {
       if (!this.operationThrottle.access()) return;
-      this.pager.requestModel((params, requestCallback, errorCallback) => {
+      this.pager.requestModel((params) => {
         this.sendRequest({
           path: apis.history.anime,
           params,
         }).then((response) => {
           let res = response.data;
           console.log(res);
-          requestCallback(res).succeed((data) => {
+          this.pager.requestCallback(res).succeed((data) => {
             this.$store.commit("addAnimeHistory", {animeHistory: data});
           });
-        }).catch(errorCallback);
+        }).catch(this.pager.errorCallback);
       });
     },
   },

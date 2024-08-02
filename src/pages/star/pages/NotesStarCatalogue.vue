@@ -107,7 +107,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.$store.commit("setNoteStarCatalogue", {catalogues: res.data});
             this.setCatalogue();
           }
@@ -147,7 +147,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.$store.dispatch("deleteFavorite", {
               deleteIndex: index,
               mapKey: this.getMapKey(this.viewedUid, group.groupId),
@@ -171,7 +171,6 @@ export default {
     },
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   }
 }
 </script>

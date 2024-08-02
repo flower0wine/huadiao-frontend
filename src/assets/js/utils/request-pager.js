@@ -32,7 +32,7 @@ class RequestPager {
      * @param requestFn {function} 发起请求的函数
      * @return {void | *} 返回调用 requestFn 的返回值
      */
-    requestModel(requestFn) {
+    requestModel = (requestFn) => {
         if (!this.hasNext || this.defaultOption.accessing) {
             return;
         }
@@ -49,7 +49,7 @@ class RequestPager {
      * @param response 需要传入响应结果
      * @returns {ResponseHandler} 返回响应处理类
      */
-    requestCallback(response) {
+    requestCallback = (response) => {
         let responseHandler = new ResponseHandler(response);
         responseHandler.succeed((data) => {
             this.sumOffset(data.length);
@@ -60,38 +60,38 @@ class RequestPager {
         return responseHandler;
     }
 
-    errorCallback(error) {
+    errorCallback = (error) => {
         console.log(error);
         this.defaultOption.accessing = false;
     }
 
     // 设置回调
-    setCompleteCallback(completeCallback) {
+    setCompleteCallback = (completeCallback) => {
         this.defaultOption.completeCallback = completeCallback;
     }
 
     // 是否还有数据
-    hasNext() {
+    hasNext = () => {
         return this.defaultOption.hasNext;
     }
 
     // 设置 hasNext 为 false
-    noNext() {
+    noNext = () => {
         let completeCallback = this.defaultOption.completeCallback;
         completeCallback && completeCallback();
         this.defaultOption.hasNext = false;
     }
 
-    getOffset() {
+    getOffset = () => {
         return this.defaultOption.offset;
     }
 
-    getRow() {
+    getRow = () => {
         return this.defaultOption.row;
     }
 
     // 累加 offset
-    sumOffset(num) {
+    sumOffset = (num) => {
         if (typeof num === "number") {
             this.defaultOption.offset += num;
             if (num < this.getRow()) {
@@ -104,7 +104,7 @@ class RequestPager {
      * 重置, 如果传入了 option, 则以 option 的参数为重置结果, 传入 true 则清除回调, 默认不清除
      * @param clearCompleteCallback 是否清除回调, 默认为 false
      */
-    reset(clearCompleteCallback = false) {
+    reset = (clearCompleteCallback = false) => {
         let defaultOption = this.defaultOption;
         let provideOption = this.provideOption;
         defaultOption.offset = provideOption?.offset ?? 0;

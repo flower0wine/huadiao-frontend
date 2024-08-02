@@ -11,7 +11,6 @@
 
 <script>
 import CommentInfer from "@/pages/singlenote/components/CommentInfer";
-import {svg} from "@/assets/js/constants/svgs";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
 
 export default {
@@ -19,15 +18,18 @@ export default {
   props: ["rootCommentId", "subCommentItem", "rootIndex", "subIndex"],
   data() {
     return {
-      svg,
-      userAvatarOptions: {
-        href: `/homepage/${this.subCommentItem.uid}`,
+    }
+  },
+  computed: {
+    userAvatarOptions() {
+      return {
+        href: this.homepage(this.subCommentItem.uid),
         userAvatar: this.subCommentItem.userAvatar,
         transitionTime: "500ms",
         scale: "30px",
         hover: true,
-      },
-    }
+      };
+    },
   },
   mounted() {
   },

@@ -33,10 +33,16 @@ export default {
       visible: {
         dropdownList: null,
       },
-      svg: {
+    }
+  },
+  computed: {
+    svg() {
+      return {
         dropdown: svg.access,
-      },
-      dropdownNavList: [{
+      }
+    },
+    dropdownNavList() {
+      return [{
         title: "笔记",
         svg: svg.blog,
         componentName: "NoteNavigationList",
@@ -46,8 +52,8 @@ export default {
         svg: svg.fanju,
         componentName: "AnimeNavigationList",
         className: "anime-dropdown",
-      }],
-    }
+      }];
+    },
   },
   beforeMount() {
     this.beforeMountInitial();

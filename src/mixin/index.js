@@ -5,15 +5,49 @@
 
 // 使用严格模式
 'use strict';
-import axios from "axios";
+import axios, {HttpStatusCode} from "axios";
 import {apis} from "@/assets/js/constants/request-path.js";
+import {statusCode} from "@/assets/js/constants/status-code";
+
+const excludeInterceptors = [
+    /\//,
+    /^\/search\/(user|note)\/.*/,
+    /^\/note\/(get|all)/,
+    /^\/common\/.*/,
+    /^\/forum\/.*/,
+    /^\/userinfo/,
+    /^\/homepage\/info/,
+    /^\/huadiaohouse\/info/,
+];
+
+function isExcludeInterceptors(pathname) {
+    for (let i = 0; i < excludeInterceptors.length; i++) {
+        if (excludeInterceptors[i].test(pathname)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+axios.interceptors.response.use((resp) => {
+    if(resp.status === HttpStatusCode.Ok) {
+        // 未登录跳转主页
+        if(resp.data.code === statusCode.NOT_AUTHORITATIVE && !isExcludeInterceptors(window.location.pathname)) {
+            window.location.href = "/";
+        }
+        // 页面不存在
+        else if(resp.data.code === statusCode.PAGE_NOT_EXIST) {
+            window.location.href = "/error/404";
+        }
+    }
+    return resp;
+});
 
 export const mixin = {
     data() {
         return {
             // 是否获取了数据
             getDataCompleted: false,
-            logoPath: `${apis.imageHost}authority.png`,
             userAvatarImagePath: `${apis.imageHost}userAvatar/`,
             huadiaoHouseImagePath: `${apis.imageHost}huadiaoHouse/`,
         }
@@ -100,23 +134,6 @@ export const mixin = {
                 return axios(srcObj);
             }
         },
-        // 清除 this 的 ref 的事件
-        clearAllRefsEvents() {
-            if (!this.$refs) {
-                return;
-            }
-            for (let elName in this.$refs) {
-                let el = this.$refs[elName];
-                // 如果是 VueComponent 实例对象
-                if (el instanceof this.__proto__.constructor) {
-                    this.$(el).off();
-                }
-                // 如果是 Element 实例对象
-                else if (el instanceof Element) {
-                    this.$(el[0]).off();
-                }
-            }
-        },
         // 将数字按照顺序插入有序数组中
         insertOrderArray(array, number) {
             if (array && Array.isArray(array) &&
@@ -172,14 +189,17 @@ export const mixin = {
         // 修改源对象指定属性为提供的对象的属性, generate: 是否允许创建新属性
         /**
          *
-         * @param targetConfig {{}} 要粘贴属性到的目标对象
-         * @param srcConfig {{}}  要复制属性源对象
-         * @param option {{generate: boolean, proto: boolean}}
+         * @param targetConfig {Object} 要粘贴属性到的目标对象
+         * @param srcConfig {Object}  要复制属性源对象
+         * @param option {{generate: boolean, proto: boolean, arrayCover: boolean}}
          * 配置对象:
          * 1. generate: 是否允许创建新属性, 默认为 true
          * 2. proto: 是否复制原型的属性, 默认为 false
+         * 3. arrayCover: 如果 srcConfig 的某个属性为数组, 并且 targetConfig 对应属性也为数组, 则直接覆盖, 否则添加至 targetConfig 的数组中, 默认为 true (覆盖)
          */
-        modifySrcObject(targetConfig, srcConfig, option = {generate: true, proto: false}) {
+        modifySrcObject(targetConfig,
+                        srcConfig,
+                        option = {generate: true, proto: false, arrayCover: true}) {
             for (let c in srcConfig) {
                 // 不修改原型并且源对象上没有此属性
                 if (!option.proto && !Object.prototype.hasOwnProperty.call(srcConfig, c)) {
@@ -187,15 +207,29 @@ export const mixin = {
                 }
                 // 可能为 对象 或者 null(属于对象)
                 if (typeof srcConfig[c] === "object") {
-                    if (!targetConfig[c]) {
-                        if (!option.generate) continue;
-                        targetConfig[c] = srcConfig[c] === null ? null : {};
-                    }
-                    if (srcConfig[c] !== null) {
-                        this.modifySrcObject(targetConfig[c], srcConfig[c], option);
+                    if(Array.isArray(srcConfig[c]) && Array.isArray(targetConfig[c])) {
+                        // 若能覆盖
+                        if(option.arrayCover) {
+                            targetConfig[c] = srcConfig[c];
+                        } else {
+                            targetConfig[c].push(...srcConfig[c]);
+                        }
+                    } else {
+                        // 如果 targetConfig 不存在对应的属性
+                        if (!targetConfig[c]) {
+                            // 是否生成新属性
+                            if (!option.generate) continue;
+                            targetConfig[c] = srcConfig[c] === null ? null : {};
+                        }
+                        // 递归
+                        if (srcConfig[c] !== null) {
+                            this.modifySrcObject(targetConfig[c], srcConfig[c], option);
+                        }
                     }
                 } else {
+                    // 如果不能生成, 则 continue
                     if (!targetConfig[c] && !option.generate) continue;
+                    // 赋值 或者 生成新属性
                     if (srcConfig[c] != null) {
                         targetConfig[c] = srcConfig[c]
                     }
@@ -340,13 +374,22 @@ export const mixin = {
             if (!avatar) {
                 return '';
             }
-            return `background-image: url('${this.userAvatarImagePath}${avatar}')`;
+            return this.packageBackgroundUrl(`${this.userAvatarImagePath}${avatar}`);
+        },
+        packageBackgroundUrl(url) {
+            return `background-image: url('${url}')`;
         },
         homepage(uid) {
             return `/homepage/${uid}`;
         },
         noteLink(authorUid, noteId) {
             return `/singlenote/${authorUid}/${noteId}`;
+        },
+        followLink(uid) {
+            return `/followfan/${uid}/follow`;
+        },
+        fanLink(uid) {
+            return `/followfan/${uid}/fan`;
         },
         getKey(args, split = '/') {
             return args.join(split);

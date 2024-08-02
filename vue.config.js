@@ -1,7 +1,7 @@
 const {defineConfig} = require('@vue/cli-service')
 
 module.exports = defineConfig({
-    publicPath: process.env.NODE_ENV === 'production' ? './' : '/huadiao/',
+    publicPath: process.env.NODE_ENV === 'production' ? './' : '/dev',
     lintOnSave: false,
     outputDir: "huadiao-user",
     assetsDir: "static",
@@ -93,6 +93,12 @@ module.exports = defineConfig({
             template: './src/pages/singleanime/index.html',
             filename: "singleanime.html",
             title: '花凋~~打造旷世巨作'
+        },
+        error: {
+            entry: "./src/pages/error/index.js",
+            template: './src/pages/error/index.html',
+            filename: "error.html",
+            title: '花凋~~路途似乎十分坎坷'
         }
     },
     css: {
@@ -100,6 +106,31 @@ module.exports = defineConfig({
             scss: {
             },
         },
+    },
+    configureWebpack: {
+        optimization: {
+            runtimeChunk: 'single',
+            splitChunks: {
+                chunks: 'all',
+                maxInitialRequests: Infinity,
+                minSize: 20000,
+                cacheGroups: {
+                    vendor: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name (module) {
+                            // get the name. E.g. node_modules/packageName/not/this/part.js
+                            // or node_modules/packageName
+                            const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
+                            if(match) {
+                                const packageName = match[1];
+                                // npm package names are URL-safe, but some servers don't like @ symbols
+                                return `npm.${packageName.replace('@', '')}`
+                            }
+                        }
+                    }
+                }
+            }
+        }
     },
     devServer: {
         host: "localhost",
@@ -109,12 +140,12 @@ module.exports = defineConfig({
         // 代理服务器
         proxy: {
             // 匹配路径后进行代理
-            "/huadiao": {
+            "^/(huadiao|images)": {
                 // 目标服务器
-                target: "http://127.0.0.1:9090/huadiao",
+                target: "http://127.0.0.1:9090",
                 // 是否跨域
                 changeOrigin: true,
-            }
+            },
         }
     }
 })

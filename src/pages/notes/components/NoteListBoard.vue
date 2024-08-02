@@ -4,7 +4,7 @@
       <div class="note-item"
            v-for="(noteItem, index) in noteList"
            :key="index">
-        <a :href="`/singlenote/${viewedUid}/${noteItem.noteId}`">
+        <a :href="`/singlenote/${authorUid}/${noteItem.noteId}`">
           <div class="note-title">{{ noteItem.noteTitle }}</div>
           <div class="note-abstract" v-text="formatNoteAbstract(noteItem.noteAbstract)"></div>
           <div class="note-item-footer">
@@ -96,7 +96,7 @@ export default {
         this.sendRequest({
           path: apis.note.all,
           params: {
-            uid: this.viewedUid,
+            uid: this.authorUid,
             ...params,
           },
         }).then((response) => {
@@ -141,6 +141,8 @@ export default {
 .note-item-footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  height: 36px;
   margin-top: 10px;
 }
 

@@ -1,8 +1,7 @@
 <template>
   <div class="whisper-board">
-    <whisper-person-board :loadOver="loadOver"/>
-    <router-view name="whisperChatBoard"
-                 v-if="visible"></router-view>
+    <whisper-person-board />
+    <router-view name="whisperChatBoard"></router-view>
   </div>
 </template>
 
@@ -11,18 +10,6 @@ import WhisperPersonBoard from "@/pages/message/pages/WhisperPersonBoard";
 
 export default {
   name: "WhisperBoard",
-  data() {
-    return {
-      visible: false,
-    }
-  },
-  methods: {
-    loadOver() {
-      this.visible = true;
-    },
-  },
-  beforeDestroy() {
-  },
   components: {
     WhisperPersonBoard
   },

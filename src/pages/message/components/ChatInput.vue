@@ -1,19 +1,35 @@
 <template>
   <div class="chat-input">
     <div class="input-tools">
-      <div class="tool" title="插入图片" v-html="svg.picture"></div>
-      <div class="tool" title="插入表情" v-html="svg.emote"></div>
+      <div class="tool" title="插入图片">
+        <div class="tool-icon">
+          <PictureIcon />
+        </div>
+      </div>
+      <div class="tool emote-tool" title="插入表情" ref="emoteTool">
+        <div class="tool-icon" @click="openEmoteBoard">
+          <EmoteIcon />
+        </div>
+        <EmoteBoard v-if="emoteBoard.render"
+                    v-show="emoteBoard.show"
+                    @close="closeEmoteBoard"
+                    @choose="insertEmote" />
+      </div>
       <div class="input-word-number">{{ wordNumber }}/300</div>
-      <div class="send-message-box" @click="sendWhisperMessage">发送</div>
+      <div class="send-message-box" @click="sendMessage">发送</div>
     </div>
     <div class="input-textarea"
          contenteditable="true"
+         @blur="changeRange"
+         @focus="changeRange"
+         @click="changeRange"
          @compositionstart="compositionstart"
          @compositionend="compositionend"
          @input="messageEntering"
-         @keydown.delete="backSpaceWhisperMessage"
-         @keyup.delete="backSpaceWhisperMessage"
-         @keydown.enter="sendWhisperMessage"
+         @keydown.delete="backspace"
+         @keyup.delete.exact="backspace"
+         @keydown.enter="sendMessage"
+         @keyup.ctrl="keyupCtrl"
          @paste="paste"
          ref="inputTextarea"
     ></div>
@@ -21,210 +37,109 @@
 </template>
 
 <script>
-import {svg} from "@/assets/js/constants/svgs";
-import {mapState} from "vuex";
-import {apis} from "@/assets/js/constants/request-path";
-import {ResponseHandler} from "@/assets/js/utils";
+import useRichText from "@/pages/message/hook/useRichText";
+import EmoteBoard from "@/pages/message/components/EmoteBoard";
+import EmoteIcon from "@/pages/components/svg/EmoteIcon";
+import PictureIcon from "@/pages/components/svg/PictureIcon";
 
 export default {
   name: "ChatInput",
+  components: {PictureIcon, EmoteIcon, EmoteBoard},
+  mixins: [
+    useRichText,
+  ],
+  emits: ["sendMessage"],
   data() {
     return {
-      svg,
-      websocket: null,
-      wordNumber: 0,
-      // 输入法合成中
-      compositing: false,
-    }
+      emoteBoard: {
+        render: false,
+        show: false,
+      },
+      sending: false,
+      range: null,
+    };
   },
-  computed: {
-    ...mapState(["latestUserIndex"]),
-    chatUid() {
-      return parseInt(this.$route.params.uid);
-    }
-  },
-  created() {
-    this.initWebsocket();
+  mounted() {
+    window.addEventListener("click", (e) => {
+      if (!this.$refs.emoteTool.contains(e.target)) {
+        this.closeEmoteBoard();
+      }
+    });
   },
   methods: {
-    initWebsocket() {
-      this.websocket = new WebSocket(apis.whisperHost);
-      this.websocket.onopen = this.websocketOpenCallback;
-      this.websocket.onmessage = this.websocketMessageCallback;
-      this.websocket.onerror = this.websocketErrorCallback;
-      this.websocket.onclose = this.websocketCloseCallback;
+    openEmoteBoard() {
+      this.emoteBoard.render = true;
+      this.emoteBoard.show = !this.emoteBoard.show;
     },
-    // websocket 连接建立
-    websocketOpenCallback(e) {
-      console.log(e);
+
+    closeEmoteBoard() {
+      this.emoteBoard.show = false;
     },
-    // websocket 接收到服务器消息
-    websocketMessageCallback(e) {
-      let res = JSON.parse(e.data);
-      console.log(res);
-      new ResponseHandler(res)
-          .succeed((res) => {
-            if(res.type === "send") {
-              this.sendMessageResponse(res.messageId);
-            }
-            else if(res.type === "receive") {
-              this.receiveMessageResponse(res.whisperMessage);
-            }
-          });
+
+    keyupCtrl(e) {
+      if (e.code === "KeyZ") {
+        this.calculateWordNumber();
+      }
     },
-    // websocket 连接出错
-    websocketErrorCallback(e) {
-      console.log(e);
+
+    changeRange() {
+      const selection = window.getSelection();
+
+      if (selection.rangeCount > 0) {
+        this.range = selection.getRangeAt(0);
+      }
     },
-    // websocket 连接关闭
-    websocketCloseCallback(e) {
-      console.log(e);
+
+    calculateWordNumber() {
+      const messageContent = this.$refs.inputTextarea.childNodes;
+      let wordNumber = 0;
+      for (let node of messageContent) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent;
+          wordNumber += text.length;
+        } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "IMG") {
+          wordNumber += node.getAttribute("alt").length;
+        }
+      }
+      this.wordNumber = wordNumber;
     },
-    // 发送消息响应
-    sendMessageResponse(messageId) {
-      let messageContent = this.$refs.inputTextarea.innerText;
-      let message = {
-        messageType: 1,
-        messageContent,
-        receiveUid: this.chatUid,
-        sendTime: new Date(),
-      };
-      message.messageId = messageId;
-      this.addNewWhisperMessage(message);
-      this.reset();
-    },
-    // 接受消息响应
-    receiveMessageResponse(message) {
-      this.addNewWhisperMessage(message);
-    },
-    addNewWhisperMessage(message) {
-      this.$bus.$emit("unshiftWhisperMessage", message);
-    },
-    // 发送消息
-    sendWhisperMessage(e) {
-      e.preventDefault();
-      let messageContent = this.$refs.inputTextarea.innerText;
-      if (!this.checkMessageContent(messageContent)) return;
-      let message = {
-        messageContent,
-        receiveUid: this.chatUid,
-      };
-      this.websocket.send(JSON.stringify(message));
-      /*this.requestSendWhisperMessage(message)
-          .then((res) => {
-            message.messageId = res;
-            this.$bus.$emit("unshiftWhisperMessage", message);
-            this.reset();
-          })
-          .catch((error) => {
-            console.log(error);
-          });*/
-    },
-    requestSendWhisperMessage({messageContent, receiveUid}) {
-      return new Promise((resolve, reject) => {
-        this.sendRequest({
-          path: apis.message.whisperAdd,
-          method: "post",
-          params: {
-            uid: receiveUid,
-          },
-          data: {
-            messageContent
-          }
-        }).then((response) => {
-          let res = response.data;
-          console.log(res);
-          new ResponseHandler(res)
-              .succeed(resolve.bind(null, res.data));
-        }).catch((error) => {
-          console.log(error);
-          reject();
-        });
-      });
-    },
-    checkMessageContent(messageContent) {
-      return 1 <= messageContent.length && messageContent.length <= 300;
-    },
-    // 输入中, 输入法输入也可以
-    messageEntering(e) {
-      // 删除时 e.data 为 null
-      if (!e.data || (this.wordNumber + e.data.length > 300) || this.compositing) {
+
+    sendMessage(e) {
+      if (e.keyCode === 13 && e.shiftKey) {
         return;
       }
-      this.wordNumber += e.data.length;
-    },
-    // 输入法合成开始
-    compositionstart() {
-      this.compositing = true;
-    },
-    // 输入法合成结束
-    compositionend(e) {
-      this.wordNumber += e.data.length;
-      this.compositing = false;
-    },
-    // 退格删除
-    backSpaceWhisperMessage() {
-      this.wordNumber = this.$refs.inputTextarea.innerText.length;
-    },
-    // 读取剪贴板, 去除格式化, 取出文本
-    paste(e) {
       e.preventDefault();
-      let innerText = this.$refs.inputTextarea.innerText;
-      // 读取剪贴板
-      navigator.clipboard
-          .readText()
-          .then((paste) => {
-            innerText = innerText + paste;
-            // 最大长度为 300
-            if (innerText.length > 300) {
-              innerText = innerText.substring(0, 300);
-            }
-            this.wordNumber = innerText.length;
-            this.$refs.inputTextarea.innerText = innerText;
 
-            this.moveCursorToEnd();
-          })
-          .catch(() => {
-            this.huadiaoMiddleTip("读取剪贴板失败!请检查是否给予权限!");
-          });
-    },
-    // 移动光标到末尾
-    moveCursorToEnd() {
-      // 移动光标到文本末尾
-      let obj = this.$refs.inputTextarea;
-      //ie11 10 9 ff safari
-      if (window.getSelection) {
-        //解决ff不获取焦点无法定位问题
-        obj.focus();
-        // 创建range
-        let range = window.getSelection();
-        // range 选择obj下所有子内容
-        range.selectAllChildren(obj);
-        // 光标移至最后
-        range.collapseToEnd();
+      const messageContent = this.$refs.inputTextarea.innerHTML;
+      if (!this.checkMessageContent()) {
+        return;
       }
-      //ie10 9 8 7 6 5
-      else if (document.selection) {
-        // 创建选择对象
-        let range = document.selection.createRange();
-        // range定位到obj
-        range.moveToElementText(obj);
-        // 光标移至最后
-        range.collapse(false);
-        range.select();
+
+      try {
+        this.$emit("sendMessage", messageContent);
+        this.$refs.inputTextarea.innerHTML = "";
+        this.wordNumber = 0;
+        this.range = null;
+      } catch (error) {
+        console.log(error);
       }
     },
-    reset() {
-      this.wordNumber = 0;
-      this.$refs.inputTextarea.innerText = "";
+
+    paste() {
+      this.calculateWordNumber();
+    },
+
+    backspace() {
+      this.calculateWordNumber();
     },
   },
   beforeDestroy() {
-  }
+    window.removeEventListener("click", this.closeEmoteBoard);
+  },
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 .chat-input {
   height: 200px;
@@ -239,24 +154,28 @@ export default {
 }
 
 .tool {
+  position: relative;
+  margin-right: 6px;
+}
+
+.tool-icon {
   width: 34px;
   height: 34px;
   text-align: center;
   line-height: 34px;
-  margin-right: 6px;
   border-radius: 4px;
   transition: var(--transition-300ms);
 }
 
-.tool:hover {
+.tool-icon:hover {
   background-color: #ffffff4f;
 }
 
-.tool:hover /deep/ svg {
+.tool-icon::v-deep svg:hover {
   fill: #d15656;
 }
 
-.tool /deep/ svg {
+.tool-icon::v-deep svg {
   width: 22px;
   height: 22px;
   fill: #aaa;
@@ -310,5 +229,12 @@ export default {
 .input-textarea::-webkit-scrollbar-thumb {
   border-radius: 5px;
   background-color: #a5a5a5;
+}
+
+.input-textarea {
+  &::v-deep .emote {
+    width: 20px;
+    height: 20px;
+  }
 }
 </style>

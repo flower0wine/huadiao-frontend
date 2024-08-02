@@ -7,6 +7,7 @@
 'use strict';
 
 import {mapState} from "vuex";
+import {apis} from "@/assets/js/constants/request-path";
 
 export const mixin = {
     data() {
@@ -17,6 +18,12 @@ export const mixin = {
         };
     },
     computed: {
+        authorUid() {
+            return this.$route.params.authorUid;
+        },
+        noteId() {
+            return this.$route.params.noteId;
+        },
         ...mapState({
             me(state) {
                 return state.noteInfo.noteAndMeRelation.me;
@@ -49,17 +56,25 @@ export const mixin = {
          * @param succeedCallback 成功回调
          * @param failCallback 失败回调
          */
-        addComment({comment, root, rootCommentIndex, succeedCallback, failCallback}) {
+        addComment({
+                       comment,
+                       root,
+                       repliedUid,
+                       rootCommentIndex,
+                       succeedCallback,
+                       failCallback
+        }) {
             let commentContent = comment.commentContent;
             let rootCommentId = comment.commentId;
 
             if (commentContent) {
                 this.sendRequest({
-                    path: "note/comment/add",
+                    path: apis.note.comment.add,
                     method: "post",
                     params: {
                         uid: this.$route.params.authorUid,
                         noteId: this.$route.params.noteId,
+                        repliedUid
                     },
                     data: {
                         rootCommentId,

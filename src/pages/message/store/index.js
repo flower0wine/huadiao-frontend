@@ -8,6 +8,10 @@
 
 import Vuex from "vuex";
 import Vue from "vue";
+import unreadCountStore from "@/pages/message/store/module/unread-count-store";
+import whisperStore from "@/pages/message/store/module/whisper-store";
+import whisperUserStore from "@/pages/message/store/module/whisper-user-store";
+import whisperMessageStore from "@/pages/message/store/module/whisper-message-store";
 
 const state = {
     latestUserIndex: 0,
@@ -70,11 +74,6 @@ const actions = {
         }
         return message;
     },
-    addLikeMessage(context, {listArray, timeStr}) {
-        context.dispatch("addMessage", {listArray, timeStr}).then((message) => {
-            context.commit("addLikeMessage", {message});
-        });
-    },
     addReplyMessage(context, {listArray, timeStr}) {
         context.dispatch("addMessage", {listArray, timeStr}).then((message) => {
             context.commit("addReplyMessage", {message});
@@ -103,8 +102,8 @@ const mutations = {
     addSystemMessage(state, {message}) {
         state.message.systemMessage.push(...message);
     },
-    addLikeMessage(state, {message}) {
-        state.message.likeMessage.push(...message);
+    addLikeMessage(state, {messageList}) {
+        state.message.likeMessage.push(...messageList);
     },
     // 删除收到的赞消息
     deleteLikeMessage(state, {messageIndex}) {
@@ -125,6 +124,12 @@ const getters = {
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+    modules: {
+        unreadCountStore,
+        whisperStore,
+        whisperUserStore,
+        whisperMessageStore,
+    },
     state,
     actions,
     mutations,

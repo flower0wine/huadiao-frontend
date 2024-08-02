@@ -1,6 +1,6 @@
 <template>
   <div class="huadiao-login-register">
-    <div class="huadiao-account-container">
+    <div class="huadiao-account-container" :style="packageBackgroundUrl(loginRegisterBackground)">
       <!--介绍-->
       <div class="huadiao-description">
         <div class="login-origin">
@@ -32,6 +32,7 @@
           <div class="login-container"
                v-if="visible.loginCard.render"
                v-show="visible.loginCard.show"
+               :style="packageBackgroundUrl(loginImg)"
           >
             <transition name="fade">
             <span v-html="loginSvg"
@@ -76,6 +77,7 @@
           <div class="register-container"
                v-if="visible.registerCard.render"
                v-show="visible.registerCard.show"
+               :style="packageBackgroundUrl(registerImg)"
           >
             <transition name="fade">
             <span v-html="registerSvg"
@@ -163,6 +165,9 @@ import {indexResponseMessage} from "@/assets/js/constants/response_message";
 import constants from "@/assets/js/constants";
 import OperationThrottle from "@/assets/js/utils/operation-throttle";
 import LoginWayList from "@/pages/index/components/index/LoginWayList";
+import LoginRegisterBackground from "@/assets/img/index/loginRegisterBackground.webp";
+import LoginImg from "@/assets/img/index/login.webp";
+import RegisterImg from "@/assets/img/index/register.webp";
 
 let usernameReg = constants.usernameReg;
 let passwordReg = constants.passwordReg;
@@ -226,6 +231,17 @@ export default {
     // 打开注册面板
     this.$bus.$on("openRegisterBoard", this.clickToDumpRegister);
     this.submitForm();
+  },
+  computed: {
+    loginRegisterBackground() {
+      return LoginRegisterBackground;
+    },
+    loginImg() {
+      return LoginImg;
+    },
+    registerImg() {
+      return RegisterImg;
+    }
   },
   methods: {
     // 表单提交
@@ -322,10 +338,10 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             // 刷新网页
             window.location.reload();
-          } else if (res.code === statusCode.notExist) {
+          } else if (res.code === statusCode.NOT_EXIST) {
             this.huadiaoMiddleTip("用户名或密码输入错误!");
           }
         },
@@ -472,18 +488,18 @@ export default {
   height: 375px;
   border-radius: 8px;
   box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.20);
-  background: url('~@/../public/img/index/loginRegisterBackground.png') no-repeat;
+  background: no-repeat;
   background-size: cover;
 }
 
 .login-container {
   left: 25px;
-  background: url('~@/../public/img/index/login.png') no-repeat;
+  background: no-repeat;
 }
 
 .register-container {
   right: 25px;
-  background: url('~@/../public/img/index/register.png') no-repeat;
+  background: no-repeat;
 }
 
 .login-container,

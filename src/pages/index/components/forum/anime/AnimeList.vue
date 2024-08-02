@@ -7,7 +7,7 @@
 
 <script>
 import AnimeItemContainer from "@/pages/index/components/forum/anime/AnimeItemContainer";
-import ContentLoading from "@/pages/index/components/forum/ContentLoading";
+import ContentLoading from "@/pages/components/ContentLoading";
 export default {
   name: "AnimeList",
   components: {ContentLoading, AnimeItemContainer},

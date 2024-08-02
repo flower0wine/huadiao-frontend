@@ -92,12 +92,12 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.$store.commit("initialHuadiaoHouseInfo", {huadiaoHouseInfo: res.data});
             this.getDataCompleted = true;
             this.initial();
           }
-          else if(res.code === statusCode.notAllowed) {
+          else if(res.code === statusCode.NOT_ALLOW) {
             this.huadiaoPopupWindow(huadiaoPopupWindowOptions.iconType.error, huadiaoPopupWindowOptions.operate.hasRead, "用户不公开番剧馆");
           }
         },
@@ -113,7 +113,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.$store.commit("initialCardBorderImage", {cardBorderImage: res.data});
             this.visible.animeHouse.render = true;
           }

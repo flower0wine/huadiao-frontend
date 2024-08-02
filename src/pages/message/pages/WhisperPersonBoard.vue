@@ -4,32 +4,32 @@
     <div class="whisper-left-board">
       <div class="user-list">
         <router-link class="latest-user-item"
-                     v-for="(item, index) in whisper"
+                     v-for="(item, index) in whisperUsers"
                      :key="item.uid"
-                     @click="loadOver"
+                     @click.native="clickLatestUserItem(index)"
                      :to="{
-                       name: 'messageChatBoard',
+                       name: messageChatBoardRouteName,
                        params: {
                          uid: item.uid,
                        },
                      }"
                      tag="div"
                      active-class="latest-user-item-active"
-                     :title="getNickname(item)"
+                     :title="huadiaoNickname(item.nickname, item.userId)"
         >
           <user-avatar-box :options="{ userAvatar: item.avatar, scale: '40px' }"/>
           <div class="user-info">
-            <div class="nickname">{{ getNickname(item) }}</div>
+            <div class="nickname">{{ huadiaoNickname(item.nickname, item.userId) }}</div>
             <div class="latest-message"
                  :title="item.latestMessage"
-                 v-text="item.latestMessage"
+                 v-html="item.latestMessage"
             ></div>
           </div>
           <div class="delete-latest-user"
                @click="deleteLatestUser(index)">
-            <div class="delete-icon" v-html="svg.fork"></div>
+            <div class="delete-icon" v-html="forkSvg"></div>
           </div>
-          <div class="unread-dot" v-if="false"></div>
+          <div class="unread-dot" v-if="item.unreadCount"></div>
         </router-link>
       </div>
     </div>
@@ -40,79 +40,81 @@
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
 import {svg} from "@/assets/js/constants/svgs";
 import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
 import {ResponseHandler} from "@/assets/js/utils";
+import {mapGetters, mapMutations, mapState} from "vuex";
+import {MESSAGE_CHAT_BOARD_ROUTE_NAME, WHISPER_ROUTE_PATH} from "@/pages/message/config";
+import {huadiaoNickname} from "@/util/huadiao-tool";
+import {huadiaoMiddleTip} from "@/pages/components/HuadiaoMiddleTip";
+import useChat from "@/pages/message/hook/useChat";
 
 export default {
-  props: ["loadOver"],
   name: "WhisperPersonBoard",
   components: {UserAvatarBox},
+  mixins: [useChat],
   data() {
     return {
-      svg,
       offset: 0,
       row: 10,
       hasNext: true,
       accessing: false,
       observer: null,
-      existedUid: null,
       visible: {
         unfollowUser: true,
       },
     }
   },
   computed: {
-    whisper() {
-      return this.$store.state.message.whisper;
+    ...mapState("whisperUserStore", ["whisperUsers"]),
+
+    ...mapState("unreadCountStore", ["count"]),
+
+    ...mapGetters("whisperUserStore", ["userUnreadCount", "userExist"]),
+
+    forkSvg() {
+      return svg.fork;
     },
-    chatUid() {
-      return parseInt(this.$route.params.uid);
-    },
-    currentRoute() {
+
+    currentRoutePath() {
       return this.$route.path;
-    }
+    },
+
+    messageChatBoardRouteName() {
+      return MESSAGE_CHAT_BOARD_ROUTE_NAME;
+    },
   },
   watch: {
-    "$route.params.uid": {
-      deep: true,
-      handler(newValue, oldValue) {
-        let fullPath = this.$route.fullPath;
-        // 如果是从其他页面跳转到私信页面, 就跳转至第一个用户
-        if(!oldValue && !newValue && fullPath.startsWith("/whisper")) {
-          this.jumpFirstUser();
-        }
-        // 如果是在不同用户之间跳转
-        else if(oldValue && newValue) {
-          this.findCurrentUid();
-        }
-      }
-    }
+    chatUid() {
+      this.getSingleLatestUser();
+      this.clearUnreadCount();
+    },
   },
   created() {
-    if(Number.isNaN(this.chatUid)) {
-      this.getLatestUser();
-    }
-    else {
-      this.getSingleLatestUser()
-          .then(this.getLatestUser)
-          .catch(this.jumpFirstUser);
-    }
+    this.getSingleLatestUser();
+    this.getLatestUser();
   },
   mounted() {
-    this.initial();
+    this.getIntersectionObserver(this.getLatestUser);
   },
   methods: {
-    initial() {
-      this.getIntersectionObserver(this.getLatestUser);
-    },
+    ...mapMutations("whisperUserStore", [
+      "unshiftWhisperUser",
+      "removeOneWhisperUser",
+      "setSelectedLatestUserIndex",
+      "addWhisperUsers",
+    ]),
+
+    ...mapMutations("unreadCountStore", ["setWhisperCount"]),
+
+    huadiaoNickname,
+
     jumpFirstUser() {
       let path;
-      let whisper = this.$store.state.message.whisper;
-      let whisperPath = "/whisper";
+      let whisper = this.whisperUsers;
       if(whisper.length !== 0) {
-        path = `${whisperPath}/${whisper[0].uid}`
+        path = `${WHISPER_ROUTE_PATH}/${whisper[0].uid}`
       }
-      if(whisperPath !== this.currentRoute) {
+
+      if (this.currentRoutePath !== path) {
         this.$router.replace({
           path,
         }).catch((err) => {
@@ -120,123 +122,115 @@ export default {
         });
       }
     },
+
     // 查找当前 uid 对应的索引
     findCurrentUid() {
-      if (this.whisper.length === 0) return;
-      let index = this.whisper.findIndex((val) => {
+      if (this.whisperUsers.length === 0) return;
+      let index = this.whisperUsers.findIndex((val) => {
         return val.uid === this.chatUid;
       });
       if (index !== -1) {
-        this.$store.commit("setLatestUserIndex", {index});
+        this.setSelectedLatestUserIndex(index);
       }
       // 查找不到跳转到第一个用户
       else {
+        this.setSelectedLatestUserIndex(0);
         this.jumpFirstUser();
       }
-      this.loadOver();
+      this.clearUnreadCount();
     },
-    // 最近消息用户获取完毕
-    notExistCallback() {
-      this.hasNext = false;
-    },
-    // 当页面以路径 whisper/:uid(\\d+) 访问, 下面的函数会被执行
+
     getSingleLatestUser() {
-      // 路径不匹配访回
-      return new Promise((resolve, reject) => {
-        if (Number.isNaN(this.chatUid)) {
-          resolve();
-          return;
-        } else {
-          this.existedUid = this.chatUid;
-        }
-        this.sendRequest({
-          path: apis.message.latestSingleUserGet,
-          params: {
-            uid: this.chatUid,
-          }
-        }).then((response) => {
-          let res = response.data;
-          console.log(res);
-          if (res.code === statusCode.succeed) {
-            this.$store.commit("addLatestSingleUser", {user: res.data});
-            resolve();
-          } else if (res.code === statusCode.notExist) {
-            reject();
-          }
-        }).catch((error) => {
-          console.log(error);
-          reject();
-        })
-      })
+      const exist = this.userExist(this.chatUid);
+      if (exist) {
+        return;
+      }
+
+      this.sendRequest({
+        path: apis.message.latestSingleUserGet,
+        params: {
+          uid: this.chatUid,
+        },
+      }).then((response) => {
+        let res = response.data;
+        console.log(res);
+
+        new ResponseHandler(res).succeed((data) => {
+          this.unshiftWhisperUser(data);
+        });
+      }).catch((error) => {
+        console.log(error);
+      });
     },
     getLatestUser() {
       if (!this.hasNext || this.accessing) return;
       this.accessing = true;
-      return new Promise((resolve) => {
-        this.sendRequest({
-          path: apis.message.latestUserGet,
-          params: {
-            offset: this.offset,
-            row: this.row,
-          }
-        }).then((response) => {
-          let res = response.data;
-          console.log(res);
-          if (res.code === statusCode.succeed) {
-            let users = res.data;
-            // 如果 existUid 存在, 则过滤掉
-            if (this.existedUid !== null) {
-              users = users.filter((item) => item.uid !== this.existedUid);
-            }
-            this.$store.commit("addLatestUser", {users});
 
-            /**
-             * 由于一个用户刚创建后可以通过输入 url 匹配到 ChatMessageWindow 组件,
-             * 所以这里需要判断 <获取的最近消息> 中是否有值, 来决定是否允许展示 ChatMessageWindow 组件,
-             * 当然首次获取数据需要设置 latestUserIndex, 后面由 watch 来监听 $route.params.uid 来改变
-             */
-            if (this.offset === 0 && this.whisper.length !== 0) {
-              this.existedUid = this.chatUid || null;
-              this.findCurrentUid();
-            }
-            this.offset += users.length;
-            if (users.length < this.row) {
-              this.notExistCallback();
-            }
-          } else if (res.code === statusCode.notExist) {
-            this.notExistCallback();
+      this.sendRequest({
+        path: apis.message.latestUserGet,
+        params: {
+          offset: this.offset,
+          row: this.row,
+        }
+      }).then((response) => {
+        let res = response.data;
+        console.log(res);
+
+        new ResponseHandler(res).succeed((data) => {
+          let users = data;
+          this.addWhisperUsers(users);
+
+          if (this.offset === 0 && this.whisperUsers.length !== 0) {
+            this.findCurrentUid();
           }
-          this.accessing = false;
-          resolve();
-        }).catch((error) => {
-          console.log(error);
-          this.accessing = false;
-          resolve();
+          this.offset += users.length;
+          if (users.length < this.row) {
+            this.hasNext = false;
+          }
+        }).notExist(() => {
+          this.hasNext = false;
         });
+      }).catch((error) => {
+        console.log(error);
+      }).finally(() => {
+        this.accessing = false;
       });
     },
     deleteLatestUser(index) {
       this.sendRequest({
         path: apis.message.latestUserDelete,
         params: {
-          uid: this.whisper[index].uid,
+          uid: this.whisperUsers[index].uid,
         }
       }).then((response) => {
         let res = response.data;
         console.log(res);
         new ResponseHandler(res)
             .succeed(() => {
-              this.$store.commit("deleteLatestUser", {index});
+              this.removeOneWhisperUser(index);
+            })
+            .error((err) => {
+              huadiaoMiddleTip(err.message);
+              console.log(err);
             });
       })
     },
+
+    clearUnreadCount() {
+      const userUnreadCount = this.userUnreadCount(this.chatUid, true);
+      if (userUnreadCount > 0) {
+        this.setWhisperCount(this.count.whisper - userUnreadCount);
+      }
+    },
+
+    clickLatestUserItem(index) {
+      this.setSelectedLatestUserIndex(index);
+    },
   },
-  beforeDestroy() {
-  }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .whisper-left-container {
   height: 100%;
   border-right: 1px solid #bebebe;
@@ -301,6 +295,11 @@ export default {
 .latest-message {
   font-size: 12px;
   color: #7a7a7a;
+
+  &::v-deep .emote {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .latest-message,
@@ -332,7 +331,7 @@ export default {
   line-height: 80px;
 }
 
-.delete-icon /deep/ svg {
+.delete-icon::v-deep svg {
   width: 12px;
   height: 12px;
   fill: #6e5f9a;

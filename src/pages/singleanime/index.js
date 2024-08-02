@@ -10,7 +10,6 @@ import VueRouter from "vue-router";
 import index from "@/pages/singleanime/index.vue";
 import "@/assets/css/common.css";
 import "@/assets/css/animation.css";
-import {mixin} from "@/mixin";
 import $ from "jquery";
 import router from "@/pages/singleanime/router";
 import store from "@/pages/singleanime/store";
@@ -19,10 +18,6 @@ Vue.config.productionTip = false;  // 生产提示
 
 // 使用路由
 Vue.use(VueRouter);
-
-// 使用 VUE 混入
-// 引入所有页面公共 mixin
-Vue.mixin(mixin);
 
 new Vue({
     beforeCreate() {

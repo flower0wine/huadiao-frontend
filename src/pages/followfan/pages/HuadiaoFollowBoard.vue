@@ -2,7 +2,7 @@
   <div class="huadiao-follow-board">
     <div class="follow-fan-board-header">
       <div class="active-group-name">{{ groupName }}</div>
-      <div class="patch-board">
+      <div class="patch-board" v-if="me">
         <transition name="right-slide" mode="out-in">
           <div class="patch-enter"
                v-if="!visible.patch"
@@ -83,6 +83,9 @@ export default {
     }
   },
   computed: {
+    me() {
+      return this.$store.state.me;
+    },
     viewedUid() {
       return this.$route.params.viewedUid;
     },
@@ -189,11 +192,11 @@ export default {
           thenCallback: (response) => {
             let res = response.data;
             console.log(res);
-            if (res.code === statusCode.succeed) {
+            if (res.code === statusCode.SUCCEED) {
               this.follow.push(...res.data.follow);
               this.offset += res.data.offset;
               resolve();
-            } else if (res.code === statusCode.notExist) {
+            } else if (res.code === statusCode.NOT_EXIST) {
               this.hasNext = false;
               resolve();
             }
@@ -261,7 +264,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             this.getFollowGroup();
             this.selectFollowArray = [];
             this.visible.patch = false;
@@ -282,7 +285,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             this.getFollowGroup();
             this.removeFollow().then(() => {
               this.visible.patch = false;

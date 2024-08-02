@@ -53,7 +53,7 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.succeed) {
+        if (res.code === statusCode.SUCCEED) {
           let maxLength = Math.max(res.data.replyMessageList.length);
           this.$store.dispatch("addReplyMessage", {listArray: [res.data.replyMessageList]});
           this.offset += maxLength;
@@ -62,7 +62,7 @@ export default {
             this.observer.unobserve(this.$refs.noReplyItem);
           }
         }
-        else if(res.code === statusCode.notExist) {
+        else if(res.code === statusCode.NOT_EXIST) {
           this.hasNext = false;
           this.observer.unobserve(this.$refs.noReplyItem);
         }

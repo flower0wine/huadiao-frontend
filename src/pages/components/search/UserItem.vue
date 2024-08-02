@@ -5,7 +5,7 @@
        target="_blank">
       <div class="user-item-content">
         <div class="user-item-left">
-          <user-avatar-box :options="{scale: `40px`, userAvatar: item.avatar ? `${userAvatarImagePath}${item.avatar}` : ''}"/>
+          <user-avatar-box :options="{scale: `40px`, userAvatar: item.avatar ? `${item.avatar}` : ''}"/>
         </div>
         <div class="user-item-right">
           <div class="nickname" v-html="item.nickname">花凋大总管</div>

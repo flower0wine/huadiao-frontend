@@ -51,7 +51,9 @@
           </div>
         </div>
         <div class="note-right">
-          <div class="note-image" v-if="noteItem.cover" :style="getImageStyle(noteItem.cover)"></div>
+          <div class="note-image"
+               v-if="noteItem.cover"
+               :style="packageBackgroundUrl(noteItem.cover)"></div>
         </div>
       </div>
     </a>
@@ -65,7 +67,12 @@ import UserAvatarBox from "@/pages/components/UserAvatarBox";
 export default {
   name: "NoteDisplay",
   components: {UserAvatarBox},
-  props: ["noteItem"],
+  props: {
+    noteItem: {
+      type: Object,
+      require: true,
+    }
+  },
   data() {
     return {
       svg: {
@@ -76,9 +83,6 @@ export default {
     }
   },
   methods: {
-    getImageStyle(image) {
-      return `background-image: url('${image}');`;
-    }
   },
   beforeDestroy() {
   }
@@ -165,7 +169,6 @@ $noteBetweenWidth: 20px;
   width: $noteRightWidth;
   height: 100px;
   border-radius: 8px;
-  background-color: $imageBackgroundColor;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;

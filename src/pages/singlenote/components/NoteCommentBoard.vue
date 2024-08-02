@@ -67,9 +67,6 @@ export default {
     }
   },
   computed: {
-    viewedUid() {
-      return this.$route.params.viewedUid;
-    },
     ...mapState(["noteInfo"]),
   },
   mounted() {
@@ -130,9 +127,9 @@ export default {
     commentRequest() {
       // 发送获取笔记评论请求
       this.sendRequest({
-        path: apis.note.comment,
+        path: apis.note.comment.get,
         params: {
-          uid: this.viewedUid,
+          uid: this.authorUid,
           noteId: this.$route.params.noteId,
           offset: this.offset,
           row: this.row
@@ -141,7 +138,7 @@ export default {
           let res = response.data;
           console.log(res);
 
-          if(res.code === statusCode.succeed) {
+          if(res.code === statusCode.SUCCEED) {
             this.offset += this.row;
             this.$store.commit("addNoteComment", {comment: res.data});
             // 改变观察对象, DOM 树上有才能观察
@@ -161,7 +158,7 @@ export default {
 
             this.obtainedNoteComment = false;
 
-          } else if(res.code === statusCode.notExist) {
+          } else if(res.code === statusCode.NOT_EXIST) {
             // 评论已经全部获取, 不再观察
             if(this.observerIndex !== 0)
               this.observer.unobserve(this.$refs.rootCommentItem[this.observerIndex - this.preCommentLength].$el);

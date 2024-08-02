@@ -4,12 +4,14 @@
                          :key="`${getPerformanceNow()}/${item.id}/${item.author.uid}`"
                          :note-item="item"
                          :index="index"/>
-    <content-loading :observe-callback="observeCallback" :get-hooks="getHooks"/>
+    <content-loading-observer :observe-callback="observeCallback"
+                     :get-hooks="getHooks"
+                     :options="contentLoadingObserverOptions"/>
   </div>
 </template>
 
 <script>
-import ContentLoading from "@/pages/index/components/forum/ContentLoading";
+import ContentLoadingObserver from "@/pages/components/ContentLoadingObserver";
 import NoteItemContainer from "@/pages/index/components/forum/note/NoteItemContainer";
 import {apis} from "@/assets/js/constants/request-path";
 import RequestPager from "@/assets/js/utils/request-pager";
@@ -18,7 +20,7 @@ let pager = new RequestPager();
 
 export default {
   name: "NoteList",
-  components: {NoteItemContainer, ContentLoading},
+  components: {NoteItemContainer, ContentLoadingObserver},
   data() {
     return {
       noteList: [],
@@ -27,6 +29,13 @@ export default {
   mounted() {
     pager.reset();
     this.getNote();
+  },
+  computed: {
+    contentLoadingObserverOptions() {
+      return {
+        noMoreText: `本站就这么点内容, 呜呜呜~~~`,
+      };
+    },
   },
   methods: {
     getNote() {

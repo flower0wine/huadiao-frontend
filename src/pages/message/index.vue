@@ -12,8 +12,11 @@
           </template>
           <span>{{ navigator[name] }}</span>
         </div>
-        <div class="router-view">
-          <transition name="top-show" mode="out-in">
+        <div class="router-view" ref="routerView">
+          <transition name="top-show"
+                      mode="out-in"
+                      @before-enter="$refs.routerView.style.overflow = 'hidden'"
+                      @after-leave="$refs.routerView.style.overflow = ''">
             <keep-alive>
               <router-view></router-view>
             </keep-alive>
@@ -33,7 +36,8 @@ import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import MessageNavigationBoard from "@/pages/message/components/MessageNavigationBoard";
-import {huadiaoHeaderStyle} from "@/assets/js/constants/huadiao_header_style/message";
+import {huadiaoHeaderStyle} from "@/assets/js/constants/style/huadiao_header_style/message";
+import MessageBackground from "@/assets/img/message/messageBackground.webp";
 
 export default {
   name: "HuadiaoMessage",
@@ -74,20 +78,9 @@ export default {
     name() {
       return this.$route.name;
     },
-  },
-  mounted() {
-    this.clickToHidden();
-  },
-  methods: {
-    // 点击隐藏
-    clickToHidden() {
-      window.addEventListener("click", () => {
-        // 隐藏消息操作面板
-        this.$bus.$emit("hiddenMessageOperationBoard");
-      });
+    messageBackground() {
+      return MessageBackground;
     }
-  },
-  beforeDestroy() {
   },
   components: {
     MessageNavigationBoard,
@@ -104,7 +97,7 @@ body {
   min-width: 1300px;
   --message-text-color: #4b4b4b;
   color: #4b4b4b;
-  background: url('~/public/img/message/messageBackground.png') no-repeat center center fixed;
+  background: url('~/src/assets/img/message/messageBackground.webp') no-repeat center center fixed;
   background-size: cover;
 }
 </style>
@@ -157,7 +150,6 @@ body {
   background-color: rgba(255, 255, 255, 0.712);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  overflow: hidden;
 }
 
 .router-view::-webkit-scrollbar {

@@ -1,20 +1,17 @@
 <template>
   <div class="message-item">
-    <div class="user-avatar-container" :class="userList.length > 1 && 'more-liker'">
-      <user-avatar-box v-for="(item, index) in userList"
-                       :key="index"
-                       :options="{
+    <div class="user-avatar-container">
+      <user-avatar-box :options="{
         href: homepage(item.uid),
         userAvatar: item.avatar,
         shadow: true,
-        scale: userList.length === 1 ? `40px` : `30px`,
+        scale: '40px',
       }"/>
     </div>
     <like-message-content :item="item" :index="index"/>
     <div class="message-origin"
-         v-text="handleFunction.contentHandle()"
-         @click="handleFunction.proceedPage"
-         :style="item.type === 'video' ? `background-image: ${addBackground(item.video.cover)}` : ''"
+         v-text="content"
+         @click="jumpLink"
     >
     </div>
   </div>
@@ -23,7 +20,8 @@
 <script>
 import LikeMessageContent from "@/pages/message/components/LikeMessageContent";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
-import {likeConstants} from "@/assets/js/constants/message/like";
+import {noteLink} from "@/util/huadiao-tool";
+import {getNoteMessageType, isCommentType, isNoteType} from "@/assets/js/constants/message/like";
 
 export default {
   name: "LikeMessageItem",
@@ -31,51 +29,28 @@ export default {
   props: ["item", "index"],
   data() {
     return {
-      // 处理函数
-      handleFunction: {
-        contentHandle: null,
-        proceedPage: null,
-      }
     }
   },
   computed: {
-    userList() {
-      return this.item.userList;
+    content() {
+      let type = getNoteMessageType(this.item);
+      if (isCommentType(type)) {
+        return this.item.comment;
+      } else if (isNoteType(type)) {
+        return this.item.noteTitle;
+      } else {
+        return "";
+      }
     },
-    likeItem() {
-      return this.item.likeMessageItem;
-    }
   },
   created() {
-    this.initial();
   },
   methods: {
-    initial() {
-      if(this.item.type === likeConstants.note) {
-        this.handleFunction.contentHandle = this.noteTitleHandle;
-        this.handleFunction.proceedPage = this.proceedNotePage;
-      }
-      else if(this.item.type === likeConstants.comment) {
-        this.handleFunction.contentHandle = this.commentHandle;
-        this.handleFunction.proceedPage = this.proceedNotePage;
-      }
+    jumpLink() {
+      // 评论和笔记均跳转到笔记
+      window.open(noteLink(this.item.authorUid, this.item.noteId), "_blank");
     },
-    commentHandle() {
-      return this.likeItem.commentContent;
-    },
-    noteTitleHandle() {
-      return this.likeItem.noteTitle;
-    },
-    proceedNotePage() {
-      let url = this.noteLink(this.likeItem.authorUid, this.likeItem.noteId);
-      this.openNewWindow(url);
-    },
-    openNewWindow(url) {
-      window.open(url, '_blank');
-    }
   },
-  beforeDestroy() {
-  }
 }
 </script>
 

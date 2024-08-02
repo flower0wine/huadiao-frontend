@@ -2,13 +2,13 @@
   <div class="huadiao-build-note">
     <huadiao-header :huadiao-header-style="huadiaoHeaderStyle"/>
     <div class="history-header" ref="historyHeader">
-      <img src="@/../public/img/history/historyBackground.png" alt="">
+      <img :src="historyBackground" alt="">
     </div>
     <div class="history-history-board">
-      <img src="@/../public/img/history/history.png" alt="">
+      <img :src="history" alt="">
     </div>
     <div class="history-guidepost">
-      <img src="@/../public/img/history/indicator.png" alt="">
+      <img :src="indicator" alt="">
       <router-link to="/history/note"
                    tag="div"
                    active-class="history-link"
@@ -41,6 +41,9 @@ import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopCont
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import {Timer} from "@/assets/js/utils";
+import HistoryBackground from "@/assets/img/history/historyBackground.webp";
+import History from "@/assets/img/history/history.webp";
+import Indicator from "@/assets/img/history/indicator.webp";
 
 export default {
   name: "HuadiaoHistory",
@@ -55,6 +58,17 @@ export default {
   },
   mounted() {
     this.initial();
+  },
+  computed: {
+    historyBackground() {
+      return HistoryBackground;
+    },
+    history() {
+      return History;
+    },
+    indicator() {
+      return Indicator;
+    }
   },
   methods: {
     initial() {

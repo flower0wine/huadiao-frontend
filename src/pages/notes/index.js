@@ -14,6 +14,7 @@ import {mixin} from "@/mixin";
 import $ from "jquery";
 import router from "@/pages/notes/router";
 import store from "@/pages/notes/store";
+import NotesMixin from "@/pages/notes/mixin";
 
 Vue.config.productionTip = false;  // 生产提示
 
@@ -23,6 +24,7 @@ Vue.use(VueRouter);
 // 使用 VUE 混入
 // 引入所有页面公共 mixin
 Vue.mixin(mixin);
+Vue.mixin(NotesMixin);
 
 new Vue({
     beforeCreate() {

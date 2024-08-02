@@ -4,9 +4,11 @@
          v-if="!me"
     >
       <div class="chat-container">
-        <span v-html="svg.chat"
-              class="chat-icon"></span>
-        <span>私信</span>
+        <a :href="whisperUrl" target="_blank">
+          <span v-html="svg.chat"
+                class="chat-icon"></span>
+          <span>私信</span>
+        </a>
       </div>
       <div class="follow-container"
            @click="clickToChangeFollow"
@@ -34,7 +36,7 @@
           <span class="active-name">获赞数</span>
         </div>
       </div>
-      <a href="/account/info"
+      <a :href="huadiaoAccountInfoLink"
          v-if="me"
       >
         <div class="modify-user-infer">
@@ -62,6 +64,15 @@
 import {svg} from "@/assets/js/constants/svgs";
 import {mapState} from "vuex";
 import {apis} from "@/assets/js/constants/request-path";
+import {
+  fanLink,
+  followLink,
+  huadiaoAnimeHouseLink,
+  huadiaoNotesLink,
+  huadiaoStarLink,
+  huadiaoWhisperLink,
+  huadiaoAccountInfoLink,
+} from "@/util/huadiao-tool";
 
 export default {
   name: "HomepageUserInferBoard",
@@ -85,31 +96,36 @@ export default {
         return state.allInfo;
       }
     }),
+
+    whisperUrl() {
+      return huadiaoWhisperLink(this.viewedUid);
+    },
+
     // 面板头部
     userActiveConfig() {
       return [{
         name: "关注",
         number: this.numberGreaterThenTenThousand(this.viewedUserInfo.followCount),
-        href: `/followfan/${this.viewedUid}/follow`
+        href: followLink(this.viewedUid),
       }, {
         name: "粉丝",
         number: this.numberGreaterThenTenThousand(this.viewedUserInfo.fanCount),
-        href: `/followfan/${this.viewedUid}/fan`
+        href: fanLink(this.viewedUid),
       }, {
         name: "收藏",
         number: this.numberGreaterThenTenThousand(this.viewedUserInfo.noteStarCount),
-        href: "/star/" + this.viewedUid
+        href: huadiaoStarLink(this.viewedUid),
       }];
     },
     // 面板下部
     otherConfig() {
       return [{
-        href: "/animehouse/" + this.viewedUid,
+        href: huadiaoAnimeHouseLink(this.viewedUid),
         name: this.name + "番剧馆",
         count: this.viewedUserInfo.animeCount,
       }, {
         name: this.name + "笔记",
-        href: `/notes/${this.viewedUid}`,
+        href: huadiaoNotesLink(this.viewedUid),
         count: this.viewedUserInfo.noteCount,
       }];
     },
@@ -125,6 +141,8 @@ export default {
     this.initialFollowStatus();
   },
   methods: {
+    huadiaoAccountInfoLink,
+
     // 改变关注状态
     clickToChangeFollow() {
       let path = this.follow ? apis.followFan.deleteFollow : apis.followFan.newFollow;
@@ -159,7 +177,6 @@ export default {
     },
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   }
 }
 </script>
@@ -314,4 +331,7 @@ export default {
   transform: rotate(-90deg);
 }
 
+.chat-container a {
+  color: #eee;
+}
 </style>

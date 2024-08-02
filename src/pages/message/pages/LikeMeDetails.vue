@@ -116,13 +116,13 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.succeed) {
+        if (res.code === statusCode.SUCCEED) {
           this.addLikeUser(res.data);
           if(res.data.length < this.row) {
             this.hasNext = false;
           }
         }
-        else if(res.code === statusCode.notExist) {
+        else if(res.code === statusCode.NOT_EXIST) {
           this.hasNext = false;
         }
         this.accessing = false;
@@ -145,7 +145,7 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.succeed) {
+        if (res.code === statusCode.SUCCEED) {
           this.changeFollowStatus(index);
         }
       });

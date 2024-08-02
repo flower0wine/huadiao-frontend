@@ -64,10 +64,6 @@ export default {
   props: ["item", "type", "index", "addFollow", "removeFollow", "patch", "mapKey", "groupId"],
   data() {
     return {
-      svg: {
-        avatar: svg.avatar,
-        more: svg.more,
-      },
       // 是否关注
       follow: this.type === "follow" ? true : (this.type === "fan" && this.item.friend),
       itemClass: "chose-follow-item",
@@ -80,6 +76,13 @@ export default {
     }
   },
   computed: {
+    svg() {
+      return {
+        avatar: svg.avatar,
+        more: svg.more,
+        multiplyInput: svg.multiplyInput
+      }
+    },
     me() {
       return this.$store.state.me;
     },
@@ -129,7 +132,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             this.changeFollowStatusOfFollow();
             this.$bus.$emit("flushFollowFanGroup");
           }

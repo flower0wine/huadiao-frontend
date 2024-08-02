@@ -6,6 +6,7 @@
                id="note-title"
                v-model="title"
                placeholder="请输入标题【5~100】"
+               autocomplete="false"
                maxlength="100">
       </div>
       <tinymce-editor/>

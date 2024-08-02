@@ -1,6 +1,11 @@
 .DS_Store
-node_modules
-/dist
+
+# npm
+node_modules/
+
+# compiler
+dist/
+huadiao-user/
 
 
 # local env files
@@ -21,3 +26,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# scss
+.sass-cache/
+*.css.map

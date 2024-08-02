@@ -55,8 +55,6 @@ export default {
     }
   },
   beforeDestroy() {
-    // 解除事件
-    this.clearAllRefsEvents();
   }
 }
 </script>

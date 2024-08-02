@@ -5,7 +5,7 @@
            v-for="(item, index) in message"
            :key="item.messageId">
         <div class="authority-png">
-          <img src="@/../public/img/authority.png" alt="">
+          <img src="../../../assets/img/authority.webp" alt="">
         </div>
         <div class="message-content-box">
           <div>
@@ -25,7 +25,7 @@
 
 <script>
 import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
+import {ResponseHandler} from "@/assets/js/utils";
 
 export default {
   name: "SystemMessageBoard",
@@ -70,16 +70,17 @@ export default {
       }).then((response) => {
         let res = response.data;
         console.log(res);
-        if (res.code === statusCode.succeed) {
-          this.$store.commit("addSystemMessage", {message: res.data});
-          this.offset += res.data.length;
+
+        new ResponseHandler(res).succeed((data) => {
+          this.$store.commit("addSystemMessage", {message: data});
+          this.offset += data.length;
           this.addSiteIconForMessageLink();
-          if (res.data.length < this.row) {
+          if (data.length < this.row) {
             this.hasNext = false;
           }
-        } else if (res.code === statusCode.notExist) {
+        }).notExist(() => {
           this.hasNext = false;
-        }
+        });
         this.accessing = false;
       }).catch((error) => {
         console.log(error);
@@ -124,6 +125,10 @@ export default {
   border-radius: 6px;
   background-color: #fff;
   box-shadow: var(--box-shadow-min);
+}
+
+.system-message-item:nth-child(n + 2) {
+  margin-top: 10px;
 }
 
 .authority-png {

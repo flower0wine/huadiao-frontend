@@ -1,19 +1,19 @@
 <template>
   <div class="star-img-container">
-    <img src="/img/star/giftbox.png"
+    <img :src="giftBox"
          id="gift-box"
          ref="giftBox"
          alt="">
-    <img src="/img/star/juandai.png"
+    <img :src="juanDai"
          id="juan-dai"
          ref="juanDai"
          alt=""
     >
-    <img src="/img/star/leftStar.png"
+    <img :src="leftStar"
          id="left-star"
          ref="leftStar"
          alt="">
-    <img src="/img/star/rightStar.png"
+    <img :src="rightStar"
          ref="rightStar"
          id="right-star"
          alt="">
@@ -22,6 +22,10 @@
 
 <script>
 import {Timer} from "@/assets/js/utils";
+import RightStar from "@/assets/img/star/rightStar.webp";
+import LeftStar from "@/assets/img/star/leftStar.webp";
+import JuanDai from "@/assets/img/star/juandai.webp";
+import GiftBox from "@/assets/img/star/giftbox.webp";
 
 export default {
   name: "StarImgAnimation",
@@ -34,6 +38,20 @@ export default {
         giftBox: new Timer(),
       }
     }
+  },
+  computed: {
+    leftStar() {
+      return LeftStar;
+    },
+    rightStar() {
+      return RightStar;
+    },
+    juanDai() {
+      return JuanDai;
+    },
+    giftBox() {
+      return GiftBox;
+    },
   },
   mounted() {
     this.addAnimationOnImg();

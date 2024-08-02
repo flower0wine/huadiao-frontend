@@ -35,22 +35,22 @@
             <label>性别</label>
             <div class="sex-buttons">
             <span class="man-button button"
-                  :class="tempUser.sex === '1' ? 'choice-button-sex' : ''"
-                  @click="tempUser.sex = '1'"
+                  :class="tempUser.sex === 1 ? 'choice-button-sex' : ''"
+                  @click="tempUser.sex = 1"
                   ref="man"
             >
               <span>男</span>
             </span>
               <span class="women-button button"
-                    :class="tempUser.sex === '2' ? 'choice-button-sex' : ''"
-                    @click="tempUser.sex = '2'"
+                    :class="tempUser.sex === 2 ? 'choice-button-sex' : ''"
+                    @click="tempUser.sex = 2"
                     ref="women"
               >
             <span>女</span>
             </span>
               <span class="no-known-button button"
-                    :class="tempUser.sex === '0' ? 'choice-button-sex' : ''"
-                    @click="tempUser.sex = '0'"
+                    :class="tempUser.sex === 0 ? 'choice-button-sex' : ''"
+                    @click="tempUser.sex = 0"
                     ref="noKnown"
               >
             <span>保密</span>
@@ -59,9 +59,9 @@
                           @after-enter="$refs.noKnowImg.classList.add('no-known-icon-enter-to')"
                           @after-leave="$refs.noKnowImg.classList.remove('no-known-icon-enter-to')"
                           appear>
-                <img src="@/../public/img/account/noknown.png"
+                <img :src="noKnownImg"
                      class="no-known-icon"
-                     v-show="tempUser.sex === '0'"
+                     v-show="tempUser.sex === 0"
                      ref="noKnowImg"
                      alt>
               </transition>
@@ -69,9 +69,9 @@
                           @after-enter="$refs.manImg.classList.add('man-icon-enter-to')"
                           @after-leave="$refs.manImg.classList.remove('man-icon-enter-to')"
                           appear>
-                <img src="@/../public/img/account/man.png"
+                <img :src="manImg"
                      class="man-icon"
-                     v-show="tempUser.sex === '1'"
+                     v-show="tempUser.sex === 1"
                      ref="manImg"
                      alt>
               </transition>
@@ -79,9 +79,9 @@
                           @after-enter="$refs.womenImg.classList.add('women-icon-enter-to')"
                           @after-leave="$refs.womenImg.classList.remove('women-icon-enter-to')"
                           appear>
-                <img src="@/../public/img/account/women.png"
+                <img :src="womenImg"
                      class="women-icon"
-                     v-show="tempUser.sex === '2'"
+                     v-show="tempUser.sex === 2"
                      ref="womenImg"
                      alt>
               </transition>
@@ -125,6 +125,9 @@ import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {accountResponseMessage} from "@/assets/js/constants/response_message/account";
 import {ResponseHandler} from "@/assets/js/utils";
+import WomenImg from "@/assets/img/account/women.webp";
+import ManImg from "@/assets/img/account/man.webp";
+import NoKnownImg from "@/assets/img/account/noknown.webp";
 
 export default {
   name: "HuadiaoAccountInfo",
@@ -155,6 +158,17 @@ export default {
   created() {
     this.getUserInfo();
   },
+  computed: {
+    womenImg() {
+      return WomenImg;
+    },
+    manImg() {
+      return ManImg;
+    },
+    noKnownImg() {
+      return NoKnownImg;
+    }
+  },
   methods: {
     getUserInfo() {
       this.visible.loadingFail = false;
@@ -163,7 +177,7 @@ export default {
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (res.code === statusCode.succeed) {
+          if (res.code === statusCode.SUCCEED) {
             let userInfo = res.data;
             this.userInfo = userInfo;
             for (let key in userInfo) {
@@ -236,7 +250,7 @@ export default {
         }
       }
       this.sendRequest({
-        path: "userInfo",
+        path: apis.account.info,
         method: "post",
         data: {
           nickname,
@@ -266,7 +280,6 @@ export default {
     },
   },
   beforeDestroy() {
-    this.clearAllRefsEvents();
   }
 }
 </script>

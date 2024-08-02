@@ -55,7 +55,7 @@ class ResponseHandler {
 
     // 响应成功回调
     succeed(callback) {
-        if(this.response.code === statusCode.succeed) {
+        if(this.response.code === statusCode.SUCCEED) {
             callback && callback(this.response.data);
         }
         return this;
@@ -63,7 +63,7 @@ class ResponseHandler {
 
     // 没有获取到结果回调
     notExist(callback) {
-        if(this.response.code === statusCode.notExist) {
+        if(this.response.code === statusCode.EMPTY_DATA) {
             callback && callback(this.response.data);
         }
         return this;
@@ -71,8 +71,15 @@ class ResponseHandler {
 
     // 参数存在错误
     errorParam(callback) {
-        if(this.response.code === statusCode.errorParam) {
+        if(this.response.code === statusCode.ERROR_PARAM) {
             callback && callback(this.response.data);
+        }
+        return this;
+    }
+
+    error(callback) {
+        if(this.response.code !== statusCode.SUCCEED) {
+            callback && callback(this.response);
         }
         return this;
     }

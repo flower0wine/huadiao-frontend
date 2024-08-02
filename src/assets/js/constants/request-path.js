@@ -5,24 +5,24 @@
 
 // 使用严格模式
 'use strict';
-// const hostIp = '1.94.55.79:8080/';
-const hostIp = 'localhost:9090/'
+
+const HUADIAO_HOST_IP = process.env.VUE_APP_HUADIAO_HOST_IP;
 
 /**
  * 后端接口
  */
 export const apis = {
     // 网站访问地址
-    huadiaoHost: `http://${hostIp}huadiao/`,
-    whisperHost: `ws://${hostIp}huadiao/message/whisper/talk`,
-    imageHost: `http://${hostIp}images/`,
+    huadiaoHost: `http://${HUADIAO_HOST_IP}/huadiao/`,
+    whisperHost: `ws://${HUADIAO_HOST_IP}/huadiao/message/whisper/talk`,
+    imageHost: `http://${HUADIAO_HOST_IP}/images/`,
     // 页面 url
     pageLinkStart: {
         homepage: "homepage",
         note: "singlenote"
     },
+    huadiaoHeader: "header",
     common: {
-        huadiaoHeader: "header",
         register: "common/register",
         login: "common/login",
         oauth: {
@@ -60,14 +60,38 @@ export const apis = {
     },
     // 笔记相关 api
     note: {
+        get: "note/get",
         all:  "note/all",
         edit: "note/edit",
         modify: "note/modify",
         publish: "note/publish",
-        comment: "note/comment",
-        commentStatus: "note/comment",
-        commentDelete: "note/comment/delete",
-        commentReport: "note/comment/report",
+        delete: "note/delete",
+        like: {
+            add: "note/like/add",
+            delete: "note/like/delete",
+        },
+        unlike: {
+            add: "note/unlike/add",
+            delete: "note/unlike/delete",
+        },
+        star: {
+            add: "note/star/add",
+            delete: "note/star/delete",
+        },
+        comment: {
+            like: {
+                add: "note/comment/like/add",
+                delete: "note/comment/like/delete",
+            },
+            unlike: {
+                add: "note/comment/unlike/add",
+                delete: "note/comment/unlike/delete",
+            },
+            get: "note/comment",
+            add: "note/comment/add",
+            delete: "note/comment/delete",
+            report: "note/comment/report",
+        },
     },
     // 个人主页相关 api
     homepage: {
@@ -133,10 +157,7 @@ export const apis = {
     message: {
         systemGet: "message/system/get",
         likeGet: "message/like/get",
-        likeNoteDelete: "message/like/note/delete",
-        likeCommentDelete: "message/like/comment/delete",
-        likeNoteUserGet: "message/like/note",
-        likeCommentUserGet: "message/like/comment",
+        likeDelete: "message/like/delete",
         replyGet: "message/reply/get",
         replyDelete: "message/reply/delete",
         latestUserGet: "message/whisper/user",

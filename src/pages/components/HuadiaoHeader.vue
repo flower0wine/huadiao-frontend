@@ -8,7 +8,7 @@
     <ul class="left-entry">
       <li class="huadiao-index">
         <a href="/" title="花凋--不一样的世界">
-          <img class="huadiao-logo" :src="logoPath" alt="">
+          <img class="huadiao-logo" :src="authorityImg" alt="">
         </a>
       </li>
     </ul>
@@ -68,9 +68,11 @@ import HuadiaoSearch from "@/pages/components/search/HuadiaoSearch";
 import constants from "@/assets/js/constants";
 import {mapState} from "vuex";
 import {svg} from "@/assets/js/constants/svgs";
-import defaultHuadiaoHeaderStyle from "@/assets/js/constants/huadiao_header_style/default";
+import defaultHuadiaoHeaderStyle from "@/assets/js/constants/style/huadiao_header_style/default";
 import {apis} from "@/assets/js/constants/request-path";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
+import AuthorityImg from "@/assets/img/authority.webp";
+import {ResponseHandler} from "@/assets/js/utils";
 
 let smallUserAvatarScale = "41px";
 let bigUserAvatarScale = "71px";
@@ -93,6 +95,9 @@ export default {
     };
   },
   computed: {
+    authorityImg() {
+      return AuthorityImg;
+    },
     login: {
       get() {
         return this.$store.state.user?.login || false;
@@ -107,7 +112,7 @@ export default {
         // 头像配置
         avatar: {
           title: this.login ? INDEX_TIPS.LOGGED : INDEX_TIPS.NOT_LOGGED,
-          src: this.login ? '/homepage/' + this.user.uid : '/',
+          src: this.login ? this.homepage(this.user.uid) : "/",
         },
         // 头部右侧配置
         rightEntry: [{
@@ -143,16 +148,20 @@ export default {
     // 获取花凋头部数据
     getHuadiaoHeaderUserinfo() {
       this.sendRequest({
-        path: apis.common.huadiaoHeader,
+        path: apis.huadiaoHeader,
         thenCallback: (response) => {
           let res = response.data;
           console.log(res);
-          if (!res || !res.login) {
-            res = {
-              login: false,
+
+          new ResponseHandler(res).succeed((data) => {
+            if (!data.login) {
+              data = {
+                login: false,
+              }
             }
-          }
-          this.$store.commit("initialUser", {user: res});
+            console.log(data)
+            this.$store.commit("initialUser", {user: data});
+          });
           this.getDataCompleted = true;
         },
         errorCallback: (error) => {

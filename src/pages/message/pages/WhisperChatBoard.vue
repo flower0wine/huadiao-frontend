@@ -1,39 +1,32 @@
 <template>
   <div class="whisper-chat-board">
     <div class="chat-header">{{ nickname }}</div>
-    <chat-message-window/>
-    <chat-input/>
+    <chat-message-window />
   </div>
 </template>
 
 <script>
 import ChatMessageWindow from "@/pages/message/components/ChatMessageWindow";
-import ChatInput from "@/pages/message/components/ChatInput";
 import {mapState} from "vuex";
+import {huadiaoNickname} from "@/util/huadiao-tool";
 
 export default {
   name: "WhisperChatBoard",
-  components: {ChatInput, ChatMessageWindow},
-  data() {
-    return {}
-  },
-  created() {
-  },
+  components: {ChatMessageWindow},
   computed: {
-    ...mapState(["latestUserIndex"]),
-    chatUid() {
-      return parseInt(this.$route.params.uid);
-    },
-    nickname() {
-      let whisper = this.$store.state.message.whisper;
-      return this.getNickname(whisper[this.latestUserIndex]);
-    }
-  },
-  methods: {
+    ...mapState("whisperUserStore", ["selectedLatestUserIndex"]),
 
+    ...mapState("whisperUserStore", ["whisperUsers"]),
+
+    nickname() {
+      const user = this.whisperUsers[this.selectedLatestUserIndex];
+      if (!user) {
+        return "选择一位好友聊天吧";
+      }
+      const {nickname, userId} = user;
+      return huadiaoNickname(nickname, userId);
+    },
   },
-  beforeDestroy() {
-  }
 }
 </script>
 
