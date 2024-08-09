@@ -1,0 +1,37 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main]  # 当推送到 main 分支时触发
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. 检出代码仓库
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. 安装依赖并打包项目
+    - name: Install dependencies and build
+      run: |
+        npm install       # 如果使用的是 Node.js 项目
+        npm run build     # 打包命令，可以根据你的项目调整
+
+    # 4. 将文件上传到服务器
+    - name: Upload to Server
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SERVER_PRIVATE_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+        # 定义目标服务器及文件路径
+        REMOTE_USER=${{ secrets.SERVER_USERNAME }}        
+        REMOTE_HOST=${{ secrets.SERVER_IP }} 
+        REMOTE_PATH=${{ secrets.SERVER_PATH }}
+
+        # 上传文件
+        scp -o StrictHostKeyChecking=no ./huadiao-user/* $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH

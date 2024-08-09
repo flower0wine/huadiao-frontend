@@ -182,6 +182,10 @@ export default {
 </script>
 
 <style scoped>
+.homepage-user-infer-board {
+  padding-inline: 10%;
+}
+
 .user-infer-board-container {
   display: flex;
   justify-content: center;
@@ -191,7 +195,6 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 300px;
   color: #EEEEEEFF;
 }
 
@@ -254,7 +257,6 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  width: 1000px;
   height: 200px;
   margin: 10px auto 0;
   padding: 10px 15px;
@@ -264,9 +266,10 @@ export default {
 
 .user-active {
   display: flex;
+  justify-content: center;
+  gap: 5%;
   width: 100%;
-  padding: 10px 300px;
-  justify-content: space-between;
+  padding-bottom: 10px;
   border-bottom: 1px solid #877e7e;
 }
 
@@ -305,7 +308,7 @@ export default {
 }
 
 .other-user-infer {
-  padding: 0 100px;
+  padding: 10px 10%;
 }
 
 .other-user-infer-item {

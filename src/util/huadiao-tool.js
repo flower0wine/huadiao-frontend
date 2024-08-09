@@ -68,7 +68,7 @@ export function huadiaoImageLink(imgName) {
 }
 
 export function huadiaoEmoteLink(emoteName) {
-    return huadiaoImageLink(`emotes/${emoteName}`);
+    return huadiaoImageLink(`emote/${emoteName}`);
 }
 
 
