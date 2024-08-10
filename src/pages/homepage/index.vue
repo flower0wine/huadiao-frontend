@@ -93,7 +93,7 @@ export default {
 <style>
 .huadiao-homepage-container {
   width: 100%;
-  min-width: 1200px;
+  min-width: 300px;
   height: 100vh;
   min-height: 600px;
   background: no-repeat fixed center/cover;
