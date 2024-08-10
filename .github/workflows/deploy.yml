@@ -19,6 +19,16 @@ jobs:
       with:
         node-version: '18'
 
+    - name: Install dependencies
+      run: npm install
+
+    - name: Create lang directory and download zh_CN language pack
+      run: |
+        mkdir -p node_modules/tinymce
+        curl -L -o node_modules/tinymce/zh_CN.zip https://download.tiny.cloud/tinymce/community/languagepacks/6/zh_CN.zip
+        unzip node_modules/tinymce/zh_CN.zip -d node_modules/tinymce/
+        rm node_modules/tinymce/zh_CN.zip
+
     - name: Debug
       run: |
         echo "Node version:"
@@ -29,10 +39,8 @@ jobs:
         npm list --depth=0
 
     # 安装依赖并打包项目
-    - name: Install dependencies and build
-      run: |
-        npm install       # 如果使用的是 Node.js 项目
-        npm run build     # 打包命令，可以根据你的项目调整
+    - name: Build
+      run: npm run build
 
     # 将文件上传到服务器
     - name: Upload to Server
@@ -47,6 +55,8 @@ jobs:
         REMOTE_USER=${{ secrets.SERVER_USERNAME }}        
         REMOTE_HOST=${{ secrets.SERVER_IP }} 
         REMOTE_PATH=${{ secrets.SERVER_PATH }}
+        
+        ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "rm -rf $REMOTE_PATH/*"
 
         # 上传文件
-        scp -o StrictHostKeyChecking=no ./huadiao-user/* $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+        scp -o StrictHostKeyChecking=no -r ./huadiao-user/* $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
