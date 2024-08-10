@@ -9,17 +9,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. 检出代码仓库
+    # 检出代码仓库
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 2. 安装依赖并打包项目
+    # 根据需要调整 Node.js 版本
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+
+    - name: Debug
+      run: |
+        echo "Node version:"
+        node -v
+        echo "NPM version:"
+        npm -v
+        echo "Installed packages:"
+        npm list --depth=0
+
+    # 安装依赖并打包项目
     - name: Install dependencies and build
       run: |
         npm install       # 如果使用的是 Node.js 项目
         npm run build     # 打包命令，可以根据你的项目调整
 
-    # 4. 将文件上传到服务器
+    # 将文件上传到服务器
     - name: Upload to Server
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SERVER_PRIVATE_KEY }}
