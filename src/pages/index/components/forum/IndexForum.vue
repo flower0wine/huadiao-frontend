@@ -7,6 +7,9 @@
       <main class="forum-main" v-if="visible.content">
         <forum-navigation/>
         <forum-content/>
+        <div class="forum-label-container">
+          <NoteRank/>
+        </div>
       </main>
     </div>
   </div>
@@ -14,14 +17,15 @@
 
 <script>
 import ForumContent from "@/pages/index/components/forum/ForumContent";
-import ForumNavigation from "@/pages/index/components/forum/navigation/ForumNavigation";
+import ForumNavigation from "@/pages/index/components/forum/components/ForumNavigation";
 import IndexForumBackground from "@/assets/img/index/indexPageTwoBackground.webp";
+import NoteRank from "@/pages/index/components/forum/components/NoteRank";
 
 let observer;
 
 export default {
   name: "IndexForum",
-  components: {ForumNavigation, ForumContent},
+  components: {NoteRank, ForumNavigation, ForumContent},
   data() {
     return {
       visible: {
@@ -57,7 +61,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forum/variables/index.scss";
+@import "~@/pages/index/scss/forum/variables/index";
+@import "~@/pages/index/scss/forum/layout";
 
 .huadiao-forum-page {
   width: 100%;
@@ -82,8 +87,25 @@ export default {
 
 .forum-main {
   display: flex;
-  justify-content: space-between;
-  width: $forumWidth;
-  margin: $forumMainMarginTop auto;
+  justify-content: center;
+  width: 100%;
+  gap: 20px;
+  margin-top: 20px;
+  margin-inline: auto;
+}
+
+.forum-label-container {
+  @extend .forum-sticky;
+  width: 20%;
+  min-width: 160px;
+  max-width: 250px;
+  height: min-content;
+  border-radius: $forumBorderRadius;
+  box-shadow: $forumBoxShadow;
+  backdrop-filter: $forumBackdropBlurFilter;
+
+  > div:nth-child(n + 2) {
+    margin-top: 20px;
+  }
 }
 </style>

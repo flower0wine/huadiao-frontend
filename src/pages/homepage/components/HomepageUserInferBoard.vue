@@ -36,7 +36,7 @@
           <span class="active-name">获赞数</span>
         </div>
       </div>
-      <a :href="huadiaoAccountInfoLink"
+      <a :href="huadiaoAccountInfoLink()"
          v-if="me"
       >
         <div class="modify-user-infer">
@@ -300,8 +300,8 @@ export default {
 
 .modify-user-infer {
   position: absolute;
-  top: 46px;
-  right: 15px;
+  top: 38px;
+  right: 23px;
   color: #534e4e;
   font-size: 14px;
   cursor: pointer;

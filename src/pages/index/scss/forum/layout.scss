@@ -1,0 +1,6 @@
+@import "variables/index";
+
+.forum-sticky {
+  position: sticky;
+  top: $forumPaddingTop + $forumMainMarginTop;
+}

@@ -1,6 +1,6 @@
 <template>
   <div class="loading-container" ref="loading">
-    <div class="loading" v-if="!visible.loaded">
+    <div class="loading" v-if="loading">
       <div class="text-content">
         <div class="line"
              v-for="(item, index) in defaultOptions.line"
@@ -19,12 +19,9 @@
 export default {
   name: "ContentLoading",
   props: {
-    observeCallback: {
-      type: Function,
-      require: true,
-    },
-    getHooks: {
-      type: Function,
+    loading: {
+      type: Boolean,
+      default: false,
     },
     options: {
       type: Object,
@@ -35,13 +32,6 @@ export default {
   },
   data() {
     return {
-      observer: null,
-      observerOptions: {
-        threshold: 0.1
-      },
-      visible: {
-        loaded: false,
-      },
       defaultOptions: {
         useImage: false,
         noMoreText: "没有更多内容了~",
@@ -65,54 +55,14 @@ export default {
   created() {
     this.initialCreated();
   },
-  mounted() {
-    this.initialMounted();
-  },
   methods: {
     initialCreated() {
-      this.observer = new IntersectionObserver(this.intersectionObserverCallback, this.observerOptions);
       this.modifySrcObject(this.defaultOptions, this.options);
-    },
-    initialMounted() {
-      this.observe();
-
-      let hooks = {
-        unobserve: this.unobserve,
-        reset: this.reset,
-      };
-      this.getHooks && this.getHooks(hooks);
     },
     getLineStyle(item) {
       return `width: ${item.width}; height: ${item.height}; background-color: ${item.background ?? this.defaultOptions.itemBackground}`;
     },
-    intersectionObserverCallback(entries) {
-      let entry = entries[0];
-      let observeCallback = this.observeCallback;
-      if (entry.isIntersecting) {
-        observeCallback && observeCallback(entry);
-      }
-    },
-    observe() {
-      if (this.$refs.loading) {
-        this.observer.observe(this.$refs.loading);
-      }
-    },
-    // 加载完毕
-    loaded() {
-      this.visible.loaded = true;
-    },
-    unobserve() {
-      this.loaded();
-      if (this.$refs.loading) {
-        this.observer.unobserve(this.$refs.loading);
-      }
-    },
-    reset() {
-      this.visible.loaded = false;
-    }
   },
-  beforeDestroy() {
-  }
 }
 </script>
 

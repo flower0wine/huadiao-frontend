@@ -49,7 +49,6 @@ export default {
 
 <style>
 html {
-  min-width: 1200px;
   min-height: 600px;
   scroll-snap-type: y mandatory;
 }
