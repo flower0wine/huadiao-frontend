@@ -4,19 +4,15 @@
       <forum-content-header/>
       <router-view></router-view>
     </div>
-    <div class="forum-label-container">
-      <note-rank/>
-    </div>
   </div>
 </template>
 
 <script>
 import ForumContentHeader from "@/pages/index/components/forum/ForumContentHeader";
-import NoteRank from "@/pages/index/components/forum/labels/NoteRank";
 
 export default {
   name: "ForumContent",
-  components: {NoteRank, ForumContentHeader},
+  components: {ForumContentHeader},
   data() {
     return {
       contentComponents: {
@@ -34,30 +30,20 @@ export default {
 @import "../../scss/forum/variables/index.scss";
 
 .forum-content {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: start;
-  width: $forumContentWidth + $forumTagWidth + $forumContentAndLabelBetween;
+  width: 60%;
   min-height: 800px;
 }
 
 .content-display-container {
-  width: $forumContentWidth;
+  width: 100%;
   min-height: 800px;
   border-radius: $forumBorderRadius;
   background-color: $forumBackgroundColor;
   box-shadow: $forumBoxShadow;
   backdrop-filter: $forumBackdropBlurFilter;
-}
-
-.forum-label-container {
-  width: $forumTagWidth;
-  border-radius: $forumBorderRadius;
-  box-shadow: $forumBoxShadow;
-  backdrop-filter: $forumBackdropBlurFilter;
-
-  > div:nth-child(n + 2) {
-    margin-top: 20px;
-  }
 }
 </style>

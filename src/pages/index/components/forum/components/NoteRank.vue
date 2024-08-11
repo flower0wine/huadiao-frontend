@@ -143,44 +143,20 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.note-rank-header {
-  svg {
-    width: 28px;
-    height: 28px;
-    fill: #3079a1;
-    vertical-align: -9px;
-  }
-}
-
-.rank-medal {
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-}
+<style scoped lang="scss">
+@import "../../../scss/forum/variables/index";
 
 $medalColors: (#d2a201, #bdb90a, #a36404);
 
 @each $item in $medalColors {
-  .article-item:nth-child(#{index($medalColors, $item)}) {
+  .article-item:nth-child(#{index($medalColors, $item)})::v-deep {
     svg {
       fill: $item;
     }
   }
 }
 
-</style>
-
-<style scoped lang="scss">
-@import "../../../scss/forum/variables/index.scss";
-
-.note-rank {
-  border-radius: $forumBorderRadius;
-  background-color: $forumBackgroundColor;
-}
-
-.note-rank-header {
+.note-rank-header::v-deep {
   text-align: center;
   padding: 10px 0 5px 0;
   border-bottom: 1px solid $forumBorderColor;
@@ -188,6 +164,13 @@ $medalColors: (#d2a201, #bdb90a, #a36404);
 
   .line-one {
     margin-bottom: 6px;
+  }
+
+  svg {
+    width: 28px;
+    height: 28px;
+    fill: #3079a1;
+    vertical-align: -9px;
   }
 }
 
@@ -224,8 +207,13 @@ $medalColors: (#d2a201, #bdb90a, #a36404);
   max-height: 240px;
 }
 
-.note-rank :has(.article-item:hover) {
-  overflow: hidden;
+.note-rank {
+  border-radius: $forumBorderRadius;
+  background-color: $forumBackgroundColor;
+
+  :has(.article-item:hover) {
+    overflow: hidden;
+  }
 }
 
 .article-item {
@@ -244,12 +232,17 @@ $medalColors: (#d2a201, #bdb90a, #a36404);
   }
 }
 
-.rank-medal {
+.rank-medal::v-deep {
   width: 26px;
   text-align: center;
   color: #898989;
   margin-right: 10px;
   font-family: sans-serif, serif;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .article-title {

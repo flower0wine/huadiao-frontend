@@ -5,7 +5,9 @@
        class="note-link"
        :title="noteItem.title">
       <div class="note-container">
-        <div class="note-left">
+        <div class="note-left" :style="{
+          width: '100%',
+        }">
           <div class="note-title">{{ noteItem.title }}</div>
           <div class="note-content">
             <div class="note-abstract" :title="noteItem.summary">{{ noteItem.summary }}</div>
@@ -50,9 +52,13 @@
             </div>
           </div>
         </div>
-        <div class="note-right">
+        <div class="note-right"
+             v-if="noteItem.cover"
+             :style="{
+               width: noteItem.cover && '160px',
+             }"
+        >
           <div class="note-image"
-               v-if="noteItem.cover"
                :style="packageBackgroundUrl(noteItem.cover)"></div>
         </div>
       </div>
@@ -123,7 +129,6 @@ export default {
 @import "../../../scss/forum/variables/index.scss";
 
 $noteRightWidth: 160px;
-$noteBetweenWidth: 20px;
 
 .note-display {
   padding: 10px 16px;
@@ -146,14 +151,13 @@ $noteBetweenWidth: 20px;
 .right-info,
 .line-one,
 .line-two,
-.label-list,
-.note-container {
+.label-list {
   display: flex;
 }
 
-.note-left {
-  width: calc(100% - #{$noteRightWidth} - #{$noteBetweenWidth});
-  margin-right: $noteBetweenWidth;
+.note-container {
+  display: flex;
+  gap: 20px;
 }
 
 .note-content {
@@ -187,11 +191,13 @@ $noteBetweenWidth: 20px;
 }
 
 .note-abstract {
+  display: -webkit-box;
   margin-top: 4px;
   color: #d5d5d5;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .note-info {
