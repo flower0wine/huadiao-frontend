@@ -9,16 +9,16 @@
 const HUADIAO_HOST_IP = process.env.VUE_APP_HUADIAO_HOST_IP;
 
 const HTTP_PROTOCOL = window.location.protocol;
-const WEBSOCKET_PROTOCOL = HTTP_PROTOCOL === "http" ? "ws" : "wss";
+const WEBSOCKET_PROTOCOL = HTTP_PROTOCOL === "http:" ? "ws:" : "wss:";
 
 /**
  * 后端接口
  */
 export const apis = {
     // 网站访问地址
-    huadiaoHost: `${HTTP_PROTOCOL}://${HUADIAO_HOST_IP}/huadiao/`,
-    whisperHost: `${WEBSOCKET_PROTOCOL}://${HUADIAO_HOST_IP}/huadiao/message/whisper/talk`,
-    imageHost: `${HTTP_PROTOCOL}://${HUADIAO_HOST_IP}/images/`,
+    huadiaoHost: `${HTTP_PROTOCOL}//${HUADIAO_HOST_IP}/huadiao/`,
+    whisperHost: `${WEBSOCKET_PROTOCOL}//${HUADIAO_HOST_IP}/huadiao/message/whisper/talk`,
+    imageHost: `${HTTP_PROTOCOL}//${HUADIAO_HOST_IP}/images/`,
     // 页面 url
     pageLinkStart: {
         homepage: "homepage",

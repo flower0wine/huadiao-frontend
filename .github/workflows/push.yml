@@ -25,4 +25,4 @@ jobs:
 
     # 4. 推送代码到 Gitee
     - name: Push to Gitee
-      run: git push gitee main
+      run: git push -f gitee main
