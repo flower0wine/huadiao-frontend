@@ -7,7 +7,7 @@
 'use strict';
 
 import {apis} from "@/assets/js/constants/request-path";
-import {HUADIAO_HOST_IP} from "@/util/request";
+import {HUADIAO_HOST} from "@/util/request";
 
 export const userAvatarImagePath = `${apis.imageHost}userAvatar/`;
 
@@ -64,7 +64,7 @@ export function huadiaoNickname(nickname, userId) {
 }
 
 export function huadiaoImageLink(imgName) {
-    return `http://${HUADIAO_HOST_IP}/images/${imgName}`;
+    return `${HUADIAO_HOST}/images/${imgName}`;
 }
 
 export function huadiaoEmoteLink(emoteName) {

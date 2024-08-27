@@ -6,10 +6,12 @@
 // 使用严格模式
 'use strict';
 
-import axios, {HttpStatusCode} from "axios";
+import axios from "axios";
 import {statusCode} from "@/assets/js/constants/status-code";
 
 export const HUADIAO_HOST_IP = process.env.VUE_APP_HUADIAO_HOST_IP;
+export const HTTP_PROTOCOL = window.location.protocol;
+export const HUADIAO_HOST = `${HTTP_PROTOCOL}//${HUADIAO_HOST_IP}`;
 
 const excludeInterceptors = [
     /\//,
@@ -31,23 +33,9 @@ function isExcludeInterceptors(pathname) {
     return false;
 }
 
-axios.interceptors.response.use((resp) => {
-    if (resp.status === HttpStatusCode.Ok) {
-        // 未登录跳转主页
-        if (resp.data.code === statusCode.NOT_AUTHORITATIVE && !isExcludeInterceptors(window.location.pathname)) {
-            window.location.href = "/";
-        }
-        // 页面不存在
-        else if (resp.data.code === statusCode.PAGE_NOT_EXIST) {
-            window.location.href = "/error/404";
-        }
-    }
-    return resp;
-});
-
 export function createAxios(config = {}) {
     const instance = axios.create({
-        baseURL: "http://" + HUADIAO_HOST_IP + "/huadiao",
+        baseURL: `${HUADIAO_HOST}/huadiao`,
         timeout: 10000,
         withCredentials: true,
 
