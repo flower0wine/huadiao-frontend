@@ -3,25 +3,25 @@
     <div class="last-time">
       <div class="left-blank"></div>
       <div class="triangle"></div>
-      <div class="visited-date">{{huadiaoDateFormat(noteHistory.time)}}</div>
+      <div class="visited-date">{{huadiaoDateFormat(noteHistory.visitTime)}}</div>
     </div>
     <div class="note-history-infer">
       <div class="note-title">
-        <a :href="`/${pageLinkStart.note}/${noteHistory.authorUid}/${noteHistory.noteId}`">{{noteHistory.title}}</a>
+        <a :href="`/${pageLinkStart.note}/${noteHistory.author.uid}/${noteHistory.noteId}`">{{noteHistory.noteTitle}}</a>
       </div>
       <div class="note-abstract" v-html="noteHistory.summary"></div>
       <div class="note-author-infer">
         <div class="user-avatar-box">
-          <a :href="`/${pageLinkStart.homepage}/${noteHistory.authorUid}`">
+          <a :href="`/${pageLinkStart.homepage}/${noteHistory.author.uid}`">
             <span v-html="svg.avatar"></span>
-            <div class="user-avatar" :style="`background-image: url('${userAvatarImagePath}${noteHistory.author.avatar}')`"></div>
+            <div class="user-avatar" :style="`background-image: url('${getAvatarUrl(noteHistory.author.userAvatar)}')`"></div>
           </a>
         </div>
         <div class="user-nickname">{{noteHistory.author.nickname || noteHistory.author.userId}}</div>
       </div>
       <div v-html="svg.deleteTrashcan"
            class="delete-icon"
-           @click="deleteNoteHistory(noteHistory.authorUid, noteHistory.noteId)"></div>
+           @click="deleteNoteHistory(noteHistory.author.uid, noteHistory.noteId)"></div>
     </div>
   </div>
 </template>
@@ -30,6 +30,10 @@
 import {apis} from "@/assets/js/constants/request-path";
 import {svg} from "@/assets/js/constants/svgs";
 import {statusCode} from "@/assets/js/constants/status-code";
+import {getAvatarUrl} from "@/util/huadiao-tool";
+import {deleteOneNoteHistory} from "@/pages/history/apis";
+import {flatPromise} from "@/util";
+import {ResponseHandler} from "@/assets/js/utils";
 
 export default {
   name: "NoteHistoryItem",
@@ -44,24 +48,21 @@ export default {
     }
   },
   methods: {
-    deleteNoteHistory(uid, noteId) {
-      this.sendRequest({
-        path: apis.history.noteDelete,
-        params: {
-          noteId,
-          uid,
-        },
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          if(res.code === statusCode.SUCCEED) {
-            this.$store.commit("deleteNoteHistory", {noteId, uid});
-          }
-        },
-        errorCallback: (error) => {
-          console.log(error);
-        }
-      })
+    getAvatarUrl,
+
+    async deleteNoteHistory(uid, noteId) {
+      const [err, res] = await flatPromise(deleteOneNoteHistory(uid, noteId));
+
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      new ResponseHandler(res).succeed(() => {
+        this.$store.commit("deleteNoteHistory", {noteId, uid});
+      }).error((err) => {
+        console.log(err);
+      });
     },
   },
   beforeDestroy() {

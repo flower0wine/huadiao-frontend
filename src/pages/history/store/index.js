@@ -34,19 +34,17 @@ const mutations = {
     clearNoteHistory(state) {
         state.noteHistory = [];
     },
-    addNoteHistory(state, {history}) {
+    addNoteHistory(state, {history, clear}) {
+        if (clear) {
+            state.noteHistory = [];
+        }
         state.noteHistory.push(...history);
     },
     addAnimeHistory(state, {animeHistory}) {
         state.animeHistory.push(...animeHistory);
     },
     deleteNoteHistory(state, {noteId, uid}) {
-        let noteHistoryList = state.noteHistory;
-        for(let index = 0; index < noteHistoryList.length; index++) {
-            if(noteHistoryList[index].uid === uid && noteHistoryList[index].noteId === noteId) {
-                noteHistoryList.splice(index, 1);
-            }
-        }
+        state.noteHistory.splice(state.noteHistory.findIndex(item => item.noteId === noteId && item.author.uid === uid), 1);
     },
     deleteAnimeHistory(state, {uid}) {
         let animeHistoryList = state.animeHistory;

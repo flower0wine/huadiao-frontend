@@ -71,4 +71,15 @@ export function huadiaoEmoteLink(emoteName) {
     return huadiaoImageLink(`emote/${emoteName}`);
 }
 
+export function getAvatarUrl(url) {
+    url += "";
+    if (url.startsWith('http')) {
+        return url;
+    }
+    if (url.startsWith('/')) {
+        url = url.substr(1);
+    }
+    return `${userAvatarImagePath}${url}`;
+}
+
 

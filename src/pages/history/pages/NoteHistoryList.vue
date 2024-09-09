@@ -2,7 +2,7 @@
   <div class="note-history-list">
     <transition-group name="right-slide">
       <note-history-item v-for="(item) in noteHistory"
-                         :key="`${item.uid}/${item.noteId}`"
+                         :key="`${item.author.uid}/${item.noteId}`"
                          :noteHistory="item"/>
     </transition-group>
     <simple-loading :option="{loadedText: `去发现更多有意思的人吧!`}"
@@ -59,9 +59,9 @@ export default {
     searchNoteHistory(searchContent) {
       pager.requestModel((params) => {
         this.sendRequest({
-          path: apis.search.history.note.title,
+          path: apis.history.note,
           params: {
-            title: searchContent,
+            noteTitle: searchContent,
             ...params,
           },
         }).then((response) => {
@@ -69,7 +69,8 @@ export default {
           console.log(res);
           pager.requestCallback(res).succeed((data) => {
             data = Array.isArray(data) ? data : [];
-            this.$store.commit("addNoteHistory", {history: data});
+
+            this.$store.commit("addNoteHistory", {history: data, clear: params.offset === 0});
           });
         }).catch(pager.errorCallback);
       });
