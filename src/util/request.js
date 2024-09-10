@@ -9,9 +9,7 @@
 import axios from "axios";
 import {statusCode} from "@/assets/js/constants/status-code";
 
-export const HUADIAO_HOST_IP = process.env.VUE_APP_HUADIAO_HOST_IP;
-export const HTTP_PROTOCOL = window.location.protocol;
-export const HUADIAO_HOST = `${HTTP_PROTOCOL}//${HUADIAO_HOST_IP}`;
+const SITE_ORIGIN = window.location.origin;
 
 const excludeInterceptors = [
     /\//,
@@ -35,7 +33,7 @@ function isExcludeInterceptors(pathname) {
 
 export function createAxios(config = {}) {
     const instance = axios.create({
-        baseURL: `${HUADIAO_HOST}/huadiao`,
+        baseURL: `${SITE_ORIGIN}/huadiao`,
         timeout: 10000,
         withCredentials: true,
 
