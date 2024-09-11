@@ -7,6 +7,10 @@
 'use strict';
 
 import VueRouter from "vue-router";
+import {
+    ERROR_403_PAGE_PATH,
+    ERROR_404_PAGE_PATH
+} from "@/pages/error/error-pages-path";
 
 export default new VueRouter({
     mode: "history",
@@ -14,10 +18,16 @@ export default new VueRouter({
         {
             path: '/error',
             name: 'error',
-        }, {
-            path: '/error/404',
-            name: 'clientError404',
+        },
+        {
+            path: ERROR_404_PAGE_PATH,
+            name: "clientError404",
             component: () => import('@/pages/error/pages/ClientError404')
-        }
+        },
+        {
+            path: ERROR_403_PAGE_PATH,
+            name: "clientError403",
+            component: () => import('@/pages/error/pages/ClientError403')
+        },
     ]
 });
