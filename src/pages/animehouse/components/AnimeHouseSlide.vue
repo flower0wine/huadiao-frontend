@@ -4,7 +4,11 @@
     <swiper ref="swiper" :options="swiperOption">
       <swiper-slide v-for="(item, index) of slides"
                     :key="item.animeId">
-        <div class="slide-content" :style="nativeUrlReject(item.cover)">{{item.word}}</div>
+        <div class="slide-content"
+             :style="{
+               backgroundImage: `url(${getHuadiaoHouseImageUrl(item.cover)})`
+             }"
+        >{{item.word}}</div>
       </swiper-slide>
       <swiper-slide v-if="slides.length === 0">
         <div class="slide-content" v-if="me">快把你喜欢的番剧记录下来吧！打造属于你的番剧馆！</div>
@@ -19,6 +23,7 @@
 import 'swiper/css/swiper.css';
 import { Swiper, SwiperSlide } from 'vue-awesome-swiper';
 import {mapState} from "vuex";
+import {getHuadiaoHouseImageUrl} from "@/pages/animehouse/tool";
 
 export default {
   name: "AnimeHouseSlide",
@@ -65,6 +70,8 @@ export default {
     this.initialSwiper();
   },
   methods: {
+    getHuadiaoHouseImageUrl,
+
     initialSwiper() {
       let $ = this.$;
       if(this.slides.length === 1) {

@@ -18,7 +18,7 @@
 <script>
 import {svg} from "@/assets/js/constants/svgs";
 import {mapState} from "vuex";
-import constants from "@/assets/js/constants";
+import {getHuadiaoHouseCardBorderImageStyle} from "@/pages/animehouse/tool";
 
 export default {
   name: "BorderImageBoard",
@@ -34,7 +34,7 @@ export default {
       borderImageList(state) {
         let cardBorderImageList = [];
         for(let cardBorderImage of state.cardBorderImage) {
-          let eleStyle = this.generateBorderImage(cardBorderImage);
+          let eleStyle = getHuadiaoHouseCardBorderImageStyle(cardBorderImage);
           cardBorderImageList.push(eleStyle);
         }
         return cardBorderImageList;

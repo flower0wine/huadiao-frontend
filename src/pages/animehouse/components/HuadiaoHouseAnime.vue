@@ -21,6 +21,7 @@ import AnimeHouseTheme from "@/pages/animehouse/components/AnimeHouseTheme";
 import {svg} from "@/assets/js/constants/svgs";
 import AnimeHouse from "@/pages/animehouse/components/AnimeHouse";
 import {mapState} from "vuex";
+import {backgroundTransform} from "@/pages/animehouse/tool";
 
 export default {
   name: "HuadiaoHouseAnime",
@@ -39,7 +40,7 @@ export default {
   computed: {
     ...mapState({
       pageBackground(state) {
-        return this.backgroundTransform(state.huadiaoHouseInfo.pageBackground);
+        return backgroundTransform(state.huadiaoHouseInfo.pageBackground);
       },
     }),
   },

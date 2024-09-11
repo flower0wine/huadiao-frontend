@@ -6,10 +6,7 @@
 // 使用严格模式
 'use strict';
 
-import {apis} from "@/assets/js/constants/request-path";
-import {SITE_ORIGIN} from "@/util/request";
-
-export const userAvatarImagePath = `${apis.imageHost}userAvatar/`;
+import {SITE_ORIGIN, HUADIAO_USER_AVATAR_HOST} from "@/util/request";
 
 export function backgroundUrl(url) {
     return `background-image: url('${url}')`;
@@ -20,7 +17,7 @@ export function huadiaoAvatarLink(avatar) {
     if (!avatar) {
         return '';
     }
-    return backgroundUrl(`${userAvatarImagePath}${avatar}`);
+    return backgroundUrl(`${HUADIAO_USER_AVATAR_HOST}${avatar}`);
 }
 
 export function homepageLink(uid) {
@@ -79,7 +76,7 @@ export function getAvatarUrl(url) {
     if (url.startsWith('/')) {
         url = url.substr(1);
     }
-    return `${userAvatarImagePath}${url}`;
+    return `${HUADIAO_USER_AVATAR_HOST}${url}`;
 }
 
 

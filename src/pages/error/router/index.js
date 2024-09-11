@@ -10,12 +10,14 @@ import VueRouter from "vue-router";
 
 export default new VueRouter({
     mode: "history",
-    routes: [{
-        path: '/error',
-        name: 'error',
-    }, {
-        path: '/error/404',
-        name: 'clientError404',
-        component: () => import('@/pages/error/components/ClientError404')
-    }]
+    routes: [
+        {
+            path: '/error',
+            name: 'error',
+        }, {
+            path: '/error/404',
+            name: 'clientError404',
+            component: () => import('@/pages/error/pages/ClientError404')
+        }
+    ]
 });

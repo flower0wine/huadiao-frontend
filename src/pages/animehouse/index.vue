@@ -29,6 +29,7 @@ import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
+import {backgroundTransform} from "@/pages/animehouse/tool";
 
 let wheelUpClassName = "wheel-up";
 let wheelDownClassName = "wheel-down";
@@ -53,7 +54,7 @@ export default {
   computed: {
     ...mapState({
       animeHeaderStyle(state) {
-        let background = this.backgroundTransform(state.huadiaoHouseInfo.titleBackground);
+        let background = backgroundTransform(state.huadiaoHouseInfo.titleBackground);
         return `color: ${state.huadiaoHouseInfo.titleColor};
               ${background}`;
       }

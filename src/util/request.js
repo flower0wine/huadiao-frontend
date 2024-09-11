@@ -9,7 +9,11 @@
 import axios from "axios";
 import {statusCode} from "@/assets/js/constants/status-code";
 
-const SITE_ORIGIN = window.location.origin;
+export const SITE_ORIGIN = window.location.origin;
+
+export const HUADIAO_IMAGE_HOST = `${SITE_ORIGIN}/images/`;
+export const HUADIAO_USER_AVATAR_HOST = `${HUADIAO_IMAGE_HOST}userAvatar/`;
+export const HUADIAO_HOUSE_IMAGE_HOST = `${HUADIAO_IMAGE_HOST}huadiaoHouse/`;
 
 const excludeInterceptors = [
     /\//,

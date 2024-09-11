@@ -6,7 +6,7 @@
            :key="item.animeId"
            ref="animeItem">
         <div class="anime-cover"
-             :style="`${nativeUrlReject(item.cover)}; ${cardBorder}`"
+             :style="`background-image: url(${getHuadiaoHouseImageUrl(item.cover)}); ${cardBorder}`"
              :class="cardBorder ? `has-border-image` : ``"></div>
         <div class="anime-info">
           <div class="anime-title">{{item.title}}</div>
@@ -38,6 +38,11 @@ import AddAnimeBoard from "@/pages/animehouse/components/AddAnimeBoard";
 import {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
+import {
+  backgroundTransform,
+  getHuadiaoHouseCardBorderImageStyle,
+  getHuadiaoHouseImageUrl
+} from "@/pages/animehouse/tool";
 
 export default {
   name: "AnimeHouse",
@@ -57,16 +62,16 @@ export default {
   computed: {
     ...mapState({
       pageForeground(state) {
-        return this.backgroundTransform(state.huadiaoHouseInfo.pageForeground);
+        return backgroundTransform(state.huadiaoHouseInfo.pageForeground);
       },
       cardBackground(state) {
-        return this.backgroundTransform(state.huadiaoHouseInfo.cardBackground);
+        return backgroundTransform(state.huadiaoHouseInfo.cardBackground);
       },
       cardBorder(state) {
         let cardBorderIndex = state.huadiaoHouseInfo.cardBorderImage;
         if(cardBorderIndex !== -1) {
           let cardBorderImage = state.cardBorderImage[cardBorderIndex];
-          return this.generateBorderImage(cardBorderImage);
+          return getHuadiaoHouseCardBorderImageStyle(cardBorderImage);
         }
         return "";
       },
@@ -88,6 +93,8 @@ export default {
     this.initial();
   },
   methods: {
+    getHuadiaoHouseImageUrl,
+
     initial() {
       this.reLayout();
       window.addEventListener("resize", () => {
