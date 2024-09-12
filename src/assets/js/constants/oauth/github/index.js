@@ -10,8 +10,20 @@ import {apis} from "@/assets/js/constants/request-path";
 
 let redirectUri = `${apis.huadiaoHost}${apis.common.oauth.github}`;
 
-export default {
-    clientId: "Iv1.877c85676f1a2d08",
-    authorizeUri: "https://github.com/login/oauth/authorize",
-    redirectUri,
+let githubOauth;
+
+if (process.env.NODE_ENV === "production") {
+    githubOauth = {
+        clientId: "Ov23ctPjEkxFJuwvphCD",
+        authorizeUri: "https://github.com/login/oauth/authorize",
+        redirectUri,
+    }
+} else {
+    githubOauth = {
+        clientId: "cdbdc26e987d1cf6c058",
+        authorizeUri: "https://github.com/login/oauth/authorize",
+        redirectUri,
+    };
 }
+
+export default githubOauth;

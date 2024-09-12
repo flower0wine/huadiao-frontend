@@ -10,10 +10,12 @@ import {apis} from "@/assets/js/constants/request-path";
 
 let redirectUri = `${apis.huadiaoHost}${apis.common.oauth.google}`;
 
-export default {
+let googleOauth = {
     clientId: "727702302847-h7suu6m0lu4dpb2enkqbf5oerosvnpfh.apps.googleusercontent.com",
-    authorizeUri: "https://accounts.google.com/o/oauth2/v2/auth",
-    scope: "openid profile email",
-    responseType: "code",
-    redirectUri,
-}
+        authorizeUri: "https://accounts.google.com/o/oauth2/v2/auth",
+        scope: "openid profile email",
+        responseType: "code",
+        redirectUri,
+};
+
+export default googleOauth;
