@@ -14,18 +14,26 @@
         </div>
         <transition name="height-to-short">
           <nav class="nav-list"
+               v-show="visible.dropdownList[index]"
                ref="navList">
-            <router-link class="nav-item"
-                         active-class="active"
-                         v-for="(item, index) in item.list"
-                         :class="judgeHeaderItemActive(item.alias)"
-                         :to="item.to"
-                         :key="index">
-              <div class="nav-content">
-                <span class="nav-icon" v-html="item.svg"></span>
-                <span class="nav-text">{{item.title}}</span>
-              </div>
-            </router-link>
+            <div class="nav-item" v-for="(item, index) in item.list" :key="index">
+              <template v-if="item.disabled">
+                <div class="nav-content" @click="handleDisabledItemClick(item)">
+                  <span class="nav-icon" v-html="item.svg"></span>
+                  <span class="nav-text">{{item.title}}</span>
+                </div>
+              </template>
+              <template v-else>
+                <router-link active-class="active"
+                             :class="judgeHeaderItemActive(item.alias)"
+                             :to="item.to">
+                  <div class="nav-content">
+                    <span class="nav-icon" v-html="item.svg"></span>
+                    <span class="nav-text">{{item.title}}</span>
+                  </div>
+                </router-link>
+              </template>
+            </div>
           </nav>
         </transition>
       </div>
@@ -35,6 +43,7 @@
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
+import {huadiaoMiddleTip} from "@/pages/components/HuadiaoMiddleTip";
 
 export default {
   name: "ForumNavigation",
@@ -61,19 +70,23 @@ export default {
             title: "关注",
             to: "/note/follow",
             svg: svg.follow,
+            disabled: true,
           }, {
             title: "综合",
             to: "/note/comprehensiveness",
             svg: svg.comprehensiveness,
             alias: ["/", "/note"],
+            disabled: true,
           }, {
             title: "前端",
             to: "/note/frontend",
             svg: svg.frontend,
+            disabled: true,
           }, {
             title: "后端",
             to: "/note/backend",
             svg: svg.backend,
+            disabled: true,
           }],
         },
         {
@@ -84,11 +97,13 @@ export default {
             title: "关注",
             to: "/anime/follow",
             svg: svg.follow,
+            disabled: true,
           }, {
             title: "综合",
             to: "/anime/comprehensiveness",
             svg: svg.comprehensiveness,
             alias: ["/anime"],
+            disabled: true,
           }],
         },
       ];
@@ -110,7 +125,7 @@ export default {
 
       for (let i = 0; i < this.dropdownNavList.length; i++) {
         let navItem = this.dropdownNavList[i];
-        this.$refs.navList[i].style.height = navItem.length * 50 + "px";
+        this.$refs.navList[i].style.height = navItem.list.length * 50 + "px";
       }
     },
     clickChangeDropdownVisibility(index) {
@@ -119,6 +134,10 @@ export default {
       dropdownList.splice(index, 1, !dropdownList[index]);
       dropdownItem[index].classList.toggle("active");
     },
+
+    handleDisabledItemClick(item) {
+      huadiaoMiddleTip("该功能暂未开放");
+    }
   },
   beforeDestroy() {
   }
