@@ -128,6 +128,8 @@ import {ResponseHandler} from "@/assets/js/utils";
 import WomenImg from "@/assets/img/account/women.webp";
 import ManImg from "@/assets/img/account/man.webp";
 import NoKnownImg from "@/assets/img/account/noknown.webp";
+import {flatPromise} from "@/util";
+import {getAccountInfo} from "@/pages/account/pages/info/apis";
 
 export default {
   name: "HuadiaoAccountInfo",
@@ -150,7 +152,7 @@ export default {
         canvases: "这个人十分神秘...",
         bornDate: null,
         school: null,
-        sex: "0",
+        sex: 0,
       },
       userInfo: null,
     }
@@ -170,32 +172,34 @@ export default {
     }
   },
   methods: {
-    getUserInfo() {
+    async getUserInfo() {
       this.visible.loadingFail = false;
-      this.sendRequest({
-        path: apis.account.info,
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          if (res.code === statusCode.SUCCEED) {
-            let userInfo = res.data;
-            this.userInfo = userInfo;
-            for (let key in userInfo) {
-              if (userInfo[key]) {
-                this.tempUser[key] = userInfo[key];
-              }
-            }
-            if (!userInfo.nickname) {
-              this.tempUser.nickname = userInfo.userId;
-            }
-            this.visible.loading = false;
+
+      const [err, res] = await flatPromise(getAccountInfo());
+
+      if (err) {
+        console.log(err);
+        this.visible.loadingFail = true;
+        return;
+      }
+
+      console.log(res);
+
+      new ResponseHandler(res).succeed((userInfo) => {
+        this.userInfo = userInfo;
+        for (let key in userInfo) {
+          if (userInfo[key]) {
+            this.tempUser[key] = userInfo[key];
           }
-        },
-        errorCallback: (error) => {
-          console.log(error);
-          this.visible.loadingFail = true;
         }
-      })
+        if (!userInfo.nickname) {
+          this.tempUser.nickname = userInfo.userId;
+        }
+        this.visible.loading = false;
+      }).error((err) => {
+        this.visible.loadingFail = true;
+        console.log(err.message);
+      });
     },
     // 点击修改用户信息
     clickToUpdateUserInfo() {
@@ -210,7 +214,7 @@ export default {
         return;
       }
       // 检查 bornDate
-      let bornDate = this.userInfo.bornDate;
+      let bornDate = new Date(this.userInfo.bornDate);
       // 用户没有设置出生日期时 bornDate 可能为 null
       let tempUserBornDate = this.tempUser.bornDate;
       if (tempUserBornDate && tempUserBornDate !== bornDate) {
@@ -218,7 +222,7 @@ export default {
           this.huadiaoMiddleTip("出生日期大于当前时间");
           return;
         }
-        bornDate = tempUserBornDate;
+        bornDate = new Date(tempUserBornDate);
       }
       // 检查 canvases
       let canvases = this.userInfo.canvases;
@@ -256,7 +260,7 @@ export default {
           nickname,
           canvases,
           sex: this.tempUser.sex,
-          bornDate,
+          bornDate: bornDate.getTime(),
           school
         },
         thenCallback: (response) => {
