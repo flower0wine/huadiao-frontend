@@ -96,38 +96,34 @@
                    @focusout="checkUsername(register.username)"
                    ref="registerUsername"
             >
-            <transition name="replace-fade" mode="out-in">
-              <div v-if="!visible.confirmPassword"
-                   key="registerPassword"
-                   class="register-password"
+            <div key="registerPassword"
+                 class="register-password"
+            >
+              <label for="registerPassword">密码</label>
+              <input :type="visible.registerPasswordVisible ? 'text' : 'password'"
+                     id="registerPassword"
+                     minlength="8"
+                     maxlength="32"
+                     v-model="register.password"
+                     @mousemove="registerPasswordInputMouseOver"
+                     @focusout="registerCheckPassword"
+                     ref="registerPassword"
               >
-                <label for="registerPassword">密码</label>
-                <input :type="visible.registerPasswordVisible ? 'text' : 'password'"
-                       id="registerPassword"
-                       minlength="8"
-                       maxlength="32"
-                       v-model="register.password"
-                       @mousemove="registerPasswordInputMouseOver"
-                       @focusout="registerCheckPassword"
-                       ref="registerPassword"
-                >
-              </div>
-              <div v-else
-                   key="confirmRegisterPassword"
-                   class="register-password"
+            </div>
+            <!--<div key="confirmRegisterPassword"
+                 class="register-password"
+            >
+              <label for="registerPassword">请确认密码</label>
+              <input :type="visible.registerPasswordVisible ? 'text' : 'password'"
+                     id="confirmRegisterPassword"
+                     minlength="8"
+                     maxlength="32"
+                     v-model="register.confirmPassword"
+                     @mousemove="registerPasswordInputMouseOver"
+                     @focusout="sameRegisterPassword"
+                     ref="confirmRegisterPassword"
               >
-                <label for="registerPassword">请确认密码</label>
-                <input :type="visible.registerPasswordVisible ? 'text' : 'password'"
-                       id="confirmRegisterPassword"
-                       minlength="8"
-                       maxlength="32"
-                       v-model="register.confirmPassword"
-                       @mousemove="registerPasswordInputMouseOver"
-                       @focusout="sameRegisterPassword"
-                       ref="confirmRegisterPassword"
-                >
-              </div>
-            </transition>
+            </div>-->
             <label for="registerCode">验证码</label>
             <div>
               <input type="text"
@@ -161,7 +157,6 @@ import {ResponseHandler, Timer} from "@/assets/js/utils";
 import {statusCode} from "@/assets/js/constants/status-code.js";
 import {apis} from "@/assets/js/constants/request-path";
 import {svg} from "@/assets/js/constants/svgs";
-import {indexResponseMessage} from "@/assets/js/constants/response_message";
 import constants from "@/assets/js/constants";
 import OperationThrottle from "@/assets/js/utils/operation-throttle";
 import LoginWayList from "@/pages/index/components/index/LoginWayList";
@@ -293,7 +288,6 @@ export default {
         data: {
           username: this.register.username,
           password: this.register.password,
-          confirmPassword: this.register.confirmPassword,
           checkCode: this.register.checkCode
         },
         thenCallback: (response) => {
@@ -303,12 +297,8 @@ export default {
             this.$refs.loginBtn.click();
             this.register.username = this.register.password = this.register.confirmPassword = this.register.checkCode = "";
             this.huadiaoWarningTip("注册成功!");
-          }).errorParam((data) => {
-            if (data === indexResponseMessage.sameUsername) {
-              this.huadiaoWarningTip("该用户名已被注册!");
-            } else if (data === indexResponseMessage.wrongCode) {
-              this.huadiaoWarningTip("您填写的验证码错误!");
-            }
+          }).error((err) => {
+            this.huadiaoWarningTip(err.message);
           });
         },
         errorCallback: () => {
@@ -363,19 +353,21 @@ export default {
       if (usernameReg.test(username)) {
         return true;
       }
-      this.huadiaoWarningTip("您的用户名应仅包含数字、字母、下划线!");
+      this.huadiaoWarningTip("您的用户名应包含数字、字母");
       return false;
     },
     // 注册时检查密码
     registerCheckPassword() {
       if (this.checkPassword(this.register.password)) {
         this.returnToModifyPassword();
-        this.visible.confirmPassword = true;
-        this.huadiaoWarningTip("按下 ctrl + alt 可以返回重新输入!");
+        // TODO: 取消密码再次输入确认
+        // this.visible.confirmPassword = true;
+        // this.huadiaoWarningTip("按下 ctrl + alt 可以返回重新输入!");
       }
     },
     // 是否是相同的密码
     sameRegisterPassword() {
+      return true;
       if (this.register.password === this.register.confirmPassword) {
         return true;
       }
