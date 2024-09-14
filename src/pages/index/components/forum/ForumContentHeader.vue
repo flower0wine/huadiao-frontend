@@ -1,23 +1,29 @@
 <template>
   <div class="forum-content-header">
     <header class="header-list" @mouseleave="mouseleaveResetUnderline">
-      <router-link class="header-item"
-                   v-for="(item, index) in headerItem"
-                   @click.native="changeCurrentIndex(index)"
-                   @mousemove.native="mouseoverToMoveUnderline(index)"
-                   active-class="active"
-                   :class="judgeHeaderItemActive(item.alias)"
-                   :to="concatQueryPath(item.to)"
-                   :key="index"
-                   ref="headerItemList">
-        <div class="header-item-content">{{ item.title }}</div>
-      </router-link>
+      <div class="header-item" v-for="(item, index) in headerItem" :key="index" ref="headerItemList" :class="index === 0 && 'active'">
+        <template v-if="item.disabled">
+          <div class="header-item-content" @click="handleDisabledItemClick(item)">{{ item.title }}</div>
+        </template>
+        <template v-else>
+          <router-link @click.native="changeCurrentIndex(index)"
+                       @mousemove.native="mouseoverToMoveUnderline(index)"
+                       active-class="active"
+                       :class="judgeHeaderItemActive(item.alias)"
+                       :to="concatQueryPath(item.to)">
+            <div class="header-item-content">{{ item.title }}</div>
+          </router-link>
+        </template>
+      </div>
+
       <div class="nav-underline" ref="navUnderline"></div>
     </header>
   </div>
 </template>
 
 <script>
+import {huadiaoMiddleTip} from "@/pages/components/HuadiaoMiddleTip";
+
 const headerItemMargin = 20;
 const rootPath = "/";
 
@@ -28,10 +34,12 @@ export default {
       currentIndex: 0,
       movingIndex: -1,
       headerItem: [{
+        disabled: true,
         title: "推荐",
         to: rootPath,
         alias: [rootPath]
       }, {
+        disabled: true,
         title: "最新",
         to: "newest",
       }],
@@ -82,7 +90,7 @@ export default {
     },
     moveToCurrentItem() {
       let currentIndex = this.currentIndex;
-      this.$refs.headerItemList[currentIndex].$el.classList.add(this.headerItemActiveClassName);
+      this.$refs.headerItemList[currentIndex].classList.add(this.headerItemActiveClassName);
       this.moveNavUnderline(currentIndex);
     },
     /**
@@ -95,10 +103,10 @@ export default {
       }
       this.movingIndex = index;
       let headerItemList = this.$refs.headerItemList;
-      let width = getComputedStyle(headerItemList[index].$el.children[0]).width;
+      let width = getComputedStyle(headerItemList[index].children[0]).width;
       let left = headerItemMargin;
       for (let i = 0; i < index; i++) {
-        let width = +getComputedStyle(headerItemList[i].$el.children[0]).width.split("px")[0];
+        let width = +getComputedStyle(headerItemList[i].children[0]).width.split("px")[0];
         left += width + (headerItemMargin << 1);
       }
       let navUnderline = this.$refs.navUnderline;
@@ -129,7 +137,10 @@ export default {
       }
       path = `?${queryKey}=${path}`;
       return path;
-    }
+    },
+    handleDisabledItemClick() {
+      huadiaoMiddleTip("该功能暂未开放");
+    },
   },
   beforeDestroy() {
   }
