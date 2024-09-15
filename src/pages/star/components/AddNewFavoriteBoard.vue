@@ -7,11 +7,8 @@
       <div class="add-new-favorite-board">
         <div class="new-favorite-board-header">
           <div>{{modify ? '修改' : '新建'}}收藏夹</div>
-          <div class="close-add-favorite-board-btn">
-            <img src="/svg/starClose.svg"
-                 @click="closeBoard"
-                 ref="closeFavoriteBoardBtn"
-                 alt="">
+          <div class="close-add-favorite-board-btn" @click="closeBoard">
+            <NoColorCloseIcon />
           </div>
         </div>
         <div class="favorite-name">
@@ -58,10 +55,11 @@
 <script>
 import ModifyButton from "@/pages/star/components/ModifyBotton";
 import NewButton from "@/pages/star/components/NewButton";
+import NoColorCloseIcon from "@/pages/components/svg/NoColorCloseIcon";
 
 export default {
   name: "AddNewFavoriteBoard",
-  components: {NewButton, ModifyButton},
+  components: {NoColorCloseIcon, NewButton, ModifyButton},
   data() {
     return {
       modify: false,
@@ -192,6 +190,13 @@ export default {
   height: 30px;
   border-radius: 4px;
   transition: var(--transition-500ms);
+}
+
+.close-add-favorite-board-btn /deep/ svg {
+  width: 17px;
+  height: 17px;
+  fill: #999;
+  vertical-align: -2px;
 }
 
 .close-add-favorite-board-btn:hover {
