@@ -14,6 +14,7 @@
 <script>
 import {Timer} from "@/assets/js/utils";
 import Vue from "vue";
+import {modifySrcObject} from "@/util/tool";
 
 const EVENT_NAME = "huadiaoMiddleTip";
 
@@ -45,13 +46,11 @@ export default {
     // 添加操作提示, 屏中展示
     this.$bus.$on(EVENT_NAME, this.addHuadiaoMiddleTip);
     eventBus.$on(EVENT_NAME, this.addHuadiaoMiddleTip);
-    this.modifyDefaultStyle();
+
+    // 修改默认样式
+    modifySrcObject(this.defaultTipStyle, this.tipStyle);
   },
   methods: {
-    // 修改默认样式
-    modifyDefaultStyle() {
-      this.modifySrcObject(this.defaultTipStyle, this.tipStyle);
-    },
     // 花凋中间弹窗提示
     addHuadiaoMiddleTip(middleTip = "") {
       // 6 个字读 1 秒

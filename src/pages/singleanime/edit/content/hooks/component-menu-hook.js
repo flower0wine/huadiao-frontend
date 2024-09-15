@@ -41,7 +41,7 @@ const EDIT_WINDOW = Symbol("edit-window");
  * <p>let windowId: Symbol;</p>
  * <p>
  * let obj = {
- *     [componentId]: {
+ *     componentId: {
  *         EDIT_WINDOW: windowId,
  *     }
  * }
@@ -240,10 +240,13 @@ export default {
         },
 
         handleContextMenu(e, componentInfo, layoutName, layoutIndex, componentIndex) {
+            const {clientX, clientY} = e;
 
-            // 右键出菜单时再右键出其他菜单时，先隐藏掉当前菜单
-            if (this.activeComponentNode !== null) {
-                this.hideContextMenu();
+            // 当右键菜单已经显示时，原来的菜单隐藏
+            if (this.activeComponentNode === e.currentTarget) {
+                this.contextMenu.top = clientY;
+                this.contextMenu.left = clientX;
+                return;
             }
 
             this.showContextMenu = true;
@@ -259,8 +262,6 @@ export default {
 
             // 被右键的 AnimeComponent 组件元素
             this.activeComponentNode = e.currentTarget;
-
-            const {clientX, clientY} = e;
 
             addOrRemoveClassNames(e.currentTarget, ACTIVE_CLASS_NAME);
 

@@ -27,16 +27,7 @@ export default {
     }
   },
 
-  created() {
-    console.log("AnimeComponent created")
-  },
-
-  mounted() {
-    console.log("AnimeComponent mounted")
-  },
-
   beforeDestroy() {
-    console.log("AnimeComponent beforeDestroy")
     this.$emit("beforeDestroy");
   },
 

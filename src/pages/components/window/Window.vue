@@ -2,10 +2,9 @@
   <Teleport to="body">
     <div class="window"
          :style="windowStyle"
-         v-if="windowVisible.render"
          @mousedown.stop="handleWindowRank"
          ref="window"
-         v-show="windowVisible.show">
+         v-show="windowVisible">
       <header @mousedown="handleHeaderMouseDown">
         <div class="window-name">
           <div class="icon">
@@ -72,7 +71,6 @@ const {
 
   showWindow,
   hideWindow,
-  destroy,
 } = useWindowControl();
 
 
@@ -92,10 +90,7 @@ export default {
       windowHeight: 0,
       transition: "",
 
-      windowVisible: {
-        render: true,
-        show: true,
-      },
+      windowVisible: true,
 
       isMaximized: false,
     };
@@ -137,7 +132,6 @@ export default {
 
     showWindow,
     hideWindow,
-    destroy,
 
     closeWindow,
     restoreWindow,

@@ -60,7 +60,8 @@ export default function useWindowControl() {
             return;
         }
 
-        this.destroy();
+        this.hideWindow();
+        this.$destroy();
     }
 
     /**
@@ -105,18 +106,13 @@ export default function useWindowControl() {
         cache.windowHeight = this.windowHeight;
     }
 
-    function destroy() {
-        this.windowVisible.render = false;
-        this.$destroy();
-    }
-
     function showWindow() {
         handleWindowRank.call(this);
-        this.windowVisible.show = true;
+        this.windowVisible = true;
     }
 
     function hideWindow() {
-        this.windowVisible.show = false;
+        this.windowVisible = false;
     }
 
     /**
@@ -139,7 +135,6 @@ export default function useWindowControl() {
             restore: restoreWindow.bind(this),
             show: showWindow.bind(this),
             hide: hideWindow.bind(this),
-            destroy: destroy.bind(this),
         };
     }
 
@@ -156,7 +151,5 @@ export default function useWindowControl() {
 
         showWindow,
         hideWindow,
-
-        destroy,
     }
 }

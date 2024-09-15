@@ -66,5 +66,11 @@ export default {
       this.toNode.append(...this.teleportNode);
     },
   },
+
+  beforeDestroy() {
+    this.teleportNode.forEach(node => {
+      node.remove();
+    });
+  },
 }
 </script>
