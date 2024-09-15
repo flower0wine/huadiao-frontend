@@ -77,6 +77,7 @@ export default {
       this.removeScroll();
     });
 
+    this.debounceGetNote();
     window.addEventListener("scroll", this.handleScroll);
   },
   methods: {
