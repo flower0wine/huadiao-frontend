@@ -54,21 +54,25 @@ export default {
             this.wordNumber += incr;
         },
 
-        insertEmote(emote) {
+        insertEmote(emote, inputEl) {
             const img = document.createElement("img");
             img.src = huadiaoEmoteLink(emote.filename);
             img.alt = emote.name;
             img.classList.add("emote");
 
-            let range = this.range;
-            range.insertNode(img);
-            // 移动光标到图片后面
-            range.setStartAfter(img);
-            range.collapse(true);
+            if (this.range) {
+                let range = this.range;
+                range.insertNode(img);
+                // 移动光标到图片后面
+                range.setStartAfter(img);
+                range.collapse(true);
 
-            const selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            } else {
+                inputEl.appendChild(img);
+            }
 
             this.increaseWordNumber(emote.name.length);
             this.calculateWordNumber();

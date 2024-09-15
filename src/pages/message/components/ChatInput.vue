@@ -13,7 +13,7 @@
         <EmoteBoard v-if="emoteBoard.render"
                     v-show="emoteBoard.show"
                     @close="closeEmoteBoard"
-                    @choose="insertEmote" />
+                    @choose="chooseEmote" />
       </div>
       <div class="input-word-number">{{ wordNumber }}/300</div>
       <div class="send-message-box" @click="sendMessage">发送</div>
@@ -74,6 +74,10 @@ export default {
 
     closeEmoteBoard() {
       this.emoteBoard.show = false;
+    },
+
+    chooseEmote(emote) {
+      this.insertEmote(emote, this.$refs.inputTextarea);
     },
 
     keyupCtrl(e) {
