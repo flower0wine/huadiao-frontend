@@ -42,7 +42,7 @@ import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopCont
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import NoLoginBoard from "@/pages/components/NoLoginBoard";
 import {svg} from "@/assets/js/constants/svgs";
-import IndexPageBackground from "@/assets/img/index/indexPageOneBackground.webp";
+import IndexPageBackground from "@/assets/img/index/indexPageOneBackground2.webp";
 import DownSlide from "@/pages/components/DownSlide";
 
 let huadiaoIndexHeaderConfig = {

@@ -9,11 +9,12 @@
     </div>
     <a class="user-avatar-box"
        :title="'前往' + nickname + '的个人主页'"
-       :href="`/homepage/${item.uid}`"
+       :href="homepageLink(item.uid)"
     >
       <span v-html="svg.avatar"></span>
       <div class="user-avatar"
-           :style="`background-image: url('${userAvatarImagePath}${item.userAvatar}')`"
+           v-if="item.userAvatar"
+           :style="`background-image: url('${getAvatarUrl(item.userAvatar)}')`"
       ></div>
     </a>
     <div class="user-infer">
@@ -46,7 +47,9 @@
              @mouseleave="visible.toolMenu.show = false"
              ref="toolMenu"
         >
-          <div>发消息</div>
+          <div>
+            <a :href="huadiaoWhisperLink(item.uid)" target="_blank">发消息</a>
+          </div>
           <slot name="toolMenu"></slot>
         </div>
       </transition>
@@ -58,6 +61,7 @@
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {svg} from "@/assets/js/constants/svgs";
+import {getAvatarUrl, homepageLink, huadiaoWhisperLink} from "@/util/huadiao-tool";
 
 export default {
   name: "HuadiaoFollowFanItem",
@@ -105,6 +109,10 @@ export default {
     }
   },
   methods: {
+    getAvatarUrl,
+    homepageLink,
+    huadiaoWhisperLink,
+
     clickMultiplyInput() {
       let classList = this.$refs.followFanItem.classList;
       let clazz = this.itemClass;
@@ -301,6 +309,10 @@ export default {
 
 .tool-menu /deep/ div:hover {
   background-color: rgba(216, 216, 216, 0.253);
+}
+
+.tool-menu /deep/ a {
+  color: inherit;
 }
 
 /* 未关注 */
