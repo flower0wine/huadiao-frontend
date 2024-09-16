@@ -68,6 +68,7 @@ export default {
   },
 
   beforeDestroy() {
+    // 因为 DOM 节点被加到其他位置，Vue 无法移除，需要自己手动移除
     this.teleportNode.forEach(node => {
       node.remove();
     });

@@ -5,8 +5,8 @@
          :style="packageBackgroundUrl(indexForumBackground)"></div>
     <div class="forum-main-container">
       <main class="forum-main" v-if="visible.content">
-        <forum-navigation/>
-        <forum-content/>
+        <forum-navigation :active-index="activeIndex" :list="navList" @navItemClick="handleNavItemClick"/>
+        <forum-content :info="contentInfo"/>
         <div class="forum-label-container">
           <NoteRank/>
         </div>
@@ -20,6 +20,7 @@ import ForumContent from "@/pages/index/components/forum/ForumContent";
 import ForumNavigation from "@/pages/index/components/forum/components/ForumNavigation";
 import IndexForumBackground from "@/assets/img/index/indexPageTwoBackground.webp";
 import NoteRank from "@/pages/index/components/forum/components/NoteRank";
+import {navList} from "@/pages/index/components/forum/nav-config";
 
 let observer;
 
@@ -30,13 +31,20 @@ export default {
     return {
       visible: {
         content: false,
-      }
+      },
+
+      activeIndex: [0, 0],
+      contentInfo: {},
     }
   },
   computed: {
     indexForumBackground() {
       return IndexForumBackground;
-    }
+    },
+
+    navList() {
+      return navList;
+    },
   },
   created() {
     observer = new IntersectionObserver((entries) => {
@@ -49,14 +57,27 @@ export default {
     }, {
       threshold: 0.1
     });
+
+    this.contentInfo = {
+      component: this.navList[this.activeIndex[0]].contentComponent,
+      itemIndex: this.activeIndex[1],
+    };
   },
+
   mounted() {
     observer.observe(this.$refs.huadiaoForumPage);
   },
+
   methods: {
+    handleNavItemClick(navIndex, itemIndex) {
+      this.activeIndex = [navIndex, itemIndex];
+      this.contentInfo = {
+        component: this.navList[navIndex].contentComponent,
+        itemIndex: itemIndex,
+        tagId: this.navList[navIndex].list[itemIndex].tagId,
+      };
+    },
   },
-  beforeDestroy() {
-  }
 }
 </script>
 

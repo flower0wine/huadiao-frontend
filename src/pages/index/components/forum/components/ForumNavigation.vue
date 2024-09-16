@@ -2,23 +2,35 @@
   <div class="forum-nav">
     <div class="dropdown-nav-list">
       <div class="dropdown-item"
-           :class="item.className"
-           v-for="(item, index) in dropdownNavList"
-           :key="index"
-           ref="dropdownItem">
+           v-for="(item, navIndex) in list"
+           :key="navIndex"
+           :class="{active: navActive[navIndex]}"
+      >
         <div class="dropdown-guide"
-             @click="clickChangeDropdownVisibility(index)">
-          <div class="intro-icon" v-html="item.svg"></div>
+             :style="{height: `${itemHeight}px`}"
+             @click="toggleDropdown(navIndex)">
+          <div class="intro-icon" v-if="item.svg" v-html="item.svg"></div>
           <div class="item-text">{{ item.title }}</div>
-          <div class="dropdown-icon" v-html="svg.dropdown"></div>
+          <div class="dropdown-icon"
+               v-if="item.list.length > 0"
+               v-html="svg.dropdown"></div>
         </div>
         <transition name="height-to-short">
           <nav class="nav-list"
-               v-show="visible.dropdownList[index]"
-               ref="navList">
-            <div class="nav-item" v-for="(item, index) in item.list" :key="index">
-              <template v-if="item.disabled">
-                <div class="nav-content" @click="handleDisabledItemClick(item)">
+               v-show="navActive[navIndex]"
+               :style="{height: `${item.list.length * itemHeight}px`}">
+            <div class="nav-item"
+                 v-for="(item, itemIndex) in item.list"
+                 :key="itemIndex"
+                 @click="handleClickNavItem(navIndex, itemIndex)"
+                 :class="{active: activeIndex[0] === navIndex && activeIndex[1] === itemIndex}"
+            >
+              <div class="nav-content">
+                <span class="nav-icon" v-html="item.svg"></span>
+                <span class="nav-text">{{item.title}}</span>
+              </div>
+              <!--<template v-if="item.disabled">
+                <div class="nav-content">
                   <span class="nav-icon" v-html="item.svg"></span>
                   <span class="nav-text">{{item.title}}</span>
                 </div>
@@ -32,7 +44,7 @@
                     <span class="nav-text">{{item.title}}</span>
                   </div>
                 </router-link>
-              </template>
+              </template>-->
             </div>
           </nav>
         </transition>
@@ -43,15 +55,30 @@
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
-import {huadiaoMiddleTip} from "@/pages/components/HuadiaoMiddleTip";
 
 export default {
   name: "ForumNavigation",
+
+  props: {
+    list: {
+      type: Array,
+      required: true,
+    },
+
+    activeIndex: {
+      type: Array,
+      required: true,
+    },
+  },
+
+  emits: ["navItemClick"],
+
   data() {
     return {
-      visible: {
-        dropdownList: null,
+      navActive: {
+        0: true,
       },
+      itemHeight: 50,
     }
   },
   computed: {
@@ -60,84 +87,16 @@ export default {
         dropdown: svg.access,
       }
     },
-    dropdownNavList() {
-      return [
-        {
-          title: "笔记",
-          svg: svg.blog,
-          className: "note-dropdown",
-          list: [{
-            title: "关注",
-            to: "/note/follow",
-            svg: svg.follow,
-            disabled: true,
-          }, {
-            title: "综合",
-            to: "/note/comprehensiveness",
-            svg: svg.comprehensiveness,
-            alias: ["/", "/note"],
-            disabled: true,
-          }, {
-            title: "前端",
-            to: "/note/frontend",
-            svg: svg.frontend,
-            disabled: true,
-          }, {
-            title: "后端",
-            to: "/note/backend",
-            svg: svg.backend,
-            disabled: true,
-          }],
-        },
-        {
-          title: "番剧",
-          svg: svg.fanju,
-          className: "anime-dropdown",
-          list: [{
-            title: "关注",
-            to: "/anime/follow",
-            svg: svg.follow,
-            disabled: true,
-          }, {
-            title: "综合",
-            to: "/anime/comprehensiveness",
-            svg: svg.comprehensiveness,
-            alias: ["/anime"],
-            disabled: true,
-          }],
-        },
-      ];
-    },
   },
-  beforeMount() {
-    this.beforeMountInitial();
-  },
-  mounted() {
-    this.mountedInitial();
-  },
+
   methods: {
-    beforeMountInitial() {
-      this.visible.dropdownList = new Array(this.dropdownNavList.length).fill(false);
-      this.visible.dropdownList[0] = true;
-    },
-    mountedInitial() {
-      this.$refs.dropdownItem[0].classList.toggle("active");
-
-      for (let i = 0; i < this.dropdownNavList.length; i++) {
-        let navItem = this.dropdownNavList[i];
-        this.$refs.navList[i].style.height = navItem.list.length * 50 + "px";
-      }
-    },
-    clickChangeDropdownVisibility(index) {
-      let dropdownItem = this.$refs.dropdownItem;
-      let dropdownList = this.visible.dropdownList;
-      dropdownList.splice(index, 1, !dropdownList[index]);
-      dropdownItem[index].classList.toggle("active");
+    toggleDropdown(index) {
+      this.$set(this.navActive, index, !this.navActive[index]);
     },
 
-    handleDisabledItemClick(item) {
-      huadiaoMiddleTip("该功能暂未开放");
-    }
+    handleClickNavItem(navIndex, itemIndex) {
+      this.$emit("navItemClick", navIndex, itemIndex);
+    },
   },
   beforeDestroy() {
   }
@@ -186,7 +145,6 @@ $dropDownNavListPadding: 8px;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: 50px;
   color: $navTextColor;
 
   &:hover {
@@ -221,8 +179,19 @@ $navItemHeight: 50px;
 $navBorderColor: #6b789878;
 
 .dropdown-item::v-deep {
-  & .dropdown-icon svg {
+  svg {
+    fill: $navTextColor;
+  }
+
+  .dropdown-icon svg {
+    width: 17px;
+    height: 17px;
     transition: transform 300ms;
+  }
+
+  .intro-icon svg {
+    width: 20px;
+    height: 20px;
   }
 
   &.active .dropdown-icon svg {
@@ -258,14 +227,6 @@ $navBorderColor: #6b789878;
 
   &:nth-child(n + 2) {
     border-top: 1px solid $navBorderColor;
-  }
-}
-
-@each $item in (("note-dropdown", 20px), ("anime-dropdown", 23px), ("dropdown-icon", 18px)) {
-  .#{nth($item, 1)}::v-deep svg {
-    width: #{nth($item, 2)};
-    height: #{nth($item, 2)};
-    fill: $navTextColor;
   }
 }
 </style>

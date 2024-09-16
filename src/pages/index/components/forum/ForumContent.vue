@@ -2,7 +2,7 @@
   <div class="forum-content">
     <div class="content-display-container">
       <forum-content-header/>
-      <router-view></router-view>
+      <component :is="info.component" v-bind="info" />
     </div>
   </div>
 </template>
@@ -12,17 +12,17 @@ import ForumContentHeader from "@/pages/index/components/forum/ForumContentHeade
 
 export default {
   name: "ForumContent",
+
+  inheritAttrs: false,
+
   components: {ForumContentHeader},
-  data() {
-    return {
-      contentComponents: {
-        noteList: "NoteList",
-      }
-    }
+
+  props: {
+    info: {
+      type: Object,
+      required: true,
+    },
   },
-  methods: {},
-  beforeDestroy() {
-  }
 }
 </script>
 

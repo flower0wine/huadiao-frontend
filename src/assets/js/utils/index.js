@@ -10,92 +10,93 @@ const {statusCode} = require("@/assets/js/constants/status-code");
 
 // 只开启单个定时器时使用
 class Timer {
-    timeoutTimerId;
-    intervalTimerId;
+  timeoutTimerId;
+  intervalTimerId;
 
-    constructor() {
-    }
+  constructor() {
+  }
 
-    // 如果计时器存在则删除旧的创建新的计时器
-    timeout(fn, delay) {
-        if(this.timeoutTimerId) {
-            // 确保每次调用时都只有一个定时器
-            clearTimeout(this.timeoutTimerId);
-        }
-        this.timeoutTimerId = setTimeout(fn, delay);
+  // 如果计时器存在则删除旧的创建新的计时器
+  timeout(fn, delay) {
+    if (this.timeoutTimerId) {
+      // 确保每次调用时都只有一个定时器
+      clearTimeout(this.timeoutTimerId);
     }
+    this.timeoutTimerId = setTimeout(fn, delay);
+  }
 
-    interval(fn, delay) {
-        if(this.intervalTimerId) {
-            clearInterval(this.intervalTimerId);
-        }
-        this.intervalTimerId = setInterval(fn, delay);
+  interval(fn, delay) {
+    if (this.intervalTimerId) {
+      clearInterval(this.intervalTimerId);
     }
+    this.intervalTimerId = setInterval(fn, delay);
+  }
 
-    // 清除计时器
-    destroy() {
-        if(this.timeoutTimerId) {
-            clearTimeout(this.timeoutTimerId);
-        }
-        if(this.intervalTimerId) {
-            clearInterval(this.intervalTimerId);
-        }
+  // 清除计时器
+  destroy() {
+    if (this.timeoutTimerId) {
+      clearTimeout(this.timeoutTimerId);
     }
+    if (this.intervalTimerId) {
+      clearInterval(this.intervalTimerId);
+    }
+  }
 }
 
 /**
  * 响应处理类
  */
 class ResponseHandler {
-    response;
+  response;
 
-    constructor(response) {
-        this.response = response;
-    }
+  constructor(response) {
+    this.response = response;
+  }
 
-    // 响应成功回调
-    succeed(callback) {
-        if(this.response.code === statusCode.SUCCEED) {
-            callback && callback(this.response.data);
-        }
-        return this;
+  // 响应成功回调
+  succeed(callback) {
+    if (this.response.code === statusCode.SUCCEED) {
+      callback && callback(this.response.data);
     }
+    return this;
+  }
 
-    // 没有获取到结果回调
-    notExist(callback) {
-        if(this.response.code === statusCode.EMPTY_DATA) {
-            callback && callback(this.response.data);
-        }
-        return this;
+  // 没有获取到结果回调
+  notExist(callback) {
+    if (this.response.code === statusCode.EMPTY_DATA) {
+      callback && callback(this.response.data);
     }
+    return this;
+  }
 
-    // 参数存在错误
-    errorParam(callback) {
-        if(this.response.code === statusCode.ERROR_PARAM) {
-            callback && callback(this.response.data);
-        }
-        return this;
+  // 参数存在错误
+  errorParam(callback) {
+    if (this.response.code === statusCode.ERROR_PARAM) {
+      callback && callback(this.response.data);
     }
+    return this;
+  }
 
-    error(callback) {
-        if(this.response.code !== statusCode.SUCCEED) {
-            callback && callback(this.response);
-        }
-        return this;
+  error(callback) {
+    if (this.response.code !== statusCode.SUCCEED) {
+      callback && callback(this.response);
     }
+    return this;
+  }
 }
 
 function getOauthPath(authorizeUri, clientId, redirectUri, scope, responseType) {
-    let uri = new URL(authorizeUri);
-    uri.searchParams.set("client_id", clientId);
-    uri.searchParams.set("redirect_uri", redirectUri);
+  let uri = new URL(authorizeUri);
+  uri.searchParams.set("client_id", clientId);
+  uri.searchParams.set("redirect_uri", redirectUri);
 
-    scope && uri.searchParams.set("scope", scope);
-    responseType && uri.searchParams.set("response_type", responseType);
-    return uri.toString();
+  scope && uri.searchParams.set("scope", scope);
+  responseType && uri.searchParams.set("response_type", responseType);
+  return uri.toString();
 }
+
 module.exports = {
-    Timer,
-    ResponseHandler,
-    getOauthPath,
+  Timer,
+  ResponseHandler,
+  getOauthPath,
 }

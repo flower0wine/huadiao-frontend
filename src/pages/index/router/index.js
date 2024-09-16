@@ -10,15 +10,5 @@ import VueRouter from "vue-router";
 export default new VueRouter({
     mode: "history",
     routes: [
-        {
-            path: "/",
-            alias: ["/note/:type(\\w+)", "/note"],
-            component: () => import("@/pages/index/components/forum/note/NoteList"),
-        },
-        {
-            path: "/anime",
-            alias: ["/anime/:type(\\w+)"],
-            component: () => import("@/pages/index/components/forum/anime/AnimeList"),
-        }
     ]
 })

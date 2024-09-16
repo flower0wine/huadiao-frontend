@@ -10,76 +10,92 @@
 
 <script>
 import ContentLoadingObserver from "@/pages/components/ContentLoadingObserver";
-import {apis} from "@/assets/js/constants/request-path";
-import RequestPager from "@/assets/js/utils/request-pager";
 import NoteDisplay from "@/pages/index/components/forum/note/NoteDisplay";
-import {debounce} from "@/util";
-
-const debounceGetNote = debounce(function() {
-  if (!pager.hasNext() || this.accessing) {
-    return;
-  }
-
-  this.accessing = true;
-
-  pager.requestModel((params) => {
-    this.sendRequest({
-      path: apis.index.forum.note.recommend,
-      method: "post",
-      params: {
-        ...params,
-      },
-    }).then((response) => {
-      let res = response.data;
-      console.log(res);
-
-
-      pager.requestCallback(res).succeed((data) => {
-        this.noteList.push(...data);
-      });
-
-      const scrollTop = document.documentElement.scrollTop;
-
-      this.$nextTick(() => {
-        document.documentElement.scrollTop = scrollTop;
-      });
-    }).catch(
-        pager.errorCallback
-    ).finally(() => {
-      this.accessing = false;
-    });
-  });
-}, 500);
-
-let pager = new RequestPager();
+import {debounce, flatPromise} from "@/util";
+import {getNoteList} from "@/pages/index/components/forum/apis";
+import {requestPager} from "@/util/request";
+import {responseHandler} from "@/assets/js/constants/status-code";
 
 export default {
   name: "NoteList",
+
   components: {NoteDisplay, ContentLoadingObserver},
+
+  props: {
+    tagId: {
+      type: Number,
+      required: false,
+    },
+  },
+
   data() {
     return {
       noteList: [],
-      accessing: false,
       loading: true,
-      debounceGetNote: debounceGetNote.bind(this),
     }
   },
+
   computed: {
     contentLoadingObserverOptions() {
       return {
         noMoreText: `本站就这么点内容, 呜呜呜~~~`,
       };
     },
-  },
-  mounted() {
-    pager.setCompleteCallback(() => {
-      this.loading = false;
-      this.removeScroll();
-    });
 
+    pager() {
+      return requestPager(({page, size}) => {
+        return getNoteList({page, size, tagId: this.tagId});
+      });
+    },
+
+    debounceGetNote() {
+      const {fetch, setHasNext, getSize} = this.pager;
+
+      return debounce(async function() {
+        let [err, res] = await flatPromise(fetch());
+
+        if (err) {
+          console.error(err);
+          return;
+        }
+
+        responseHandler(res)
+          .succeed((res) => {
+            if (res.data.length < getSize()) {
+              setHasNext(false);
+              this.loading = false;
+            }
+
+            this.noteList.push(...res.data);
+
+            const scrollTop = document.documentElement.scrollTop;
+
+            this.$nextTick(() => {
+              document.documentElement.scrollTop = scrollTop;
+            });
+          })
+          .emptyData(() => {
+            setHasNext(false);
+            this.loading = false;
+          });
+      }, 500);
+    },
+  },
+
+  mounted() {
     this.debounceGetNote();
     window.addEventListener("scroll", this.handleScroll);
   },
+
+  watch: {
+    tagId() {
+      this.noteList = [];
+      this.loading = true;
+      this.pager.reset();
+      this.debounceGetNote();
+    },
+  },
+
   methods: {
     handleScroll() {
       const { height, top } = this.$refs.noteList.getBoundingClientRect();
@@ -87,17 +103,16 @@ export default {
         this.debounceGetNote();
       }
     },
-    /**
-     * 获取当前的时间
-     * @return {DOMHighResTimeStamp}
-     */
+
     getPerformanceNow() {
       return performance.now();
     },
+
     removeScroll() {
       window.removeEventListener("scroll", this.handleScroll);
     },
   },
+
   beforeDestroy() {
     this.removeScroll();
   },
