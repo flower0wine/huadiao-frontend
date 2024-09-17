@@ -1,98 +1,58 @@
 <template>
   <div class="forum-content-header">
-    <header class="header-list" @mouseleave="mouseleaveResetUnderline">
-      <div class="header-item" v-for="(item, index) in headerItem" :key="index" ref="headerItemList" :class="index === 0 && 'active'">
-        <template v-if="item.disabled">
-          <div class="header-item-content" @click="handleDisabledItemClick(item)">{{ item.title }}</div>
-        </template>
-        <template v-else>
-          <router-link @click.native="changeCurrentIndex(index)"
-                       @mousemove.native="mouseoverToMoveUnderline(index)"
-                       active-class="active"
-                       :class="judgeHeaderItemActive(item.alias)"
-                       :to="concatQueryPath(item.to)">
-            <div class="header-item-content">{{ item.title }}</div>
-          </router-link>
-        </template>
+    <header class="header-list" @mouseleave="moveToCurrentItem">
+      <div class="header-item"
+           :class="{active: currentIndex === index}"
+           v-for="(item, index) in headerItem"
+           :key="index"
+           ref="headerItemList"
+      >
+        <div class="header-item-content"
+             :class="{active: currentIndex === index}"
+             @click="changeCurrentIndex(index)"
+             @mousemove="moveNavUnderline(index)"
+        >{{ item.title }}</div>
       </div>
 
-      <div class="nav-underline" ref="navUnderline"></div>
+      <div class="nav-underline" :style="underLineConfig"></div>
     </header>
   </div>
 </template>
 
 <script>
-import {huadiaoMiddleTip} from "@/pages/components/HuadiaoMiddleTip";
-
-const headerItemMargin = 20;
-const rootPath = "/";
-
 export default {
   name: "ForumContentHeader",
+
   data() {
     return {
       currentIndex: 0,
       movingIndex: -1,
       headerItem: [{
-        disabled: true,
         title: "推荐",
-        to: rootPath,
-        alias: [rootPath]
       }, {
-        disabled: true,
         title: "最新",
-        to: "newest",
       }],
+
+      underLineConfig: {
+        width: 0,
+        left: 0,
+      },
     }
   },
-  computed: {
-    routeFullPath() {
-      return this.$route.fullPath;
-    },
-    routeQuery() {
-      return this.$route.query;
-    }
-  },
-  watch: {
-    routeFullPath: {
-      handler() {
-        this.moveToRelevantHeaderItem();
-      }
-    }
-  },
+
   mounted() {
-    this.moveToRelevantHeaderItem();
+    this.moveToCurrentItem();
   },
+
   methods: {
-    /**
-     * 根据当前的 fullPath 移动到对应的子项下
-     */
-    moveToRelevantHeaderItem() {
-      this.changeCurrentIndex(this.findIndexFromHeaderItem());
-      this.moveToCurrentItem();
-    },
-    /**
-     * 寻找索引, 根据当前的 fullPath
-     * @return {number} 找到返回对应的索引, 未找到默认为第一个, 即为 0
-     */
-    findIndexFromHeaderItem() {
-      let headerItem = this.headerItem;
-      for(let i = 0; i < headerItem.length; i++) {
-        let to = headerItem[i].to;
-        if(this.routeFullPath === to) {
-          return i;
-        }
-        if(this.routeFullPath.endsWith(to)) {
-          return i;
-        }
-      }
-      return 0;
-    },
     moveToCurrentItem() {
-      let currentIndex = this.currentIndex;
-      this.$refs.headerItemList[currentIndex].classList.add(this.headerItemActiveClassName);
-      this.moveNavUnderline(currentIndex);
+      this.moveNavUnderline(this.currentIndex);
     },
+
+    changeCurrentIndex(index) {
+      this.currentIndex = index;
+    },
+
     /**
      * 移动到指定导航子项的底部
      * @param index {number} 索引
@@ -101,49 +61,24 @@ export default {
       if (index === this.movingIndex) {
         return;
       }
+
       this.movingIndex = index;
       let headerItemList = this.$refs.headerItemList;
       let width = getComputedStyle(headerItemList[index].children[0]).width;
+      let headerItemMargin = 20;
       let left = headerItemMargin;
+
       for (let i = 0; i < index; i++) {
         let width = +getComputedStyle(headerItemList[i].children[0]).width.split("px")[0];
         left += width + (headerItemMargin << 1);
       }
-      let navUnderline = this.$refs.navUnderline;
-      navUnderline.style.width = width;
-      navUnderline.style.left = `${left}px`;
-    },
-    mouseleaveResetUnderline() {
-      this.moveToCurrentItem();
-    },
-    /**
-     * 鼠标悬浮时移动下划线
-     * @param index {number} 索引
-     */
-    mouseoverToMoveUnderline(index) {
-      this.moveNavUnderline(index);
-    },
-    changeCurrentIndex(index) {
-      this.currentIndex = index;
-    },
-    /**
-     * 拼接 query 参数
-     * @param path {string} 要拼接的 query 参数
-     */
-    concatQueryPath(path) {
-      let queryKey = "sort";
-      if(path === rootPath) {
-        return "";
-      }
-      path = `?${queryKey}=${path}`;
-      return path;
-    },
-    handleDisabledItemClick() {
-      huadiaoMiddleTip("该功能暂未开放");
+
+      this.underLineConfig = {
+        width,
+        left: `${left}px`,
+      };
     },
   },
-  beforeDestroy() {
-  }
 }
 </script>
 
