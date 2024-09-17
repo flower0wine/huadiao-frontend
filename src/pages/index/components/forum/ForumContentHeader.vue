@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import {huadiaoMiddleTip} from "@/eventbus";
+
 export default {
   name: "ForumContentHeader",
 
@@ -50,7 +52,8 @@ export default {
     },
 
     changeCurrentIndex(index) {
-      this.currentIndex = index;
+      huadiaoMiddleTip("该功能暂未开放");
+      // this.currentIndex = index;
     },
 
     /**

@@ -55,6 +55,7 @@
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
+import {huadiaoMiddleTip} from "@/eventbus";
 
 export default {
   name: "ForumNavigation",
@@ -95,6 +96,10 @@ export default {
     },
 
     handleClickNavItem(navIndex, itemIndex) {
+      if (this.list[navIndex].list[itemIndex].disabled) {
+        huadiaoMiddleTip("该功能暂未开放");
+        return;
+      }
       this.$emit("navItemClick", navIndex, itemIndex);
     },
   },

@@ -25,9 +25,11 @@ export const navList = [
     svg: svg.fanju,
     contentComponent: AnimeList,
     list: [{
+      disabled: true,
       title: "关注",
       svg: svg.follow,
     }, {
+      disabled: true,
       title: "综合",
       svg: svg.comprehensiveness,
     }],
