@@ -30,11 +30,11 @@
           <div class="topping" v-if="noteInfo.topping">置顶</div>
           <div class="concentration" v-if="noteInfo.concentration">精选</div>
         </div>
-        <div class="note-tags">
+        <div class="note-tags" v-if="noteInfo.noteTags?.length">
           <div class="tags-label">笔记内容所属:</div>
-          <a class="note-tag-item" href="#">linux</a>
-          <a class="note-tag-item" href="#">网络</a>
-          <a class="note-tag-item" href="#">运维</a>
+          <span class="note-tag-item"
+                v-for="item in noteInfo.noteTags"
+                :key="item.tagId">{{item.tagName}}</span>
         </div>
       </div>
       <div class="note-content" v-html="noteInfo.noteContent"></div>
