@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import HuadiaoAccountOptions from "@/pages/account/components/HuadiaoAccountOptions";
 import {mapState} from "vuex";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";

@@ -21,7 +21,7 @@
 
 <script>
 import {mapState} from "vuex";
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import AnimeHouseSlide from "@/pages/animehouse/components/AnimeHouseSlide";
 import HuadiaoHouseAnime from "@/pages/animehouse/components/HuadiaoHouseAnime";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";

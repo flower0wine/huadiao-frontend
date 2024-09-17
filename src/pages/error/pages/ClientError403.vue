@@ -7,7 +7,7 @@
       <div class="tip-icon">
         <WarnIcon />
       </div>
-      <div class="tip-text">查看该页面需要权限</div>
+      <div class="tip-text">{{ tipText || "查看该页面需要权限" }}</div>
     </div>
   </div>
 </template>
@@ -17,9 +17,13 @@ import WarnIcon from "@/pages/components/svg/WarnIcon";
 
 export default {
   name: "ClientError403",
+
   components: {WarnIcon},
-  data() {
-    return {}
+
+  computed: {
+    tipText() {
+      return this.$route.query.tip;
+    },
   },
 }
 </script>

@@ -73,6 +73,8 @@ import {
   huadiaoWhisperLink,
   huadiaoAccountInfoLink,
 } from "@/util/huadiao-tool";
+import {responseHandler} from "@/assets/js/constants/status-code";
+import {huadiaoMiddleTip} from "@/eventbus";
 
 export default {
   name: "HomepageUserInferBoard",
@@ -135,13 +137,29 @@ export default {
     },
   },
   created() {
-    this.name = this.accordingSexToSetName(this.me, this.viewedUserInfo.userInfo.sex);
+    this.initialSex();
   },
   mounted() {
     this.initialFollowStatus();
   },
   methods: {
     huadiaoAccountInfoLink,
+
+    initialSex() {
+      const sex = this.viewedUserInfo.userInfo.sex;
+      if (this.me) {
+        this.name = "我的";
+        return;
+      }
+
+      let sexMapping = {
+        0: "",
+        1: "他的",
+        2: "她的",
+      };
+
+      this.name = sexMapping[sex];
+    },
 
     // 改变关注状态
     clickToChangeFollow() {
@@ -153,13 +171,19 @@ export default {
         },
         thenCallback: (response) => {
           let res = response.data;
-          console.log(res);
-          this.follow = !this.follow;
-          if (this.follow) {
-            this.$refs.followContainer.classList.replace("unfollow", "following");
-          } else {
-            this.$refs.followContainer.classList.replace("following", "unfollow");
-          }
+
+          responseHandler(res)
+            .succeed(() => {
+              this.follow = !this.follow;
+              if (this.follow) {
+                this.$refs.followContainer.classList.replace("unfollow", "following");
+              } else {
+                this.$refs.followContainer.classList.replace("following", "unfollow");
+              }
+            })
+            .notAuthoritative(() => {
+              huadiaoMiddleTip("请先登录!");
+            });
         },
         errorCallback: (error) => {
           console.log(error);

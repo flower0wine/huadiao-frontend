@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import {NAVIGATION_COMPONENT_NAME} from "@/pages/singleanime/edit/content/anime-component-config";
 
 export default {

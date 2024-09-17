@@ -14,6 +14,9 @@ import {mixin} from "@/mixin";
 import $ from "jquery";
 import router from "@/pages/history/router";
 import store from "@/pages/history/store";
+import {validateSSO} from "@/sso";
+
+validateSSO();
 
 Vue.config.productionTip = false;  // 生产提示
 

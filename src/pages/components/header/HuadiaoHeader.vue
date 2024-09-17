@@ -72,14 +72,18 @@ import defaultHuadiaoHeaderStyle from "@/assets/js/constants/style/huadiao_heade
 import {apis} from "@/assets/js/constants/request-path";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
 import AuthorityImg from "@/assets/img/authority.webp";
-import {ResponseHandler} from "@/assets/js/utils";
+import {responseHandler} from "@/assets/js/constants/status-code";
+import {flatPromise} from "@/util";
+import {getHeader} from "@/pages/components/header/apis";
 
 let smallUserAvatarScale = "41px";
 let bigUserAvatarScale = "71px";
 
 export default {
   name: "HuadiaoHeader",
+
   props: ["huadiaoHeaderStyle", "mouseenterAvatarCallback", "mouseleaveAvatarCallback"],
+
   data() {
     return {
       svg,
@@ -146,29 +150,23 @@ export default {
   },
   methods: {
     // 获取花凋头部数据
-    getHuadiaoHeaderUserinfo() {
-      this.sendRequest({
-        path: apis.huadiaoHeader,
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
+    async getHuadiaoHeaderUserinfo() {
+      const [err, res] = await flatPromise(getHeader());
 
-          new ResponseHandler(res).succeed((data) => {
-            if (!data.login) {
-              data = {
-                login: false,
-              }
-            }
-            console.log(data)
-            this.$store.commit("initialUser", {user: data});
-          });
-          this.getDataCompleted = true;
-        },
-        errorCallback: (error) => {
-          console.log(error);
-          this.login = false;
-        },
-      });
+      if (err) {
+        console.log(err);
+        this.login = false;
+        return;
+      }
+
+      responseHandler(res)
+        .succeed((res) => {
+          let data = res.data;
+
+          this.$store.commit("initialUser", {user: data});
+        });
+
+      this.getDataCompleted = true;
     },
     // 渲染之后再次修改头部样式
     modifyHuadiaoHeaderStyle(style) {

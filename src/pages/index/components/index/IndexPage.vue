@@ -33,7 +33,7 @@
 
 <script>
 import {mapState} from "vuex";
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import HuadiaoBelow from "@/pages/index/components/HuadiaoBelow";
 import HuadiaoMenu from "@/pages/index/components/HuadiaoMenu";
 import HuadiaoPoem from "@/pages/index/components/index/HuadiaoPoem";

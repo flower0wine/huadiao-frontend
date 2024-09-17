@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import StarImgAnimation from "@/pages/star/components/StarImgAnimation";
 import AddNewFavoriteBoard from "@/pages/star/components/AddNewFavoriteBoard";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";

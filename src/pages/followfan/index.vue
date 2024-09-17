@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import AddNewGroupBoard from "@/pages/followfan/components/AddNewGroupBoard";
@@ -26,22 +26,17 @@ import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
 import TransferFollowGroup from "@/pages/followfan/components/TransferFollowGroup";
 import FollowFanForeground from "@/assets/img/followfan/followFanForeground.webp";
 import FollowFanBackground from "@/assets/img/followfan/followFanBackground.webp";
+import {jumpToIndex} from "@/util/huadiao-tool";
 
 export default {
   name: "HuadiaoFollowFan",
+
   data() {
     return {
-      visible: false
-    }
+      visible: false,
+    };
   },
-  watch: {
-    "$store.state.user": {
-      deep: true,
-      handler(val) {
-        this.visible = true;
-      }
-    }
-  },
+
   computed: {
     foreground() {
       return this.packageBackgroundUrl(FollowFanForeground);
@@ -50,11 +45,7 @@ export default {
       return this.packageBackgroundUrl(FollowFanBackground);
     }
   },
-  mounted() {
-  },
-  methods: {},
-  beforeDestroy() {
-  },
+
   components: {
     TransferFollowGroup,
     HuadiaoPopupWindow,

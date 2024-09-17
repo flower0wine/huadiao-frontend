@@ -16,6 +16,9 @@ import router from "@/pages/account/router";
 import store from "@/pages/account/store";
 import 'element-ui/lib/theme-chalk/index.css';
 import $ from 'jquery';
+import {validateSSO} from "@/sso";
+
+validateSSO();
 
 Vue.config.productionTip = false;  // 生产提示
 

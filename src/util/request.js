@@ -9,6 +9,7 @@
 import axios from "axios";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {flatPromise} from "@/util/index";
+import {ERROR_404_PAGE_PATH} from "@/pages/error/error-pages-path";
 
 export const SITE_ORIGIN = window.location.origin;
 
@@ -51,7 +52,7 @@ export function createAxios(config = {}) {
     }
     // 页面不存在
     else if (response.data.code === statusCode.PAGE_NOT_EXIST) {
-      window.location.href = "/error/404";
+      window.location.href = ERROR_404_PAGE_PATH;
     }
 
     //返回参数

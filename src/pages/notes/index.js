@@ -15,6 +15,9 @@ import $ from "jquery";
 import router from "@/pages/notes/router";
 import store from "@/pages/notes/store";
 import NotesMixin from "@/pages/notes/mixin";
+import {validateSSO} from "@/sso";
+
+validateSSO();
 
 Vue.config.productionTip = false;  // 生产提示
 

@@ -15,6 +15,9 @@ import followFanMixin from "@/pages/followfan/mixin";
 import $ from "jquery";
 import router from "@/pages/followfan/router";
 import store from "@/pages/followfan/store";
+import {validateSSO} from "@/sso";
+
+validateSSO();
 
 Vue.config.productionTip = false;  // 生产提示
 

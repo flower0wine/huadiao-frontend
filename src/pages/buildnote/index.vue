@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";

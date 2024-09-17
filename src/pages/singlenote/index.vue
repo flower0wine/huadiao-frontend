@@ -26,7 +26,7 @@
 
 <script>
 import {mapState} from "vuex";
-import HuadiaoHeader from "@/pages/components/HuadiaoHeader";
+import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import NoteContentBoard from "@/pages/singlenote/components/NoteContentBoard";
 import SunLightTheme from "@/pages/notes/components/SunLightTheme";
 import LeftSliderBoard from "@/pages/components/NoteLeftSliderBoard";

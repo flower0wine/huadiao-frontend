@@ -15,6 +15,9 @@ import $ from "jquery";
 import router from "@/pages/buildnote/router";
 import store from "@/pages/buildnote/store";
 import tinymce from "tinymce";
+import {validateSSO} from "@/sso";
+
+validateSSO();
 
 Vue.config.productionTip = false;  // 生产提示
 
