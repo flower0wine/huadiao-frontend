@@ -32,7 +32,7 @@ import SunLightTheme from "@/pages/notes/components/SunLightTheme";
 import LeftSliderBoard from "@/pages/components/NoteLeftSliderBoard";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
-import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import HuadiaoPopupWindow from "@/pages/components/popwindow/HuadiaoPopupWindow";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {singleNoteHuadiaoHeaderStyle} from "@/assets/js/constants/style/huadiao_header_style/singlenote";
 import {apis} from "@/assets/js/constants/request-path";

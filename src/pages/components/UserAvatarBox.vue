@@ -2,25 +2,30 @@
   <div class="user-avatar-box"
        :style="userAvatarStyle"
        :class="defaultOptions.hover ? 'userAvatarHover' : ''">
+    <!--带链接-->
     <template v-if="defaultOptions.href">
       <a :href="defaultOptions.href" target="_blank">
-        <div class="default-user-avatar" v-html="svg.avatar"></div>
+        <div class="default-user-avatar" v-html="avatarIcon"></div>
         <div class="user-avatar"
              v-if="hasAvatar"
-             :style="`${userAvatar}; ${borderStyle};`"></div>
+             :style="`background-image: url(${userAvatar}); ${borderStyle};`"></div>
       </a>
     </template>
+
+    <!--不带链接-->
     <template v-else>
-      <div class="default-user-avatar" v-html="svg.avatar"></div>
+      <div class="default-user-avatar" v-html="avatarIcon"></div>
       <div class="user-avatar"
            v-if="hasAvatar"
-           :style="`${userAvatar}; ${borderStyle}`"></div>
+           :style="`background-image: url(${userAvatar}); ${borderStyle}`"></div>
     </template>
   </div>
 </template>
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
+import {modifySrcObject} from "@/util/tool";
+import {getAvatarUrl} from "@/util/huadiao-tool";
 
 export default {
   name: "UserAvatarBox",
@@ -37,14 +42,13 @@ export default {
         shadow: false,
         hover: false,
       },
-      svg,
     }
   },
   watch: {
     options: {
       deep: true,
       handler(newValue) {
-        this.modifySrcObject(this.defaultOptions, newValue);
+        modifySrcObject(this.defaultOptions, newValue);
       }
     },
     userAvatarUrl: {
@@ -54,16 +58,22 @@ export default {
       }
     }
   },
+
   created() {
-    this.modifySrcObject(this.defaultOptions, this.options);
+    modifySrcObject(this.defaultOptions, this.options);
   },
+
   computed: {
+    avatarIcon() {
+      return svg.avatar;
+    },
+
     hasAvatar() {
-      return this.userAvatarUrl || this.defaultOptions.userAvatar;
+      return Boolean(this.userAvatarUrl || this.defaultOptions.userAvatar);
     },
     userAvatar() {
       let userAvatar = this.defaultUserAvatar || this.defaultOptions.userAvatar;
-      return this.parseUserAvatar(userAvatar);
+      return getAvatarUrl(userAvatar);
     },
     userAvatarStyle() {
       let defaultOptions = this.defaultOptions;
@@ -75,16 +85,6 @@ export default {
       return defaultOptions.borderColor ? 'border: 2px solid ' + defaultOptions.borderColor : '';
     }
   },
-  methods: {
-    parseUserAvatar(userAvatar) {
-      if (!userAvatar.startsWith("blob:http://") && !userAvatar.startsWith("http")) {
-        userAvatar = `${this.userAvatarImagePath}${userAvatar}`;
-      }
-      return `background-image: url('${userAvatar}')`;
-    }
-  },
-  beforeDestroy() {
-  }
 }
 </script>
 

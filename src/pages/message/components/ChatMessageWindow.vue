@@ -49,7 +49,7 @@ import useChat from "@/pages/message/hook/useChat";
 import useObserver from "@/mixin/useObserver";
 import {ResponseHandler, Timer} from "@/assets/js/utils";
 import {apis} from "@/assets/js/constants/request-path";
-import {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
+import {huadiaoPopupWindowOptions} from "@/pages/components/popwindow/HuadiaoPopupWindow";
 import useWebsocket from "@/pages/message/hook/useWhisperWebsocket";
 import usePaginator from "@/mixin/usePaginator";
 import ChatInput from "@/pages/message/components/ChatInput";

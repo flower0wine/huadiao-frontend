@@ -49,7 +49,7 @@
 import {mapState} from "vuex";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
-import {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
+import {huadiaoPopupWindowOptions} from "@/pages/components/popwindow/HuadiaoPopupWindow";
 import {svg} from "@/assets/js/constants/svgs";
 
 const ADD = "add";

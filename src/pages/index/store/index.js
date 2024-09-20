@@ -7,50 +7,51 @@
 'use strict';
 import Vue from "vue";
 import Vuex from "vuex";
+import global from "@/common/global-store";
+
 
 // 用于存储数据
 const state = {
-    refs: {
-        immediatelyLogin: null,
-        immediatelyRegister: null,
-    },
-    // 用户信息
-    user: {
-        login: false,
-        nickname: "",
-        uid: 0,
-        userAvatar: "",
-        follows: 0,
-        fans: 0,
-    },
-    // 诗句
-    poem: {
-
-    }
+  refs: {
+    immediatelyLogin: null,
+    immediatelyRegister: null,
+  },
+  // 用户信息
+  user: {
+    login: false,
+    nickname: "",
+    uid: 0,
+    userAvatar: "",
+    follows: 0,
+    fans: 0,
+  },
+  // 诗句
+  poem: {}
 }
 
 // 用于响应组件中的动作
-const actions = {
-}
+const actions = {}
 // 用于操作数据
 const mutations = {
-    // 初始化 user 的信息
-    initialUser(state, {user}) {
-        state.user = user;
-    },
+  // 初始化 user 的信息
+  initialUser(state, {user}) {
+    state.user = user;
+  },
 }
 
 // 获取
-const getters = {
-}
+const getters = {}
 
 // 先使用 vuex 插件
 Vue.use(Vuex)
 
 // 再创建 store 对象
 export default new Vuex.Store({
-    actions,
-    mutations,
-    state,
-    getters,
-})
+  modules: {
+    global,
+  },
+  actions,
+  mutations,
+  state,
+  getters,
+});

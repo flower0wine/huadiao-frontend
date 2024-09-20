@@ -15,7 +15,7 @@
         </div>
         <div class="confirm-or-cancel">
           <!-- 这里方法的括号不加不起作用 -->
-          <div class="confirm-operation" @click="modify ? modifyGroupName() : addNewGroup()">确认</div>
+          <div class="confirm-operation" @click="modify ? requestModifyGroupName() : requestAddFollowGroup()">确认</div>
           <div class="cancel-operation" @click="closeBoard">取消</div>
         </div>
       </div>
@@ -24,9 +24,12 @@
 </template>
 
 <script>
-import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
-import {mapState} from "vuex";
+import {responseHandler} from "@/assets/js/constants/status-code";
+import {mapMutations} from "vuex";
+import {flatPromise} from "@/util";
+import {createFollowGroup, modifyFollowGroup} from "@/pages/followfan/apis";
+import {huadiaoMiddleTip} from "@/eventbus";
+import {followLink} from "@/util/huadiao-tool";
 
 export default {
   name: "AddNewGroupBoard",
@@ -49,7 +52,9 @@ export default {
     }
   },
   computed: {
-    ...mapState(["viewedUid"]),
+    viewedUid() {
+      return parseInt(this.$route.params.viewedUid);
+    },
   },
   watch: {
     tempGroupName: {
@@ -76,86 +81,80 @@ export default {
     });
   },
   methods: {
+    ...mapMutations("follow", ["modifyGroupName", "addNewFollowGroup"]),
+
     // 修改组名
-    modifyGroupName() {
+    async requestModifyGroupName() {
       // 相同的组名不发送请求
       if (this.groupName === this.tempGroupName) {
-        this.visible.show = false;
+        huadiaoMiddleTip("组名未修改!");
         return;
       }
-      this.sendRequest({
-        path: apis.followFan.followGroupModify,
-        params: {
-          groupName: this.tempGroupName,
-          groupId: this.groupId,
-        },
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          // 发出更改
-          this.$store.dispatch("modifyGroupName", {
+
+      const [err, res] = await flatPromise(modifyFollowGroup({
+        groupName: this.tempGroupName,
+        groupId: this.groupId,
+      }));
+
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      responseHandler(res)
+        .succeed(() => {
+          this.modifyGroupName({
             modifyIndex: this.modifyIndex,
             groupName: this.tempGroupName,
-            succeedCallback: () => {
-              this.visible.show = false;
-              this.huadiaoMiddleTip("组名修改成功!");
-            },
           });
-        },
-        errorCallback: (error) => {
-          console.log(error);
-        }
-      });
+
+          this.groupName = this.tempGroupName;
+          this.visible.show = false;
+
+          huadiaoMiddleTip("修改成功!");
+        })
+        .notExist(() => {
+          huadiaoMiddleTip("该分组不存在，请刷新页面重试!");
+        });
     },
+
     // 添加新组
-    addNewGroup() {
-      if (this.tempGroupName.length !== 0 && this.tempGroupName.length <= 16) {
-        this.requestAddNewGroup().then((groupId) => {
-          this.$store.commit("addNewFollowGroup", {groupId, groupName: this.tempGroupName});
-          // 关闭面板
+    async requestAddFollowGroup() {
+      if (!(this.tempGroupName.length !== 0 && this.tempGroupName.length <= 16)) {
+        huadiaoMiddleTip("组名不能为空且长度不能超过 16 个字符!");
+        return;
+      }
+
+      const [err, res] = await flatPromise(createFollowGroup({groupName: this.tempGroupName}));
+
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      responseHandler(res)
+        .succeed((res) => {
+          const groupId = res.data.followGroupId;
+
+          this.addNewFollowGroup({
+            groupId,
+            groupName: this.tempGroupName,
+          });
+
           this.visible.show = false;
           this.tempGroupName = "";
           this.$nextTick(() => {
-            this.$router.replace(`/followfan/${this.viewedUid}/follow/${groupId}`);
+            this.$router.replace(followLink(this.viewedUid, groupId));
           });
-        }).catch((err) => {
-          console.log(err);
         });
-      } else if (this.tempGroupName.length === 0) {
-        this.huadiaoMiddleTip("组名不能为空哦!");
-      } else if (this.tempGroupName.length > 16) {
-        this.huadiaoMiddleTip("组名长度最大为 16 个字符!");
-      }
     },
-    requestAddNewGroup() {
-      return new Promise((resolve, reject) => {
-        this.sendRequest({
-          path: apis.followFan.followGroupAdd,
-          params: {
-            groupName: this.tempGroupName,
-          },
-          thenCallback: (response) => {
-            let res = response.data;
-            console.log(res);
-            if(res.code === statusCode.SUCCEED) {
-              resolve(res.data.followGroupId);
-            }
-          },
-          errorCallback: (error) => {
-            console.log(error);
-            reject();
-          }
-        })
-      });
-    },
+
     // 关闭面板
     closeBoard() {
       this.visible.show = false;
       this.groupName = "";
     }
   },
-  beforeDestroy() {
-  }
 }
 </script>
 

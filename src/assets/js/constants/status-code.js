@@ -65,6 +65,7 @@ export const statusCodeMapping = statusCodeTemp;
 
 /**
  * @typedef {Object} ResponseHandlers
+ * @property {(callback: Function) => ResponseHandlers} error
  * @property {(callback: Function) => ResponseHandlers} succeed
  * @property {(callback: Function) => ResponseHandlers} errorParam
  * @property {(callback: Function) => ResponseHandlers} notAuthoritative
@@ -91,6 +92,14 @@ export function responseHandler(response) {
       return handlers;
     };
   }
+
+  // 通用错误处理方法
+  handlers.error = (callback) => {
+    if (response.code !== statusCode.SUCCEED) {
+      callback && callback(response);
+    }
+    return handlers;
+  };
 
   return handlers;
 }

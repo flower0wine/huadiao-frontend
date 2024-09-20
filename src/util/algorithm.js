@@ -87,3 +87,46 @@ export function useMaxNumberMapping(minNumber) {
         getMaxMappingNumber,
     }
 }
+
+/**
+ * 二分查找添加数字
+ * @param array
+ * @param number
+ */
+export function insertOrderArray(array, number) {
+  if (array && Array.isArray(array) &&
+    typeof number === "number" && Number.isInteger(number)) {
+    if (array.length === 0) {
+      array.push(number);
+    } else {
+      let search = this.binarySearchPosition(array, number);
+      for (let index = array.length; index > search; index--) {
+        array[index] = array[index - 1];
+        array.splice(index, 1, array[index - 1]);
+      }
+      array.splice(search, 1, number);
+    }
+  }
+}
+
+/**
+ * 二分查找删除数字
+ * @param array
+ * @param number
+ */
+export function deleteNumberFromArray(array, number) {
+  if (array && Array.isArray(array) &&
+    typeof number === "number" && Number.isInteger(number)) {
+    let left = 0, right = array.length - 1, mid;
+    while (left <= right) {
+      mid = left + ((right - left) >> 1);
+      if (array[mid] === number) {
+        array.splice(mid, 1);
+      } else if (array[mid] > number) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+    }
+  }
+}

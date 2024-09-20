@@ -28,8 +28,8 @@ export function noteLink(authorUid, noteId) {
     return `/singlenote/${authorUid}/${noteId}`;
 }
 
-export function followLink(uid) {
-    return `/followfan/${uid}/follow`;
+export function followLink(uid, groupId) {
+    return `/followfan/${uid}/follow${groupId ? `/${groupId}` : ''}`;
 }
 
 export function fanLink(uid) {

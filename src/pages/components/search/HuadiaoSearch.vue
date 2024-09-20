@@ -98,9 +98,7 @@ export default {
                --search-option-hover-bg: ${this.inputTheme.searchOptionHoverBackgroundColor}`
     },
   },
-  created() {
-    window.addEventListener("click", this.clickToHidden);
-  },
+
   methods: {
     clickToHidden(e) {
       let target = e.target;
@@ -136,9 +134,12 @@ export default {
       }
       // 如果展示了输入框, 就让输入框获取焦点
       if(searchInput) {
+        window.addEventListener("click", this.clickToHidden);
         this.$nextTick(() => {
           this.$refs.searchInput.focus();
         });
+      } else {
+        window.removeEventListener("click", this.clickToHidden);
       }
     },
     // 搜索输入中

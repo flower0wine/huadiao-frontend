@@ -22,10 +22,11 @@
 
 <script>
 import HuadiaoFollowFanItem from "@/pages/followfan/components/HuadiaoFollowFanItem";
-import {mapState} from "vuex";
-import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
-import {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
+import {responseHandler} from "@/assets/js/constants/status-code";
+import {deleteFan, getFan} from "@/pages/followfan/apis";
+import {requestPager} from "@/util/request";
+import {flatPromise} from "@/util";
+import {huadiaoMiddleTip, huadiaoPopupWindow} from "@/eventbus";
 
 export default {
   name: "HuadiaoFanBoard",
@@ -39,84 +40,66 @@ export default {
   },
   computed: {
     viewedUid() {
-      return this.$route.params.viewedUid;
+      return parseInt(this.$route.params.viewedUid);
     },
-  },
-  watch: {
-    "$route.params.groupId": {
-      immediate: true,
-      handler(val) {
-        if(typeof val === "undefined") {
-          this.resetFan();
-          this.getFanInfo();
-        }
-      },
-    },
-  },
-  created() {
 
-  },
-  methods: {
-    resetFan() {
-      this.fan = [];
-      this.offset = 0;
-      this.hasNext = true;
+    pager() {
+      return requestPager(getFan);
     },
+  },
+
+  created() {
+    this.getFanInfo();
+  },
+
+  methods: {
     // 获取关注信息
-    getFanInfo() {
-      if(!this.hasNext) {
+    async getFanInfo() {
+      const promiseRes = await this.pager.fetch({
+        uid: this.viewedUid,
+      });
+
+      const [err, res] = await flatPromise(promiseRes);
+
+      if (err) {
+        console.log(err);
         return;
       }
-      this.sendRequest({
-        path: apis.followFan.fanGet,
-        params: {
-          uid: this.viewedUid,
-          offset: this.offset,
-          row: this.row,
-        },
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          if(res.code === statusCode.SUCCEED) {
-            this.fan.push(...res.data);
-            this.offset += res.data.length;
-          } else if(res.code === statusCode.NOT_EXIST) {
-            this.hasNext = false;
-          }
-        },
-        errorCallback: (error) => {
-          console.log(error);
-        }
-      });
+
+      responseHandler(res)
+        .succeed((res) => {
+          this.fan.push(...res.data);
+
+          this.pager.setHasNext(this.pager.getSize() <= res.data.length);
+        });
     },
     // 请求删除粉丝
-    requestDeleteFan(index) {
-      this.sendRequest({
-        path: apis.followFan.deleteFan,
-        params: {
-          uid: this.fan[index].uid,
-        },
-      }).then((response) => {
-        let res = response.data;
-        console.log(res);
-        if(res.code === statusCode.SUCCEED) {
+    async requestDeleteFan(index) {
+      const [err, res] = await flatPromise(deleteFan({uid: this.fan[index].uid}));
+
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      responseHandler(res)
+        .succeed(() => {
           this.fan.splice(index, 1);
-        }
-      }).catch((error) => {
-        console.log(error);
-        this.huadiaoMiddleTip("移除粉丝失败");
-      });
+        })
+        .error(() => {
+          huadiaoMiddleTip("删除粉丝失败");
+        });
     },
+
     // 删除粉丝
     deleteFan(index) {
-      this.huadiaoPopupWindow(huadiaoPopupWindowOptions.iconType.warning, huadiaoPopupWindowOptions.operate.confirmOrCancel,"确认删除粉丝吗?")
+      huadiaoPopupWindow("warning", "confirmOrCancel","确认删除粉丝吗?")
           .then(this.requestDeleteFan.bind(this, index));
     },
   },
-  beforeDestroy() {
-  },
+
   components: {
-    HuadiaoFollowFanItem
+    HuadiaoFollowFanItem,
   },
 }
 </script>

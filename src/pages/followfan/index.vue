@@ -1,14 +1,17 @@
 <template>
-  <div class="huadiao-follow-fan" :style="background">
+  <div class="huadiao-follow-fan" :style="`background-image: url(${background})`">
     <huadiao-header/>
-    <template v-if="visible">
-      <router-view></router-view>
-    </template>
-    <div class="follow-fan-foreground foreground-animation"
+    <div class="follow-fan-container">
+      <HuadiaoFollowFanBoard />
+    </div>
+    <div class="follow-fan-foreground"
+         :class="{
+           'foreground-animation': !mouseenterForeground
+         }"
          ref="followFanForeground"
-         :style="foreground"
-         @mouseenter="$refs.followFanForeground.classList.remove('foreground-animation')"
-         @mouseleave="$refs.followFanForeground.classList.add('foreground-animation')"></div>
+         :style="`background-image: url(${foreground})`"
+         @mouseenter="mouseenterForeground = true"
+         @mouseleave="mouseenterForeground = false"></div>
     <transfer-follow-group/>
     <huadiao-middle-tip/>
     <huadiao-warning-top-container/>
@@ -22,52 +25,73 @@ import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import AddNewGroupBoard from "@/pages/followfan/components/AddNewGroupBoard";
-import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import HuadiaoPopupWindow from "@/pages/components/popwindow/HuadiaoPopupWindow";
 import TransferFollowGroup from "@/pages/followfan/components/TransferFollowGroup";
 import FollowFanForeground from "@/assets/img/followfan/followFanForeground.webp";
 import FollowFanBackground from "@/assets/img/followfan/followFanBackground.webp";
-import {jumpToIndex} from "@/util/huadiao-tool";
+import {validateUser} from "@/common/apis";
+import {flatPromise} from "@/util";
+import {responseHandler} from "@/assets/js/constants/status-code";
+import HuadiaoFollowFanBoard from "@/pages/followfan/pages/HuadiaoFollowFanBoard";
 
 export default {
   name: "HuadiaoFollowFan",
 
   data() {
     return {
+      mouseenterForeground: false,
       visible: false,
     };
   },
 
   computed: {
     foreground() {
-      return this.packageBackgroundUrl(FollowFanForeground);
+      return FollowFanForeground;
     },
     background() {
-      return this.packageBackgroundUrl(FollowFanBackground);
+      return FollowFanBackground;
     }
   },
 
+  methods: {
+    async validate() {
+      const [err, res] = await flatPromise(validateUser());
+
+      if (err) {
+        console.error(err);
+        return;
+      }
+
+      responseHandler(res).notAuthoritative(() => {});
+    },
+  },
+
   components: {
+    HuadiaoFollowFanBoard,
     TransferFollowGroup,
     HuadiaoPopupWindow,
     AddNewGroupBoard,
     HuadiaoWarningTopContainer,
     HuadiaoMiddleTip,
-    HuadiaoHeader
+    HuadiaoHeader,
   },
 }
 </script>
 
-<style>
-body {
-}
-
+<style lang="scss">
 .huadiao-follow-fan {
-  width: 100%;
+  display: flex;
+  justify-content: center;
   min-height: 100vh;
-  padding: 60px 0 100px 0;
   color: #646464;
   font-family: "宋体", serif;
   background: no-repeat center/cover;
+  overflow: auto;
+
+  .follow-fan-container {
+    flex: 1;
+    padding: 70px 6% 50px 6%;
+  }
 }
 
 .follow-fan-foreground {

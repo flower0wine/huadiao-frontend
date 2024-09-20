@@ -16,7 +16,7 @@
 <script>
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
-import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
+import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/popwindow/HuadiaoPopupWindow";
 import HomepageUserInferTop from "@/pages/homepage/components/HomepageUserInferTop";
 import HuadiaoHomepageHeader from "@/pages/homepage/components/HuadiaoHomepageHeader";
 import HomepageUserInferBoard from "@/pages/homepage/components/HomepageUserInferBoard";

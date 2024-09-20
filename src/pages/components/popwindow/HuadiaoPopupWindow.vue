@@ -38,19 +38,7 @@
 
 <script>
 import {Timer} from "@/assets/js/utils";
-
-export const huadiaoPopupWindowOptions = {
-  iconType: {
-    warning: "warning",
-    completed: "completed",
-    error: "error",
-    info: "info"
-  },
-  operate: {
-    confirmOrCancel: "confirmOrCancel",
-    hasRead: "hasRead",
-  }
-}
+import {eventBus} from "@/eventbus";
 
 export default {
   name: "HuadiaoPopupWindow",
@@ -108,9 +96,12 @@ export default {
       timer: new Timer(),
     }
   },
+
   beforeMount() {
     this.$bus.$on("huadiaoPopupWindow", this.modifyTipType);
+    eventBus.$on("huadiaoPopupWindow", this.modifyTipType);
   },
+
   methods: {
     /**
      * 修改提示类型
@@ -167,7 +158,10 @@ export default {
       this.callback.cancelCallback && this.callback.cancelCallback();
     },
   },
+
   beforeDestroy() {
+    this.$bus.$off("huadiaoPopupWindow", this.modifyTipType);
+    eventBus.$off("huadiaoPopupWindow", this.modifyTipType);
   }
 }
 </script>

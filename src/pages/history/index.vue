@@ -39,7 +39,7 @@ import HuadiaoHeader from "@/pages/components/header/HuadiaoHeader";
 import HistoryTools from "@/pages/history/components/HistoryTools";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
-import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import HuadiaoPopupWindow from "@/pages/components/popwindow/HuadiaoPopupWindow";
 import {Timer} from "@/assets/js/utils";
 import HistoryBackground from "@/assets/img/history/historyBackground.webp";
 import History from "@/assets/img/history/history.webp";

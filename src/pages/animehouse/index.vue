@@ -26,7 +26,7 @@ import AnimeHouseSlide from "@/pages/animehouse/components/AnimeHouseSlide";
 import HuadiaoHouseAnime from "@/pages/animehouse/components/HuadiaoHouseAnime";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
-import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
+import HuadiaoPopupWindow, {huadiaoPopupWindowOptions} from "@/pages/components/popwindow/HuadiaoPopupWindow";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {backgroundTransform} from "@/pages/animehouse/tool";

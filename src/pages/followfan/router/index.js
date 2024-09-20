@@ -8,36 +8,24 @@
 import VueRouter from "vue-router";
 
 export default new VueRouter({
-    mode: "history",
-    routes: [
-        {
-            path: "/followfan/:viewedUid(\\d+)/follow",
-            redirect: "/followfan/:viewedUid(\\d+)/follow/-1",
-        },
-        {
-            name: "followFanBoard",
-            path: "/followfan/:viewedUid(\\d+)",
-            component: () => import("@/pages/followfan/pages/HuadiaoFollowFanBoard"),
-            children: [{
-                name: "followBoard",
-                path: "follow/:groupId(-?\\d+)",
-                components: {
-                    followFanExhibit: () => import("@/pages/followfan/pages/HuadiaoFollowBoard"),
-                },
-                beforeRouteLeave() {
-                    this.$store.commit("clearDeletedFollow");
-                }
-            },
-            {
-                name: "fanBoard",
-                path: "fan",
-                components: {
-                    followFanExhibit: () => import("@/pages/followfan/pages/HuadiaoFanBoard"),
-                },
-                beforeRouteLeave() {
-                    this.$store.commit("clearDeletedFan");
-                }
-            }]
-        },
-    ]
-})
+  mode: "history",
+  routes: [
+    {
+      path: "/followfan/:viewedUid(\\d+)/follow",
+      redirect: to => {
+        const viewedUid = to.params.viewedUid;
+        return `/followfan/${viewedUid}/follow/-1`;
+      },
+    },
+    {
+      name: "followBoard",
+      path: "/followfan/:viewedUid(\\d+)/follow/:groupId(-?\\d+)",
+      component: () => import("@/pages/followfan/pages/HuadiaoFollowBoard"),
+    },
+    {
+      name: "fanBoard",
+      path: "/followfan/:viewedUid(\\d+)/fan",
+      component: () => import("@/pages/followfan/pages/HuadiaoFanBoard"),
+    },
+  ],
+});

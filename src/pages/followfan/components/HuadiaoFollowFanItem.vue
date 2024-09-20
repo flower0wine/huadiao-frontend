@@ -1,5 +1,8 @@
 <template>
   <div class="huadiao-follow-fan-item"
+       :class="{
+         'chose-follow-item': !patch || choose,
+       }"
        ref="followFanItem">
     <div class="choose-input-box"
          v-show="patch">
@@ -58,19 +61,24 @@
 </template>
 
 <script>
-import {apis} from "@/assets/js/constants/request-path";
-import {statusCode} from "@/assets/js/constants/status-code";
+import {responseHandler} from "@/assets/js/constants/status-code";
 import {svg} from "@/assets/js/constants/svgs";
 import {getAvatarUrl, homepageLink, huadiaoWhisperLink} from "@/util/huadiao-tool";
+import {mapState} from "vuex";
+import {flatPromise} from "@/util";
+import {addFollow, deleteFollow} from "@/pages/followfan/apis";
 
 export default {
   name: "HuadiaoFollowFanItem",
-  props: ["item", "type", "index", "addFollow", "removeFollow", "patch", "mapKey", "groupId"],
+  props: ["item", "type", "index", "patch", "groupId"],
+
+  emits: ["addFollow", "removeFollow"],
+
   data() {
     return {
       // 是否关注
       follow: this.type === "follow" ? true : (this.type === "fan" && this.item.friend),
-      itemClass: "chose-follow-item",
+      choose: false,
       visible: {
         toolMenu: {
           render: false,
@@ -80,6 +88,8 @@ export default {
     }
   },
   computed: {
+    ...mapState("follow", ["me"]),
+
     svg() {
       return {
         avatar: svg.avatar,
@@ -87,78 +97,61 @@ export default {
         multiplyInput: svg.multiplyInput
       }
     },
-    me() {
-      return this.$store.state.me;
-    },
+
     nickname() {
       return this.item.nickname ?? this.item.userId;
     },
+
     canvases() {
       return this.item.canvases > 20 ? this.item.canvases.substring(0, 20) :
           this.item.canvases;
     }
   },
-  watch: {
-    patch: {
-      handler(val) {
-        if (!val) {
-          let classList = this.$refs.followFanItem.classList;
-          classList.remove(this.itemClass);
-        }
-      }
-    }
-  },
+
   methods: {
     getAvatarUrl,
     homepageLink,
     huadiaoWhisperLink,
 
     clickMultiplyInput() {
-      let classList = this.$refs.followFanItem.classList;
-      let clazz = this.itemClass;
-      if (classList.contains(clazz)) {
-        classList.remove(clazz);
-        this.removeFollow(this.index);
+      this.choose = !this.choose;
+      if (!this.choose) {
+        this.$emit("removeFollow", this.index);
       } else {
-        classList.add(clazz);
-        this.addFollow(this.index);
+        this.$emit("addFollow", this.index);
       }
     },
-    changeFollowStatus(uid) {
+
+    async changeFollowStatus(uid) {
       // 根据不同的关注状态选择不同的后端接口
-      let path;
+      let callback;
       if (this.follow) {
-        path = apis.followFan.deleteFollow;
+        callback = deleteFollow;
       } else {
-        path = apis.followFan.newFollow;
+        callback = addFollow;
       }
-      this.sendRequest({
-        path,
-        params: {
-          uid,
-        },
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          if (res.code === statusCode.SUCCEED) {
-            this.changeFollowStatusOfFollow();
-            this.$bus.$emit("flushFollowFanGroup");
-          }
+
+      const [err, res] = await flatPromise(callback({uid}));
+
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      responseHandler(res)
+        .succeed(() => {
+          this.changeFollowStatusOfFollow();
+          this.$bus.$emit("flushFollowFanGroup");
           this.follow = !this.follow;
-        },
-        errorCallback: (error) => {
-          console.log(error);
-        },
-      });
+        });
     },
+
     changeFollowStatusOfFollow() {
       if(this.type === "follow") {
         this.$bus.$emit("changeFollowStatus", this.index);
       }
     },
   },
-  beforeDestroy() {
-  }
 }
 </script>
 

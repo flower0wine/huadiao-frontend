@@ -12,6 +12,7 @@
 
 <script>
 import {svg} from "@/assets/js/constants/svgs";
+import {modifySrcObject} from "@/util/tool";
 
 export default {
   name: "SimpleLoading",
@@ -44,7 +45,7 @@ export default {
     },
   },
   created() {
-    this.modifySrcObject(this.defaultOptions, this.option);
+    modifySrcObject(this.defaultOptions, this.option);
     this.initialCreated();
   },
   mounted() {

@@ -20,6 +20,7 @@
 <script>
 import {Timer} from "@/assets/js/utils";
 import {svg} from "@/assets/js/constants/svgs";
+import {modifySrcObject} from "@/util/tool";
 
 export default {
   name: "HuadiaoWarningTopContainer",
@@ -51,7 +52,7 @@ export default {
   methods: {
     // 修改默认样式
     modifyDefaultStyle() {
-      this.modifySrcObject(this.defaultTipStyle, this.tipStyle);
+      modifySrcObject(this.defaultTipStyle, this.tipStyle);
     },
     // 花凋警告提示
     addHuadiaoWarningTip(warningTip) {

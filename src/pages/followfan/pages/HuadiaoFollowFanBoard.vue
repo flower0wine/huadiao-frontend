@@ -1,16 +1,16 @@
 <template>
-  <div class="huadiao-follow-fan-board" v-if="visible.followFanBoard">
+  <div class="huadiao-follow-fan-board">
     <div class="follow-fan-group">
       <div class="follow-group">
         <div class="group-header">
-          <span>{{ $store.getters.call }}的关注</span>
+          <span>{{ identity }}的关注</span>
           <span v-html="svg.add"
                 title="新建分组"
                 v-if="me"
                 @click="openAddNewGroupBoard"
                 ref="addNewGroup"></span>
         </div>
-        <router-link :to="`/followfan/${viewedUid}/follow/${item.groupId}`"
+        <router-link :to="followLink(viewedUid, item.groupId)"
                      v-for="(item, index) in followGroup"
                      class="group-link"
                      :class="me && item.allowOperate ? 'group-link-hover' : ''"
@@ -43,7 +43,7 @@
       </div>
       <div class="fan-group">
         <div class="group-header">我的粉丝</div>
-        <router-link :to="{name: item.to}"
+        <router-link :to="`/followfan/${viewedUid}/fan`"
                      v-for="(item, index) in fanGroup"
                      class="group-link"
                      :title="item.groupName"
@@ -56,24 +56,25 @@
       </div>
     </div>
     <div class="follow-fan-exhibit">
-      <keep-alive>
-        <router-view name="followFanExhibit"></router-view>
-      </keep-alive>
+      <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
-import {mapState} from "vuex";
-import {statusCode} from "@/assets/js/constants/status-code";
-import {apis} from "@/assets/js/constants/request-path";
+import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+import {responseHandler} from "@/assets/js/constants/status-code";
 import {svg} from "@/assets/js/constants/svgs";
+import {flatPromise} from "@/util";
+import {deleteFollowGroup, getFollowGroup, getRelationCount} from "@/pages/followfan/apis";
+import {followLink} from "@/util/huadiao-tool";
+import {huadiaoMiddleTip, huadiaoPopupWindow} from "@/eventbus";
 
 export default {
   name: "HuadiaoFollowFanBoard",
+
   data() {
     return {
-      viewedUid: null,
       svg: {
         add: svg.circleAdd,
         more: svg.more,
@@ -88,125 +89,143 @@ export default {
       followFanArray: [],
     }
   },
+
   computed: {
-    ...mapState(["followGroup", "fanGroup", "me"]),
+    ...mapState(["user"]),
+    ...mapState("follow", ["followGroup", "fanGroup"]),
+
+    ...mapGetters("follow", ["identity"]),
+
+    viewedUid() {
+      return parseInt(this.$route.params.viewedUid);
+    },
+
+    me() {
+      return this.user.uid === this.viewedUid;
+    },
   },
-  created() {
-    this.initial();
+
+  watch: {
+    user() {
+      this.initial();
+    },
   },
+
   methods: {
+    followLink,
+
+    ...mapMutations("follow", [
+      "initialMe",
+      "initialViewedUid",
+      "initialFollowGroup",
+      "initialFollowFanCount",
+      "deleteFollowGroup",
+    ]),
+
+    ...mapActions("follow", ["deleteFollowGroup"]),
+
     // 初始化
     initial() {
       this.$bus.$on("getFollowGroup", this.getUserFollowGroup);
       this.$bus.$on("flushFollowFanGroup", this.getCurrentUserFollowFanInfo);
 
-      let myUid = this.$store.state.user.uid;
-      this.viewedUid = +this.$route.params.viewedUid;
-      this.$store.commit("initialMe", {me: myUid === this.viewedUid});
-      this.$store.commit("initialViewedUid", {viewedUid: this.viewedUid});
+      this.initialMe({me: this.me});
+      this.initialViewedUid({viewedUid: this.viewedUid});
 
       this.getCurrentUserFollowFanInfo();
-      this.visible.followFanBoard = true;
     },
+
     setGroupMore() {
       let array = new Array(this.followGroup.length);
       this.visible.groupMore = array.fill(false);
     },
+
     // 获取当前用户的关注与粉丝信息
     getCurrentUserFollowFanInfo() {
-      this.getFollowFanCount().then(() => {
-        if (this.me) {
-          this.getUserFollowGroup();
-        }
-      });
+      this.getFollowFanCount();
+
+      if (this.me) {
+        this.getUserFollowGroup();
+      }
     },
+
     // 获取用户关注分组
-    getUserFollowGroup() {
-      this.sendRequest({
-        path: apis.followFan.followGroupGet,
-        thenCallback: (response) => {
-          let res = response.data;
-          console.log(res);
-          if (res.code === statusCode.SUCCEED) {
-            this.$store.commit("initialFollowGroup", {followGroup: res.data});
-            this.setGroupMore();
-          }
-        },
-        errorCallback: (error) => {
-          console.log(error);
-        }
-      });
-    },
-    // 获取用户关注和粉丝总数数量
-    getFollowFanCount() {
-      return new Promise((resolve) => {
-        this.sendRequest({
-          path: apis.followFan.followFanCount,
-          params: {
-            uid: this.viewedUid,
-          },
-          thenCallback: (response) => {
-            let res = response.data;
-            console.log(res);
-            if (res.code === statusCode.SUCCEED) {
-              resolve();
-              this.$store.commit("initialFollowFanCount", {stat: res.data});
-            }
-          },
-          errorCallback: (error) => {
-            console.log(error);
-          }
+    async getUserFollowGroup() {
+      const [err, res] = await flatPromise(getFollowGroup());
+
+      if (err) {
+        console.error(err);
+        return;
+      }
+
+      responseHandler(res)
+        .succeed((res) => {
+          this.initialFollowGroup({followGroup: res.data});
+          this.setGroupMore();
         });
-      });
     },
+
+    // 获取用户关注和粉丝总数数量
+    async getFollowFanCount() {
+      const [err, res] = await flatPromise(getRelationCount({uid: this.viewedUid}));
+
+      if (err) {
+        console.error(err);
+        return;
+      }
+
+      responseHandler(res)
+        .succeed((res) => {
+          this.initialFollowFanCount({stat: res.data});
+        });
+    },
+
     // 打开新建面板
     openAddNewGroupBoard() {
       this.$bus.$emit('openAddNewGroupBoard');
     },
+
     // 修改组名
     modifyGroupName(modifyIndex, groupName, groupId) {
       this.$bus.$emit("openModifyGroupBoard", modifyIndex, groupName, groupId);
     },
+
     // 删除分组
     deleteGroup(deleteIndex, groupId) {
-      this.huadiaoPopupWindow(
+      const count = this.followGroup[deleteIndex].count;
+      if (count > 0) {
+        huadiaoMiddleTip("该分组下存在关注，无法删除");
+        return;
+      }
+
+      huadiaoPopupWindow(
           "warning",
           "confirmOrCancel",
           "确认删除吗？删除后该收藏夹下的所有收藏都将删除!",
           () => {
-            this.requestDeleteGroup(groupId).then(() => {
-              this.$store.dispatch("deleteFollowGroup", {
-                deleteIndex,
-              });
-              this.getCurrentUserFollowFanInfo();
-              this.$router.replace(`/followfan/${this.viewedUid}/follow/-1`)
-            })
+            this.requestDeleteGroup(groupId, deleteIndex);
           });
     },
+
     // 请求删除
-    requestDeleteGroup(groupId) {
-      return new Promise((resolve) => {
-        this.sendRequest({
-          path: apis.followFan.followGroupDelete,
-          params: {
-            groupId,
-          },
-          thenCallback: (response) => {
-            let res = response.data;
-            console.log(res);
-            if (res.code === statusCode.SUCCEED) {
-              resolve();
-            }
-          },
-          errorCallback: (error) => {
-            console.log(error);
-          }
+    async requestDeleteGroup(groupId, deleteIndex) {
+      const [err, res] = await flatPromise(deleteFollowGroup({groupId}));
+
+      if (err) {
+        console.error(err);
+        return;
+      }
+
+      responseHandler(res)
+        .succeed(() => {
+          this.deleteFollowGroup({
+            deleteIndex,
+          });
+          this.getCurrentUserFollowFanInfo();
+          this.$router.replace(followLink(this.viewedUid, -1));
         });
-      });
-    }
+    },
   },
-  beforeDestroy() {
-  }
 }
 </script>
 
@@ -215,8 +234,10 @@ export default {
   display: flex;
   position: relative;
   z-index: 1;
-  width: 1200px;
-  height: 800px;
+  width: 100%;
+  min-width: 600px;
+  height: 100%;
+  min-height: 400px;
   margin: 0 auto;
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.747);
@@ -224,8 +245,7 @@ export default {
 
 /* 关注、粉丝组 */
 .follow-fan-group {
-  width: 20%;
-  height: 100%;
+  width: 240px;
   border-right: 1px solid #c1c1c1;
 }
 
@@ -241,6 +261,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 10%;
   width: 100%;
   height: 50px;
   font-size: 20px;
@@ -250,7 +271,6 @@ export default {
 .group-header /deep/ svg {
   width: 20px;
   height: 20px;
-  margin-left: 30px;
   fill: #646464;
   vertical-align: -3px;
   cursor: pointer;
@@ -262,9 +282,17 @@ export default {
   align-items: center;
   width: 100%;
   height: 40px;
-  padding: 0 30px 0 30px;
+  padding: 0 20px;
   font-size: 18px;
   cursor: pointer;
+}
+
+.group-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  -webkit-line-clamp: 1;
+  margin-right: 20px;
 }
 
 .group-link:hover {

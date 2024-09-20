@@ -7,8 +7,7 @@
 'use strict';
 
 import axios from "axios";
-import {statusCode} from "@/assets/js/constants/status-code";
-import {flatPromise} from "@/util/index";
+import {responseHandler, statusCode} from "@/assets/js/constants/status-code";
 import {ERROR_404_PAGE_PATH} from "@/pages/error/error-pages-path";
 
 export const SITE_ORIGIN = window.location.origin;
@@ -119,8 +118,13 @@ export function requestPager(request, config = {}) {
     }
 
     return new Promise((resolve, reject) => {
-      request({page: _config.page, size: _config.size})
+      request({page: _config.page, size: _config.size, ...params})
         .then((res) => {
+          responseHandler(res)
+            .emptyData(() => {
+              setHasNext(false);
+            });
+
           accessing = false;
           _config.page++;
           resolve(res);

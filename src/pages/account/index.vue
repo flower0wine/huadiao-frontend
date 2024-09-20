@@ -19,7 +19,7 @@ import HuadiaoAccountOptions from "@/pages/account/components/HuadiaoAccountOpti
 import {mapState} from "vuex";
 import HuadiaoWarningTopContainer from "@/pages/components/HuadiaoWarningTopContainer";
 import HuadiaoMiddleTip from "@/pages/components/HuadiaoMiddleTip";
-import HuadiaoPopupWindow from "@/pages/components/HuadiaoPopupWindow";
+import HuadiaoPopupWindow from "@/pages/components/popwindow/HuadiaoPopupWindow";
 
 export default {
   name: "HuadiaoAccount",

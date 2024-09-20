@@ -55,7 +55,7 @@ export default {
     }
   },
   computed: {
-    ...mapState({
+    ...mapState("follow", {
       followGroup(state) {
         return state.followGroup.slice(1);
       },

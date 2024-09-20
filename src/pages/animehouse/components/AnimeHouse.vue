@@ -35,7 +35,7 @@
 import {mapState} from "vuex";
 import {svg} from "@/assets/js/constants/svgs";
 import AddAnimeBoard from "@/pages/animehouse/components/AddAnimeBoard";
-import {huadiaoPopupWindowOptions} from "@/pages/components/HuadiaoPopupWindow";
+import {huadiaoPopupWindowOptions} from "@/pages/components/popwindow/HuadiaoPopupWindow";
 import {apis} from "@/assets/js/constants/request-path";
 import {statusCode} from "@/assets/js/constants/status-code";
 import {

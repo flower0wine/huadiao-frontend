@@ -1,7 +1,7 @@
 <template>
   <div class="huadiao-header"
        ref="huadiaoHeader"
-       v-show="getDataCompleted"
+       v-show="fetched"
        :style="huadiaoHeaderAttachStyle"
   >
     <!-- 左侧图标 -->
@@ -69,12 +69,13 @@ import constants from "@/assets/js/constants";
 import {mapState} from "vuex";
 import {svg} from "@/assets/js/constants/svgs";
 import defaultHuadiaoHeaderStyle from "@/assets/js/constants/style/huadiao_header_style/default";
-import {apis} from "@/assets/js/constants/request-path";
 import UserAvatarBox from "@/pages/components/UserAvatarBox";
 import AuthorityImg from "@/assets/img/authority.webp";
 import {responseHandler} from "@/assets/js/constants/status-code";
 import {flatPromise} from "@/util";
 import {getHeader} from "@/pages/components/header/apis";
+import {modifySrcObject} from "@/util/tool";
+import {homepageLink} from "@/util/huadiao-tool";
 
 let smallUserAvatarScale = "41px";
 let bigUserAvatarScale = "71px";
@@ -87,6 +88,7 @@ export default {
   data() {
     return {
       svg,
+      fetched: false,
       visible: {
         // 已登录面板
         loggedBoard: {
@@ -109,14 +111,16 @@ export default {
       set() {
       }
     },
+
     ...mapState(["user"]),
+
     // 首页头部配置
     huadiaoIndexHeaderConfig() {
       return {
         // 头像配置
         avatar: {
           title: this.login ? INDEX_TIPS.LOGGED : INDEX_TIPS.NOT_LOGGED,
-          src: this.login ? this.homepage(this.user.uid) : "/",
+          src: this.login ? homepageLink(this.user.uid) : "/",
         },
         // 头部右侧配置
         rightEntry: [{
@@ -144,7 +148,7 @@ export default {
   },
   mounted() {
     // 修改默认配置
-    this.modifySrcObject(this.boardConfig, this.huadiaoHeaderStyle);
+    modifySrcObject(this.boardConfig, this.huadiaoHeaderStyle);
     // 修改默认样式
     this.$bus.$on("modifyHuadiaoHeaderStyle", this.modifyHuadiaoHeaderStyle);
   },
@@ -166,14 +170,14 @@ export default {
           this.$store.commit("initialUser", {user: data});
         });
 
-      this.getDataCompleted = true;
+      this.fetched = true;
     },
     // 渲染之后再次修改头部样式
     modifyHuadiaoHeaderStyle(style) {
       if (style) {
-        this.modifySrcObject(this.boardConfig, style);
+        modifySrcObject(this.boardConfig, style);
       } else {
-        this.modifySrcObject(this.boardConfig, this.huadiaoHeaderStyle);
+        modifySrcObject(this.boardConfig, this.huadiaoHeaderStyle);
       }
     },
     // 鼠标进入头像
